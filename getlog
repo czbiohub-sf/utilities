@@ -1,0 +1,2 @@
+#!/bin/sh
+aegea batch describe $1 | grep logStream | cut -c 23-77
