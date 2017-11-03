@@ -151,7 +151,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
 
         # compressed the results dir and move it to s3
         command = ['tar', '-cvfz',
-                   '{}.{}.tgz',format(sample_name, taxon),
+                   '{}.{}.tgz'.format(sample_name, taxon),
                    'results']
         log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
 
