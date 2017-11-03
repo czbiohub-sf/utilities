@@ -61,10 +61,11 @@ def log_command_to_queue(log_queue, command, **kwargs):
 
 
 # def run_sample(sample_name, exp_id):
-def run_sample(star_queue, htseq_queue, log_queue, genome_dir, n_proc):
+def run_sample(star_queue, htseq_queue, log_queue,
+               s3_input_dir, genome_dir, run_dir, n_proc):
     for sample_name,exp_id in iter(star_queue.get, 'STOP'):
         log_queue.put('{} - {}'.format(exp_id, sample_name), logging.INFO)
-        dest_dir = os.path.join(DEST_DIR, sample_name)
+        dest_dir = os.path.join(run_dir, sample_name)
         os.makedirs(dest_dir)
         os.mkdir(os.path.join(dest_dir, 'rawdata'))
         os.mkdir(os.path.join(dest_dir, 'results'))
@@ -132,7 +133,7 @@ def run_sample(star_queue, htseq_queue, log_queue, genome_dir, n_proc):
         htseq_queue.put((exp_id, sample_name, dest_dir))
 
 
-def run_htseq(htseq_queue, log_queue, taxon, sjdb_gtf):
+def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
     for exp_id, sample_name, dest_dir in iter(htseq_queue.get, 'STOP'):
         # running htseq
 
@@ -184,7 +185,6 @@ def main(logger):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--root_dir', default='/mnt')
-    parser.add_argument('--dest_dir', default='/mnt/data/hca/')
     parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
 
     parser.add_argument('--s3_input_dir')
@@ -201,7 +201,8 @@ def main(logger):
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
         args.root_dir = os.path.join(args.root_dir, os.environ['AWS_BATCH_JOB_ID'])
-        args.dest_dir = os.path.join(args.root_dir, 'data' 'hca')
+
+    run_dir = os.path.join(args.root_dir, 'data' 'hca')
 
     if args.taxon == 'homo':
         genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/") # change
@@ -285,19 +286,18 @@ def main(logger):
 
     n_star_procs = mp.cpu_count() / args.star_proc
 
-    star_procs = [mp.Process(target=run_sample,
-                             args=(star_queue, htseq_queue, log_queue,
-                                   genome_dir, args.star_proc))
+    star_args = (star_queue, htseq_queue, log_queue, args.s3_input_dir,
+                 genome_dir, run_dir, args.star_proc)
+    star_procs = [mp.Process(target=run_sample, args=star_args)
                   for i in range(n_star_procs)]
 
     for p in star_procs:
         p.start()
 
-    htseq_procs = [
-        mp.Process(target=run_htseq,
-                   args=(htseq_queue, log_queue, args.taxon, sjdb_gtf))
-        for i in range(args.htseq_proc)
-    ]
+    htseq_args = (htseq_queue, log_queue, args.s3_input_dir,
+                  args.taxon, sjdb_gtf)
+    htseq_procs = [mp.Process(target=run_htseq, args=htseq_args)
+                   for i in range(args.htseq_proc)]
 
     for p in htseq_procs:
         p.start()
@@ -355,7 +355,6 @@ def main(logger):
 
             logger.info("Adding sample {} to queue".format(sample_name))
             star_queue.put((sample_name, exp_id))
-
 
     for i in range(n_star_procs):
         star_queue.put('STOP')
