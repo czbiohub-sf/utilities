@@ -248,7 +248,7 @@ def main(logger):
     os.makedirs(os.path.join(args.root_dir, 'genome'))
     command = ['aws', 's3', 'cp',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
-               os.path.join(args.root_dir, 'genome')]
+               os.path.join(args.root_dir, 'genome/')]
     log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'. format(ref_genome_file))
@@ -257,13 +257,12 @@ def main(logger):
         tf.extractall(path=os.path.join(args.root_dir, 'genome'))
 
 
-
     # download STAR stuff
     os.makedirs(os.path.join(args.root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
-               os.path.join(args.root_dir, 'genome', 'STAR')]
+               os.path.join(args.root_dir, 'genome', 'STAR/')]
     log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'.format(ref_genome_star_file))
@@ -277,7 +276,7 @@ def main(logger):
     log_command(logger, command, shell=True)
 
     log_queue = mp.Queue()
-    log_thread = threading.Thread(target=logger_thread,
+    log_thread = threading.Thread(target=process_logs,
                                   args=(log_queue, logger))
     log_thread.start()
 
@@ -294,15 +293,17 @@ def main(logger):
     for p in star_procs:
         p.start()
 
-    htseq_procs = [mp.Process(target=run_htseq,
-                              args=(htseq_queue, log_queue, taxon, sjdb_gtf))
-                   for i in range(args.htseq_proc)]
+    htseq_procs = [
+        mp.Process(target=run_htseq,
+                   args=(htseq_queue, log_queue, args.taxon, sjdb_gtf))
+        for i in range(args.htseq_proc)
+    ]
 
     for p in htseq_procs:
         p.start()
 
 
-    for exp_id in exp_ids:
+    for exp_id in args.exp_ids:
         if exp_id.startswith('Undetermined'):
             logger.info("Skipping file: %s" % exp_id)
             continue
@@ -326,7 +327,7 @@ def main(logger):
         logger.info("number of files: {}".format(len(output_files)))
 
         logger.info("Running partition {} of {} for exp {}".format(
-                partition_id, num_partitions, exp_id)
+                args.partition_id, args.num_partitions, exp_id)
         )
 
         command = ['aws', 's3', 'ls',
@@ -336,7 +337,7 @@ def main(logger):
             output = subprocess.check_output(' '.join(command),
                                              shell=True).split("\n")
         except subprocess.CalledProcessError:
-            logger.info("error in aws command", exc_info=True)
+            logger.info("Nothing in the rawdata directory", exc_info=True)
             output = []
 
         sample_list = []
@@ -346,8 +347,9 @@ def main(logger):
             if matched:
                 sample_list.append(matched.group(1))
 
-        for sample_name in sample_list[partition_id::num_partitions]:
-            if '{}.{}.htseq-count.txt'.format(sample_name, TAXON) in output_files:
+        for sample_name in sample_list[args.partition_id::args.num_partitions]:
+            if ('{}.{}.htseq-count.txt'.format(sample_name, args.taxon)
+                in output_files):
                 logger.info("{} already exists, skipping".format(sample_name))
                 continue
 
