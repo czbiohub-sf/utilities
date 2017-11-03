@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import datetime
+import glob
 import os
 import re
 import subprocess
 import tarfile
-import thread
 
 
 import threading
@@ -55,16 +55,16 @@ def log_command(logger, command, **kwargs):
 
 
 def log_command_to_queue(log_queue, command, **kwargs):
-    log_queue.put(' '.join(command), logging.INFO)
+    log_queue.put((' '.join(command), logging.INFO))
     output = subprocess.check_output(' '.join(command), **kwargs)
-    log_queue.put(output, logging.DEBUG)
+    log_queue.put((output, logging.DEBUG))
 
 
 # def run_sample(sample_name, exp_id):
 def run_sample(star_queue, htseq_queue, log_queue,
                s3_input_dir, genome_dir, run_dir, n_proc):
     for sample_name,exp_id in iter(star_queue.get, 'STOP'):
-        log_queue.put('{} - {}'.format(exp_id, sample_name), logging.INFO)
+        log_queue.put(('{} - {}'.format(exp_id, sample_name), logging.INFO))
         dest_dir = os.path.join(run_dir, sample_name)
         os.makedirs(dest_dir)
         os.mkdir(os.path.join(dest_dir, 'rawdata'))
@@ -81,8 +81,8 @@ def run_sample(star_queue, htseq_queue, log_queue,
                 log_command_to_queue(log_queue, command, shell=True)
                 break
             except subprocess.CalledProcessError:
-                log_queue.put("retrying data download - {}".format(i),
-                              logging.DEBUG)
+                log_queue.put(("retrying data download - {}".format(i),
+                               logging.DEBUG))
         else:
             raise RuntimeError("couldn't download fastq.gz files")
 
@@ -91,7 +91,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
 
         reads = glob.glob(os.path.join(dest_dir, 'rawdata', '*.fastq.gz'))
         if not reads:
-            log_queue.put("Empty reads for %s" % s3_source, logging.INFO)
+            log_queue.put(("Empty reads for %s" % s3_source, logging.INFO))
             return
 
         os.makedirs(os.path.join(dest_dir, 'results', 'Pass1'))
@@ -139,7 +139,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
 
         command = [HTSEQ,
                    '-r', 'name', '-s', 'no', '-f', 'bam',
-                   '-m', '-intersection-nonempty',
+                   '-m', 'intersection-nonempty',
                    os.path.join(dest_dir, 'results', 'Pass1',
                                 'Aligned.out.sorted-byname.bam'),
                    sjdb_gtf, '>', 'htseq-count.txt']
@@ -171,7 +171,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
         ]
 
         for src_file,dest_name in zip(src_files, dest_names):
-            command = ['aws', 's3', 'cp', file_name,
+            command = ['aws', 's3', 'cp', src_file,
                        os.path.join(s3_dest, dest_name)]
 
             log_command_to_queue(log_queue, command, shell=True)
