@@ -1,2 +1,3 @@
+botocore
 boto3
 git+git://github.com/kislyuk/aegea.git#egg=aegea
