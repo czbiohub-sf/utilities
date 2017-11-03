@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import argparse
-import subprocess
-import os
-import thread
 import datetime
-
+import os
 import re
+import subprocess
+import tarfile
+import thread
+
 
 import threading
 import multiprocessing as mp
@@ -92,7 +93,7 @@ def run_sample(star_queue, htseq_queue, log_queue, genome_dir, n_proc):
             log_queue.put("Empty reads for %s" % s3_source, logging.INFO)
             return
 
-        os.makedir(os.path.join(dest_dir, 'results', 'Pass1'))
+        os.makedirs(os.path.join(dest_dir, 'results', 'Pass1'))
 
         command = COMMON_PARS[:]
         command.extend(('--runThreadN', str(n_proc),
@@ -234,8 +235,8 @@ def main(logger):
                        taxon:\t{}
                 s3_input_dir:\t{}
                      exp_ids:\t{}'''.format(
-                    args.star_proc, args.htseq_proc,
                     args.partition_id, args.num_partitions,
+                    args.star_proc, args.htseq_proc,
                     genome_dir, ref_genome_file,
                     ref_genome_star_file, sjdb_gtf,
                     args.taxon, args.s3_input_dir,
@@ -253,12 +254,12 @@ def main(logger):
     logger.debug('Extracting {}'. format(ref_genome_file))
     with tarfile.open(os.path.join(args.root_dir, 'genome',
                                    ref_genome_file)) as tf:
-        tf.extractall(path=os.path.join(args.root_dir ,'genome'))
+        tf.extractall(path=os.path.join(args.root_dir, 'genome'))
 
 
 
     # download STAR stuff
-    os.makedir(os.path.join(args.root_dir, 'genome', 'STAR'))
+    os.makedirs(os.path.join(args.root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
@@ -405,10 +406,13 @@ if __name__ == "__main__":
 
     try:
         main(mainlogger)
+    except:
+        mainlogger.info("An exception occurred", exc_info=True)
+        raise
     finally:
         if log_file:
             log_cmd = 'aws s3 cp {} {}'.format(log_file, S3_LOG_DIR)
             mainlogger.info(log_cmd)
 
-            handler.close()
+            file_handler.close()
             subprocess.check_output(log_cmd, shell=True)

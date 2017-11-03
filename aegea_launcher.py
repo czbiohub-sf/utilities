@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import json
 import os
 import subprocess
 
@@ -181,5 +182,6 @@ if __name__ == '__main__':
 
     logger.info('executing command:\n\t{}'.format(' '.join(aegea_command)))
     if not args.dryrun:
-        output = subprocess.check_output(' '.join(aegea_command), shell=True)
-        logger.info(output)
+        output = json.loads(subprocess.check_output(' '.join(aegea_command),
+                                                    shell=True))
+        logger.info('Launched job with jobId: {}'.format(output['jobId']))
