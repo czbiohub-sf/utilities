@@ -150,25 +150,33 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
                                'Aligned.out.sorted-byname.bam'))
 
 
-        # compressed the results dir and move it to s3
+        # compress the results dir and move it to s3
         command = ['tar', '-cvzf',
                    '{}.{}.tgz'.format(sample_name, taxon),
                    'results']
         log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
 
-        # copy htseq and log files out to s3
+        # copy specific htseq and log files out to s3 on their own
         s3_dest = os.path.join(s3_input_dir, exp_id, 'results/')
 
         src_files = [
             os.path.join(dest_dir, '{}.{}.tgz'.format(sample_name, taxon)),
             os.path.join(dest_dir, 'results', 'htseq-count.txt'),
-            os.path.join(dest_dir, 'results', 'Pass1', 'Log.final.out')
+            os.path.join(dest_dir, 'results', 'Pass1', 'Log.final.out'),
+            os.path.join(dest_dir, 'results', 'Pass1', 'SJ.out.tab'),
+            os.path.join(dest_dir, 'results', 'Pass1',
+                         'Aligned.out.sorted.bam'),
+            os.path.join(dest_dir, 'results', 'Pass1',
+                         'Aligned.out.sorted.bam.bai')
         ]
 
         dest_names = [
             '{}.{}.tgz'.format(sample_name, taxon),
             '{}.{}.htseq-count.txt'.format(sample_name, taxon),
-            '{}.{}.log.final.out'.format(sample_name, taxon)
+            '{}.{}.log.final.out'.format(sample_name, taxon),
+            '{}.{}.SJ.out.tab'.format(sample_name, taxon),
+            '{}.{}.Aligned.out.sorted.bam'.format(sample_name, taxon),
+            '{}.{}.Aligned.out.sorted.bam.bai'.format(sample_name, taxon)
         ]
 
         for src_file,dest_name in zip(src_files, dest_names):
