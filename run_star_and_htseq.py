@@ -66,9 +66,10 @@ def run_sample(star_queue, htseq_queue, log_queue,
     for sample_name,exp_id in iter(star_queue.get, 'STOP'):
         log_queue.put(('{} - {}'.format(exp_id, sample_name), logging.INFO))
         dest_dir = os.path.join(run_dir, sample_name)
-        os.makedirs(dest_dir)
-        os.mkdir(os.path.join(dest_dir, 'rawdata'))
-        os.mkdir(os.path.join(dest_dir, 'results'))
+        if not os.path.exists(dest_dir):
+            os.mkdir(dest_dir)
+            os.mkdir(os.path.join(dest_dir, 'rawdata'))
+            os.mkdir(os.path.join(dest_dir, 'results'))
 
         # copy fastq.gz from s3 to local
         s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata', sample_name)
@@ -150,7 +151,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
 
 
         # compressed the results dir and move it to s3
-        command = ['tar', '-cvfz',
+        command = ['tar', '-cvzf',
                    '{}.{}.tgz'.format(sample_name, taxon),
                    'results']
         log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
@@ -202,7 +203,8 @@ def main(logger):
     if os.environ.get('AWS_BATCH_JOB_ID'):
         args.root_dir = os.path.join(args.root_dir, os.environ['AWS_BATCH_JOB_ID'])
 
-    run_dir = os.path.join(args.root_dir, 'data' 'hca')
+    run_dir = os.path.join(args.root_dir, 'data', 'hca')
+    os.makedirs(run_dir)
 
     if args.taxon == 'homo':
         genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/") # change
