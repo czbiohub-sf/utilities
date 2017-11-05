@@ -70,6 +70,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
             os.mkdir(dest_dir)
             os.mkdir(os.path.join(dest_dir, 'rawdata'))
             os.mkdir(os.path.join(dest_dir, 'results'))
+            os.mkdir(os.path.join(dest_dir, 'results', 'Pass1'))
 
         # copy fastq.gz from s3 to local
         s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata', sample_name)
@@ -94,8 +95,6 @@ def run_sample(star_queue, htseq_queue, log_queue,
         if not reads:
             log_queue.put(("Empty reads for %s" % s3_source, logging.INFO))
             return
-
-        os.makedirs(os.path.join(dest_dir, 'results', 'Pass1'))
 
         command = COMMON_PARS[:]
         command.extend(('--runThreadN', str(n_proc),
@@ -206,6 +205,8 @@ def main(logger):
     parser.add_argument('--htseq_proc', type=int, default=4,
                         help='Number of htseq processes to run')
 
+    parser.add_argument('--force_realign', action='store_true')
+
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
@@ -256,7 +257,7 @@ def main(logger):
     )
 
     # download the genome data
-    os.makedirs(os.path.join(args.root_dir, 'genome'))
+    os.mkdir(os.path.join(args.root_dir, 'genome'))
     command = ['aws', 's3', 'cp',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
                os.path.join(args.root_dir, 'genome/')]
@@ -269,7 +270,7 @@ def main(logger):
 
 
     # download STAR stuff
-    os.makedirs(os.path.join(args.root_dir, 'genome', 'STAR'))
+    os.mkdir(os.path.join(args.root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
@@ -359,7 +360,7 @@ def main(logger):
 
         for sample_name in sample_list[args.partition_id::args.num_partitions]:
             if ('{}.{}.htseq-count.txt'.format(sample_name, args.taxon)
-                in output_files):
+                in output_files and not args.force_realign):
                 logger.info("{} already exists, skipping".format(sample_name))
                 continue
 
