@@ -1,17 +1,12 @@
 #!/usr/bin/env python
-# Example:
-#  bcl2fastq --sample-sheet <your sheet> -R <your data dir> -o <fastq_output>
+
 import argparse
 import glob
 import logging
-import subprocess
 import os
-import sys
-import time
-
-
-import json
 import re
+import subprocess
+import sys
 
 
 BCL2FASTQ = 'bcl2fastq'
@@ -46,12 +41,12 @@ def main(logger):
 
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        arsg.root_dir = os.path.join(args.root_dir,
+        args.root_dir = os.path.join(args.root_dir,
                                      os.environ['AWS_BATCH_JOB_ID'])
 
 
     sample_sheet_name = os.path.basename(args.s3_sample_sheet_path)
-    exp_id = os.path.basename(ars.s3_input_dir)
+    exp_id = os.path.basename(args.s3_input_dir)
 
     # local directories
     result_path = os.path.join(args.root_dir, 'data', 'hca', exp_id)
@@ -65,13 +60,13 @@ def main(logger):
 
 
 
-    command = ['aws', 's3', 'cp', S3_SAMPLE_SHEET_PATH, result_path]
+    command = ['aws', 's3', 'cp', args.s3_sample_sheet_path, result_path]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
             break
         except subprocess.CalledProcessError:
-            log.info("retrying s3 copy")
+            logger.info("retrying s3 copy")
     else:
         raise RuntimeError("couldn't download sample sheet {}".format(
                 args.s3_sample_sheet_path)
@@ -86,7 +81,7 @@ def main(logger):
             log_command(logger, command, shell=True)
             break
         except subprocess.CalledProcessError:
-            print >> log_OUT, "retrying s3 sync bcl"
+            logger.info("retrying s3 sync bcl")
     else:
         raise RuntimeError("couldn't sync {}".format(args.s3_input_dir))
 
@@ -106,12 +101,12 @@ def main(logger):
 
     # fix directory structure of the files *before* sync!
     fastqgz_files = glob.glob(os.path.join(output_path, '*fastq.gz'))
-    print >> log_OUT, 'all fastq.gz files\n{}\n\n'.format('\n'.join(fastqgz_files))
+    logger.debug('all fastq.gz files\n{}\n\n'.format('\n'.join(fastqgz_files)))
 
     for fastq_file in fastqgz_files:
         if (args.skip_undetermined
             and os.path.basename(fastq_file).startswith('Undetermined')):
-            print >> log_OUT, "removing {}".format(os.path.basename(fastq_file))
+            logger.info("removing {}".format(os.path.basename(fastq_file)))
             os.remove(fastq_file)
         elif args.star_structure:
             m = re.match("(.+)(_R[12]_001.fastq.gz)",
@@ -133,13 +128,9 @@ def main(logger):
     sys.stdout.flush()
 
     # upload fastq files to destination folder
-    command = 'aws s3 sync {} {} --exclude "*" --include "*fastq.gz"'.format(
-            output_path, os.path.join(S3_OUTPUT_DIR, 'rawdata')
-    )
     command = ['aws', 's3', 'sync', output_path,
                os.path.join(args.s3_output_dir, 'rawdata'),
-               '--exclude', '"*"',
-               '--include', '"*fastq.gz"']
+               '--exclude', '"*"', '--include', '"*fastq.gz"']
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
@@ -152,7 +143,7 @@ def main(logger):
 
     # check fastq upload
     command = ['aws', 's3', 'ls', '--recursive',
-               os.path.join(S3_OUTPUT_DIR, 'rawdata')]
+               os.path.join(args.s3_output_dir, 'rawdata')]
     log_command(logger, command, shell=True)
 
 
