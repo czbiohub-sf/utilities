@@ -67,7 +67,8 @@ if __name__ == '__main__':
             'script_name',
             help='Name of the script to run, e.g. bcl2fastq.py'
     )
-    basic_group.add_argument('script_args',
+    basic_group.add_argument(
+            'script_args',
             help='Script arguments, as a string. e.g. "--taxon mus".'
     )
 
