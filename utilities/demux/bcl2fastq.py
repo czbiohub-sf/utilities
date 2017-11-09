@@ -24,32 +24,37 @@ def log_command(logger, command, **kwargs):
 def main(logger):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--root_dir', default='/mnt')
+    parser.add_argument('--exp_id')
 
-    parser.add_argument('--s3_input_dir')
-    parser.add_argument('--s3_output_dir')
-    parser.add_argument('--s3_report_dir')
-    parser.add_argument('--s3_sample_sheet_path')
+    parser.add_argument('--s3_input_dir',
+                        default='s3://czbiohub-seqbot/bcl')
+    parser.add_argument('--s3_output_dir',
+                        default='s3://czbiohub-seqbot/fastqs')
+    parser.add_argument('--s3_report_dir',
+                        default='s3://czbiohub-seqbot/reports')
+    parser.add_argument('--s3_sample_sheet_dir',
+                        default='s3://czbiohub-seqbot/sample-sheets')
 
     parser.add_argument('--star_structure', action='store_true')
     parser.add_argument('--bcl2fastq_options', default='--no-lane-splitting')
     parser.add_argument('--skip_undetermined', action='store_true')
 
+    parser.add_argument('--sample_sheet_name', default=None,
+                        help='Defaults to [exp_id].csv')
+    parser.add_argument('--root_dir', default='/mnt')
+
     args = parser.parse_args()
-
-
-
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
         args.root_dir = os.path.join(args.root_dir,
                                      os.environ['AWS_BATCH_JOB_ID'])
 
 
-    sample_sheet_name = os.path.basename(args.s3_sample_sheet_path)
-    exp_id = os.path.basename(args.s3_input_dir)
+    if args.sample_sheet_name is None:
+        args.sample_sheet_name = '{}.csv'.format(args.exp_id)
 
     # local directories
-    result_path = os.path.join(args.root_dir, 'data', 'hca', exp_id)
+    result_path = os.path.join(args.root_dir, 'data', 'hca', args.exp_id)
     bcl_path = os.path.join(result_path, 'bcl')
     output_path = os.path.join(result_path, 'fastqs')
 
@@ -59,8 +64,9 @@ def main(logger):
 
 
 
-
-    command = ['aws', 's3', 'cp', args.s3_sample_sheet_path, result_path]
+    command = ['aws', 's3', 'cp',
+               os.path.join(args.s3_sample_sheet_dir, args.sample_sheet_name),
+               result_path]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
@@ -69,13 +75,14 @@ def main(logger):
             logger.info("retrying s3 copy")
     else:
         raise RuntimeError("couldn't download sample sheet {}".format(
-                args.s3_sample_sheet_path)
+                os.path.join(args.s3_sample_sheet_dir, args.sample_sheet_name))
         )
 
 
 
     # download the bcl files
-    command = ['aws', 's3', 'sync', args.s3_input_dir, bcl_path]
+    command = ['aws', 's3', 'sync',
+               os.path.join(args.s3_input_dir, args.exp_id), bcl_path]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
@@ -83,7 +90,9 @@ def main(logger):
         except subprocess.CalledProcessError:
             logger.info("retrying s3 sync bcl")
     else:
-        raise RuntimeError("couldn't sync {}".format(args.s3_input_dir))
+        raise RuntimeError("couldn't sync {}".format(
+                os.path.join(args.s3_input_dir, args.exp_id))
+        )
 
 
     command = ('while true;'
@@ -95,7 +104,8 @@ def main(logger):
 
     # Run bcl2 fastq
     command = [BCL2FASTQ, args.bcl2fastq_options,
-               '--sample-sheet', os.path.join(result_path, sample_sheet_name),
+               '--sample-sheet', os.path.join(result_path,
+                                              args.sample_sheet_name),
                '-R', bcl_path, '-o', output_path]
     log_command(logger, command, shell=True)
 
@@ -129,7 +139,7 @@ def main(logger):
 
     # upload fastq files to destination folder
     command = ['aws', 's3', 'sync', output_path,
-               os.path.join(args.s3_output_dir, 'rawdata'),
+               os.path.join(args.s3_output_dir, args.exp_id, 'rawdata'),
                '--exclude', '"*"', '--include', '"*fastq.gz"']
     for i in range(S3_RETRY):
         try:
@@ -143,7 +153,7 @@ def main(logger):
 
     # check fastq upload
     command = ['aws', 's3', 'ls', '--recursive',
-               os.path.join(args.s3_output_dir, 'rawdata')]
+               os.path.join(args.s3_output_dir, args.exp_id, 'rawdata')]
     log_command(logger, command, shell=True)
 
 
@@ -152,7 +162,8 @@ def main(logger):
             "ls -d {}".format(os.path.join(output_path, 'Reports', 'html', '*',
                                            'all', 'all', 'all')),
             shell=True).rstrip()
-    command = ['aws', 's3', 'cp', reports_path, args.s3_report_dir,
+    command = ['aws', 's3', 'cp', reports_path,
+               os.path.join(args.s3_report_dir, args.exp_id),
                '--recursive']
     for i in range(S3_RETRY):
         try:
