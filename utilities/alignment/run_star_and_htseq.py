@@ -195,7 +195,8 @@ def main(logger):
     parser.add_argument('--root_dir', default='/mnt')
     parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
 
-    parser.add_argument('--s3_input_dir')
+    parser.add_argument('--s3_input_dir',
+                        default='s3://czbiohub-seqbot/fastqs')
     parser.add_argument('--num_partitions', type=int)
     parser.add_argument('--partition_id', type=int)
     parser.add_argument('--exp_ids', nargs='+')
@@ -210,13 +211,14 @@ def main(logger):
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        args.root_dir = os.path.join(args.root_dir, os.environ['AWS_BATCH_JOB_ID'])
+        args.root_dir = os.path.join(args.root_dir,
+                                     os.environ['AWS_BATCH_JOB_ID'])
 
     run_dir = os.path.join(args.root_dir, 'data', 'hca')
     os.makedirs(run_dir)
 
     if args.taxon == 'homo':
-        genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/") # change
+        genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/")
         ref_genome_file = 'hg38-plus.tgz'
         ref_genome_star_file = 'HG38-PLUS.tgz'
         sjdb_gtf = os.path.join(args.root_dir, 'genome', 'hg38-plus',

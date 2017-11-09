@@ -6,11 +6,11 @@ A collection of scripts for common data management and processing tasks
 Clone this report and make a new environment, then install the package:
 
 ```
-git clone https://github.com/czbiohub/utilities.git
-conda create --name [whatever name you like]
-source activate [that name]
-cd utilities
-pip install -e .
+➜  git clone https://github.com/czbiohub/utilities.git
+➜  conda create --name [whatever name you like]
+➜  source activate [that name]
+➜  cd utilities
+➜  pip install -e .
 ```
 
 ## Usage
@@ -33,12 +33,18 @@ Run any script as a batch job e.g. aegea_launcher.py my_bucket/my_scripts
 [...more stuff...]
 ```
 
-### How to demux a thing:
+### How to demux a thing using the standard workflow:
 
-This is super cumbersome right now, I will make a helper script soon (or you could!).
+If your BCLs were uploaded to czbiohub-seqbot/bcl and your sample sheet is in czbiohub-seqbot/sample-sheets, you can do this:
 
 ```
-./aegea_launcher.py --queue aegea_batch_demux --vcpus 16 --memory 128000 --storage 1000 jamestwebber-logs/new_scripts bcl2fastq/bcl2fastq.py "--s3_input_dir s3://czbiohub-seqbot/bcl/171103_M05295_0051_000000000-BDHHB --s3_output_dir s3://czbiohub-seqbot/fastqs/171103_M05295_0051_000000000-BDHHB --s3_report_dir s3://czbiohub-seqbot/reports/171103_M05295_0051_000000000-BDHHB --s3_sample_sheet_path s3://czbiohub-seqbot/sample-sheets/171103_M05295_0051_000000000-BDHHB.csv"
+➜  utilities git:(master) ./aegea_launcher.py --queue aegea_batch_demux --vcpus 16 --memory 128000 --storage 1000 jamestwebber-logs/new_scripts bcl2fastq.py "--exp_id 171103_M05295_0051_000000000-BDHHB"
+```
+
+If you want to stick the results somewhere other than czbiohub-seqbot/fastqs, you can change that option:
+
+```
+➜  utilities git:(master) ./aegea_launcher.py --queue aegea_batch_demux --vcpus 16 --memory 128000 --storage 1000 jamestwebber-logs/new_scripts bcl2fastq.py "--exp_id 171103_M05295_0051_000000000-BDHHB --s3_output_dir s3://my-special-bucket"
 ```
 
 
@@ -47,7 +53,7 @@ This is super cumbersome right now, I will make a helper script soon (or you cou
 ```
 ➜  utilities git:(master) ./alignment/aws_star.py mus 10 171101_NB501961_0026_AHL33MBGX3 > giana_star.sh
 ➜  utilities git:(master) cat giana_star.sh 
-python aegea_launcher.py --queue aegea_batch --vcpus 16 --memory 64000 --storage 500 jamestwebber-logs/new_scripts run_star_and_htseq.py "--taxon mus --s3_input_dir s3://czbiohub-seqbot/fastqs --num_partitions 10 --partition_id 0 --exp_ids 171101_NB501961_0026_AHL33MBGX3"
+python aegea_launcher.py --queue aegea_batch --vcpus 16 --memory 64000 --storage 500 jamestwebber-logs/new_scripts run_star_and_htseq.py "--taxon mus --num_partitions 10 --partition_id 0 --exp_ids 171101_NB501961_0026_AHL33MBGX3"
 sleep 10
 [...lots more...]
 ➜  utilities git:(master) source giana_star.sh 
