@@ -7,8 +7,9 @@ Clone this report and make a new environment, then install the package:
 
 ```
 ➜  git clone https://github.com/czbiohub/utilities.git
-➜  conda create --name [whatever name you like]
-➜  source activate [that name]
+# Create an environment called `utilities-env` with Python and pip
+➜  conda create --name utilities-env python pip
+➜  source activate utilities-env
 ➜  cd utilities
 ➜  pip install -e .
 ```
