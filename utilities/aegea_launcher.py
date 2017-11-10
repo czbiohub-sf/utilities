@@ -54,7 +54,8 @@ if __name__ == '__main__':
                 "[script name] [script args...]"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",
-            add_help=False
+            add_help=False,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     # basic usage
