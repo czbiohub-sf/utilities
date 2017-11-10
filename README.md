@@ -5,13 +5,28 @@ A collection of scripts for common data management and processing tasks
 
 Clone this report and make a new environment, then install the package:
 
+Create a conda environment called `utilities-env` specific to this Python package:
+
 ```
-➜  git clone https://github.com/czbiohub/utilities.git
-# Create an environment called `utilities-env` with Python and pip
 ➜  conda create --name utilities-env python pip
-➜  source activate utilities-env
-➜  cd utilities
-➜  pip install -e .
+➜  ~ source activate utilities-env
+(utilities-env) ➜  ~ 
+```
+The `(utilities-env)` indicates that the `utilities-env` environment is active.
+
+Now let's clone the environment into a `code` folder:
+
+```
+(utilities-env) ➜  ~ cd code 
+(utilities-env) ➜ code git clone https://github.com/czbiohub/utilities.git
+# Create an environment called `utilities-env` with Python and pip
+```
+
+Now we'll change to that folder with `cd` and install the program with `pip install -e .`, where the `.` means right here.
+
+```
+(utilities-env) ➜  cd utilities
+(utilities-env) ➜  utilities git:(master) pip install -e .
 ```
 
 ## Usage
