@@ -191,7 +191,7 @@ if __name__ == '__main__':
             )
             raise
 
-        logger.debug('Script parser args successfully')
+        logger.debug('Script parsed args successfully')
 
     job_command = "aws s3 cp s3://{} .; chmod 755 {}; ./{} {}".format(
             os.path.join(s3_bucket, s3_key),
