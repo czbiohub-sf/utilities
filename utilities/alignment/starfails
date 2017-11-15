@@ -4,7 +4,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-for job in `aegea batch ls --status FAILED -c jobId | grep "hours ago" | cut -c 2-37 | grep -a "-"`
+for job in `aegea batch ls --status FAILED -c jobId | grep "minutes ago" | cut -c 2-37 | grep -a "-"`
     do echo $job
     aegea batch describe $job | grep "partition_id" | sed -e 's/.*\(partition_id [0-9]*\).*/\1/' >> ${1}_failed_jobs
 done
