@@ -164,8 +164,11 @@ if __name__ == '__main__':
         if not os.path.exists(args.script_name):
             raise ValueError("Can't find script: {}".format(args.script_name))
 
+        logger.debug('Testing script args')
+
         module_name = os.path.splitext(os.path.basename(args.script_name))[0]
 
+        logger.debug('Importing script as a module')
         spec = importlib.util.spec_from_file_location(module_name,
                                                       args.script_name)
         script_module = importlib.util.module_from_spec(spec)
@@ -187,6 +190,8 @@ if __name__ == '__main__':
                     args.script_name, args.script_args)
             )
             raise
+
+        logger.debug('Script parser args successfully')
 
     job_command = "aws s3 cp s3://{} .; chmod 755 {}; ./{} {}".format(
             os.path.join(s3_bucket, s3_key),
