@@ -15,6 +15,11 @@ S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/bcl2fastq_logs/'
 
 
+def get_default_requirements():
+    return argparse.Namespace(vcpus=64, memory=256000, storage=1200,
+                              ulimits=['nofile:1000000'])
+
+
 def get_parser():
     parser = argparse.ArgumentParser(prog='bcl2fastq.py')
 
