@@ -6,11 +6,10 @@
 import glob
 import logging
 import os
+import subprocess
+import sys
 import time
 
-from collections import defaultdict
-
-from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
 
 import boto3
@@ -28,7 +27,27 @@ S3_BUCKET = 'czbiohub-seqbot'
 S3_BCL_DIR = 'bcl'
 
 # time to sleep between uploads
-SLEEPY_TIME = 0.01 # 1/100th of a second between every file...?
+SLEEPY_TIME = 0.001 # 1/1000th of a second between every file...
+
+
+def maybe_exit_process():
+    # get all python pids
+    pids = subprocess.check_output("pgrep python", shell=True).split()
+
+    cmds = 0
+    for pid in pids:
+        with open(os.path.join('/proc', pid, 'cmdline')) as f:
+            # get the cmdline and match against this script
+            line = f.read().split('\x00')[0]
+            if line == sys.argv[0]:
+                cmds += 1
+
+    # if there are more than one, exit this one
+    if cmds > 1:
+        sys.exit(0)
+    else:
+        # otherwise, take a short nap before starting
+        time.sleep(5)
 
 
 def scan_dir(seq_dir, client, logger):
@@ -109,6 +128,9 @@ def main(logger, upload_set):
 
 
 if __name__ == "__main__":
+    # check for an existing process running
+    maybe_exit_process()
+
     mainlogger = logging.getLogger(__name__)
     mainlogger.setLevel(logging.DEBUG)
 
