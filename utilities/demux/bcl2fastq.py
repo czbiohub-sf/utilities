@@ -15,14 +15,8 @@ S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/bcl2fastq_logs/'
 
 
-def log_command(logger, command, **kwargs):
-    logger.info(' '.join(command))
-    output = subprocess.check_output(' '.join(command), **kwargs)
-    logger.debug(output)
-
-
-def main(logger):
-    parser = argparse.ArgumentParser()
+def get_parser():
+    parser = argparse.ArgumentParser(prog='bcl2fastq.py')
 
     parser.add_argument('--exp_id')
 
@@ -42,6 +36,18 @@ def main(logger):
     parser.add_argument('--sample_sheet_name', default=None,
                         help='Defaults to [exp_id].csv')
     parser.add_argument('--root_dir', default='/mnt')
+
+    return parser
+
+
+def log_command(logger, command, **kwargs):
+    logger.info(' '.join(command))
+    output = subprocess.check_output(' '.join(command), **kwargs)
+    logger.debug(output)
+
+
+def main(logger):
+    parser = get_parser()
 
     args = parser.parse_args()
 
