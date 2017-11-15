@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import importlib.util
 import json
 import os
 import subprocess
@@ -48,6 +49,7 @@ def get_logger(debug, dryrun):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
+            prog='aegea_launcher.py',
             description=(
                 "Run any script as a batch job\n"
                 "e.g. aegea_launcher.py my_bucket/my_scripts "
@@ -111,6 +113,8 @@ if __name__ == '__main__':
                              help="Upload the script to S3 before running")
     other_group.add_argument('-d', '--debug', action='store_true',
                              help="Set logging to debug level")
+    other_group.add_argument('-t', '--testargs', action='store_true',
+                             help="Test the arguments on a local script")
     other_group.add_argument('-h', '--help', action='help',
                              help="show this help message and exit")
 
@@ -155,6 +159,34 @@ if __name__ == '__main__':
         except botocore.exceptions.ClientError:
             raise ValueError("{} is not on s3, you should upload it.".format(
                     args.script_name))
+
+    if args.testargs:
+        if not os.path.exists(args.script_name):
+            raise ValueError("Can't find script: {}".format(args.script_name))
+
+        module_name = os.path.splitext(os.path.basename(args.script_name))[0]
+
+        spec = importlib.util.spec_from_file_location(module_name,
+                                                      args.script_name)
+        script_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(script_module)
+
+        if hasattr(script_module, 'get_parser'):
+            script_parser = script_module.get_parser()
+        else:
+            raise ValueError(
+                    "{} has no 'get_parser' method, can't test args".format(
+                            args.script_name
+                    )
+            )
+
+        try:
+            script_parser.parse_args(args.script_args.split())
+        except:
+            logger.error("{} failed with the given arg string\n\t{}".format(
+                    args.script_name, args.script_args)
+            )
+            raise
 
     job_command = "aws s3 cp s3://{} .; chmod 755 {}; ./{} {}".format(
             os.path.join(s3_bucket, s3_key),
