@@ -40,6 +40,10 @@ COMMON_PARS = [STAR,
 CURR_MIN_VER = datetime.date(2017, 3, 1)
 
 
+def get_default_requirements():
+    return argparse.Namespace(vcpus=16, memory=64000, storage=500)
+
+
 def get_parser():
     parser = argparse.ArgumentParser(prog='run_star_and_htseq.py')
 
