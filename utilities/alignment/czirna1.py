@@ -10,6 +10,36 @@ import subprocess
 
 READ_NAMES = 'R1', 'R2'
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+S3_LOG_DIR = 's3://olgabot-transcript-assembly/logs/'
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+stream_handler.setFormatter(formatter)
+
+logger.addHandler(stream_handler)
+
+# Set up where to write the logs to
+if os.environ.get('AWS_BATCH_JOB_ID'):
+    log_file = '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+
+    # add the handlers to the logger
+    logger.addHandler(file_handler)
+else:
+    log_file = None
+
+
 def log_command(logger, command, **kwargs):
     logger.info(' '.join(command))
     output = subprocess.check_output(' '.join(command), **kwargs)
@@ -43,16 +73,14 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
     temp_folder : str
         Location to store temporary data
     """
+    temp_folder = temp_folder if temp_folder.endswith('/') else temp_folder + '/'
+
     command = ('while true;'
                ' do echo "memory usage" `cat /sys/fs/cgroup/memory/memory.usage_in_bytes`;'
                ' echo "disk usage" `df -h | grep "/mnt"`;'
                ' sleep 90;'
                ' done')
     memory_checker = subprocess.Popen([command], shell=True)
-
-    logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger(__name__)
-
     read_pair = read1, read2
     basename = None
 
@@ -68,7 +96,7 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
             if basename is None:
                 basename = os.path.basename(read)
 
-            command = ['aws', 's3', 'cp', read, temp_folder + '/']
+            command = ['aws', 's3', 'cp', read, temp_folder]
             maybe_run_command(logger, command, f'Retrying copying {read}',
                               f"Couldn't download {read}")
 
@@ -77,7 +105,7 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
     os.makedirs(data_folder)
     for read_name in READ_NAMES:
         command = ['zcat', f'{temp_folder}/*{read_name}*',
-                   '{data_folder}/{read_name}.fastq']
+                   f'{data_folder}/{read_name}.fastq']
         maybe_run_command(logger, command,
                           f"Retrying concatenating {read_name} fastq files",
                           f"Couldn't concatenate {read_name} fastq files")
@@ -100,4 +128,14 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
 
 
 if __name__ == "__main__":
-    cli()
+
+    try:
+        cli()
+    except:
+        # Save to file
+        if log_file:
+            log_cmd = 'aws s3 cp {} {}'.format(log_file, S3_LOG_DIR)
+            logger.info(log_cmd)
+
+            file_handler.close()
+            subprocess.check_output(log_cmd, shell=True)
