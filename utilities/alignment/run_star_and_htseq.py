@@ -40,6 +40,32 @@ COMMON_PARS = [STAR,
 CURR_MIN_VER = datetime.date(2017, 3, 1)
 
 
+def get_default_requirements():
+    return argparse.Namespace(vcpus=16, memory=64000, storage=500)
+
+
+def get_parser():
+    parser = argparse.ArgumentParser(prog='run_star_and_htseq.py')
+
+    parser.add_argument('--root_dir', default='/mnt')
+    parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
+
+    parser.add_argument('--s3_input_dir',
+                        default='s3://czbiohub-seqbot/fastqs')
+    parser.add_argument('--num_partitions', type=int)
+    parser.add_argument('--partition_id', type=int)
+    parser.add_argument('--exp_ids', nargs='+')
+
+    parser.add_argument('--star_proc', type=int, default=8,
+                        help='Number of processes to give to each STAR run')
+    parser.add_argument('--htseq_proc', type=int, default=4,
+                        help='Number of htseq processes to run')
+
+    parser.add_argument('--force_realign', action='store_true')
+
+    return parser
+
+
 def process_logs(q, logger):
     for msg,level in iter(q.get, 'STOP'):
         if level == logging.INFO:
@@ -190,23 +216,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
 
 
 def main(logger):
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--root_dir', default='/mnt')
-    parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
-
-    parser.add_argument('--s3_input_dir',
-                        default='s3://czbiohub-seqbot/fastqs')
-    parser.add_argument('--num_partitions', type=int)
-    parser.add_argument('--partition_id', type=int)
-    parser.add_argument('--exp_ids', nargs='+')
-
-    parser.add_argument('--star_proc', type=int, default=8,
-                        help='Number of processes to give to each STAR run')
-    parser.add_argument('--htseq_proc', type=int, default=4,
-                        help='Number of htseq processes to run')
-
-    parser.add_argument('--force_realign', action='store_true')
+    parser = get_parser()
 
     args = parser.parse_args()
 
