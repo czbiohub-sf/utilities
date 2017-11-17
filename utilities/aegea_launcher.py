@@ -122,9 +122,6 @@ if __name__ == '__main__':
     if not os.path.exists(args.script_name):
         raise ValueError("Can't find script: {}".format(args.script_name))
 
-    if not args.ecr_image or args.ami:
-        args.ecr_image = 'sra_download'
-
     logger = get_logger(args.debug, args.dryrun)
 
     script_base = os.path.basename(args.script_name)
@@ -151,6 +148,9 @@ if __name__ == '__main__':
                         args.script_name
                 )
         )
+
+    if not (args.ecr_image or args.ami):
+        args.ecr_image = 'sra_download'
 
     logger.debug('Testing script args')
 
@@ -219,6 +219,8 @@ if __name__ == '__main__':
         aegea_command.extend(['--ecr-image', args.ecr_image])
     elif args.ami:
         aegea_command.extend(['--ami', args.ami])
+    else:
+        raise ValueError('either --ecr-image or --ami is required')
 
     if args.storage:
         aegea_command.extend(['--storage', '/mnt={}'.format(args.storage)])
