@@ -3,10 +3,15 @@ import click
 import logging
 import subprocess
 
-from ..demux.bcl2fastq import log_command
+# from ..demux.bcl2fastq import log_command
 
 
 READ_NAMES = 'R1', 'R2'
+
+def log_command(logger, command, **kwargs):
+    logger.info(' '.join(command))
+    output = subprocess.check_output(' '.join(command), **kwargs)
+    logger.debug(output)
 
 
 def maybe_run_command(logger, command, retry_message, error_message, retry=5):
@@ -21,8 +26,8 @@ def maybe_run_command(logger, command, retry_message, error_message, retry=5):
 
 
 @click.command()
-@click.option('read1')
-@click.option('read2')
+@click.argument('read1')
+@click.argument('read2')
 @click.option('--output-bucket', default='s3://olgabot-transcript-assembly')
 @click.option('--temp-folder', default='original_data')
 def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
@@ -36,6 +41,13 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
     temp_folder : str
         Location to store temporary data
     """
+    command = ('while true;'
+               ' do echo "memory usage" `cat /sys/fs/cgroup/memory/memory.usage_in_bytes`;'
+               ' echo "disk usage" `df -h | grep "/mnt"`;'
+               ' sleep 90;'
+               ' done')
+    memory_checker = subprocess.Popen([command], shell=True)
+
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
@@ -83,6 +95,7 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
     maybe_run_command(logger, command,
                       f"Retrying copying outputs to {output}",
                       f"Couldn't copy outputs to {output}")
+    memory_checker.kill()
 
 
 if __name__ == "__main__":
