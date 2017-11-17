@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.6
+
 import os
 import click
 import logging
@@ -87,7 +89,6 @@ def cli(read1, read2, output_bucket='s3://olgabot-transcript-assembly',
         maybe_run_command(logger, command,
                           f"Retrying Paolo's code with flag: {flag}",
                           f"Couldn't run Paolo's code with flag: {flag}")
-
 
     # Copy assembled transcripts and data back to s3
     output = f'{output_bucket}/{basename}'
