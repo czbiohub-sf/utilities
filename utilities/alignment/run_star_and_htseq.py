@@ -52,9 +52,9 @@ def get_parser():
 
     parser.add_argument('--s3_input_dir',
                         default='s3://czbiohub-seqbot/fastqs')
-    parser.add_argument('--num_partitions', type=int)
-    parser.add_argument('--partition_id', type=int)
-    parser.add_argument('--exp_ids', nargs='+')
+    parser.add_argument('--num_partitions', type=int, required=True)
+    parser.add_argument('--partition_id', type=int, required=True)
+    parser.add_argument('--exp_ids', nargs='+', required=True)
 
     parser.add_argument('--star_proc', type=int, default=8,
                         help='Number of processes to give to each STAR run')

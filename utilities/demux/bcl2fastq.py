@@ -24,7 +24,7 @@ def get_default_requirements():
 def get_parser():
     parser = argparse.ArgumentParser(prog='bcl2fastq.py')
 
-    parser.add_argument('--exp_id')
+    parser.add_argument('--exp_id', required=True)
 
     parser.add_argument('--s3_input_dir',
                         default='s3://czbiohub-seqbot/bcl')
