@@ -75,7 +75,7 @@ def main(logger, upload_set):
     client = boto3.client('s3')
 
     logger.info("Scanning {}...".format(ROOT_DIR))
-    uploads = 0
+    total_uploads = 0
 
     # for each sequencer, check for newly completed runs
     for seq in SEQS:
@@ -93,11 +93,13 @@ def main(logger, upload_set):
             if (seq != 'NovaSeq-01'
                 or os.path.exists(os.path.join(seq_dir, 'CopyComplete.txt'))):
                     file_set = scan_dir(seq_dir, client, logger)
-
+                    num_files = 0
+                    uploads = 0
                     logger.info('syncing {}'.format(seq_dir))
 
                     seq_root = os.path.dirname(seq_dir)
                     for root, dirs, files in os.walk(seq_dir, topdown=True):
+                        num_files += len(files)
                         logger.debug('syncing {} files in {}'.format(
                                 len(files), root)
                         )
@@ -110,19 +112,27 @@ def main(logger, upload_set):
                                 logger.debug('uploading {} to {}'.format(
                                         file_name, s3_key)
                                 )
-                                client.upload_file(
-                                    Filename=os.path.join(root, file_name),
-                                    Bucket=S3_BUCKET,
-                                    Key=s3_key)
-                                uploads += 1
+                                try:
+                                    client.upload_file(
+                                        Filename=os.path.join(root, file_name),
+                                        Bucket=S3_BUCKET,
+                                        Key=s3_key)
+                                    uploads += 1
+                                except IOError:
+                                    logger.warning("couldn't read {}".format(
+                                            file_name)
+                                    )
                                 time.sleep(SLEEPY_TIME)
 
-                    logger.info('{} is synced'.format(seq_dir))
-                    upload_set.add(seq_dir)
-                    logger.debug('added {} for upload_set'.format(seq_dir))
+                    if (uploads + len(file_set)) == num_files:
+                        logger.info('{} is synced'.format(seq_dir))
+                        upload_set.add(seq_dir)
+                        logger.debug('added {} for upload_set'.format(seq_dir))
+
+                    total_uploads += uploads
 
     logger.info("sync complete")
-    logger.info("{} files uploaded".format(uploads))
+    logger.info("{} files uploaded".format(total_uploads))
 
     return upload_set
 
