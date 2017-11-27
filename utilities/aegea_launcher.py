@@ -9,6 +9,7 @@ import subprocess
 
 import boto3
 import botocore.exceptions
+from click.testing import CliRunner
 
 
 def resource_range(name, min_val, max_val):
@@ -164,6 +165,19 @@ if __name__ == '__main__':
                             args.script_name, args.script_args)
             )
             raise
+    elif hasattr(script_module, 'cli'):
+        pass
+        # try:
+        #     runner = CliRunner()
+        #     result = runner.invoke(script_module.cli,
+        #                            args.script_args.split())
+        #     assert result.exit_code == 0
+        # except:
+        #     logger.error(
+        #             "{} failed with the given arg string\n\t{}".format(
+        #                     args.script_name, args.script_args)
+        #     )
+        #     raise
     else:
         raise NotImplementedError(
                 "{} must have a 'get_parser' method to test args".format(
