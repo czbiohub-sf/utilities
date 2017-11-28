@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 for i in range(args.num_partitions):
     print(' '.join(('python aegea_launcher.py',
-                    'run_star_and_htseq.py',
+                    'alignment/run_star_and_htseq.py',
                     '"--taxon {}'.format(args.taxon),
                     '--num_partitions {}'.format(args.num_partitions),
                     '--partition_id {}'.format(i),
