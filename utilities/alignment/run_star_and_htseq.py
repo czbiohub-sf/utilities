@@ -45,7 +45,11 @@ def get_default_requirements():
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(prog='run_star_and_htseq.py')
+    parser = argparse.ArgumentParser(
+            prog='run_star_and_htseq.py',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
 
     parser.add_argument('--root_dir', default='/mnt')
     parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
