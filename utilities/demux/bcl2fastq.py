@@ -22,7 +22,10 @@ def get_default_requirements():
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(prog='bcl2fastq.py')
+    parser = argparse.ArgumentParser(
+            prog='bcl2fastq.py',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     parser.add_argument('--exp_id', required=True)
 

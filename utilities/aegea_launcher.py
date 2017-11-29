@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import logging
@@ -52,8 +52,8 @@ if __name__ == '__main__':
             prog='aegea_launcher.py',
             description=(
                 "Run any script as a batch job\n"
-                "e.g. aegea_launcher.py my_bucket/my_scripts "
-                "[script name] [script args...]"
+                "e.g. aegea_launcher.py path/to/my_script.py "
+                "[script args...]"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",
             add_help=False,

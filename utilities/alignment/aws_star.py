@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 
@@ -11,7 +11,7 @@ parser.add_argument('exp_ids', nargs='+')
 args = parser.parse_args()
 
 for i in range(args.num_partitions):
-    print(' '.join(('python aegea_launcher.py',
+    print(' '.join(('python3 aegea_launcher.py',
                     'alignment/run_star_and_htseq.py',
                     '"--taxon {}'.format(args.taxon),
                     '--num_partitions {}'.format(args.num_partitions),
