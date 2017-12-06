@@ -150,11 +150,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description=(
                 "Construct the gene-cell table for an experiment\n"
-                "e.g. ./generate_gene_cel_table.py my_bucket/my_scripts "
-                "[script name] [script args...]"
+                "e.g. ./alignment/gene_cell_table.py --s3_bucket czbiohub-maca"
+                " data/170823_A00111_etc path/to/output.csv"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",
-            add_help=False
+            add_help=False,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     # basic usage
