@@ -4,8 +4,8 @@ import os
 
 rc_d = {'A': 'T', 'G': 'C', 'C': 'G', 'T': 'A'}
 
-def batch_samplesheet(samplesheet_file, run_prefix, runA, runB=None, n=300, 
-                      reverse_comp_i7=False, reverse_comp_i5=False,
+def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
+                      reverse_comp_i7, reverse_comp_i5,
                       s3_input_dir, s3_output_dir, s3_report_dir,
                       star_structure):
     """
@@ -61,7 +61,7 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB=None, n=300,
                            f' --s3_sample_sheet_dir s3://czbiohub-seqbot/sample-sheets/{run_prefix}'
                            f' --sample_sheet_name novaseq_batch_{i}.csv'
                            ' --skip_undetermined'
-                           ' --star_structure"' if star_structure else '"'),
+                           f' {"--star_structure" if star_structure else ""}"'),
                           file=OUT)
                     print('sleep 10', file=OUT)
 
