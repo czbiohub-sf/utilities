@@ -5,6 +5,7 @@ import logging
 import importlib.util
 import json
 import os
+import shlex
 import subprocess
 
 import boto3
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     if hasattr(script_module, 'get_parser'):
         script_parser = script_module.get_parser()
         try:
-            script_parser.parse_args(args.script_args.split())
+            script_parser.parse_args(shlex.split(args.script_args))
         except:
             logger.error(
                     "{} failed with the given arg string\n\t{}".format(
