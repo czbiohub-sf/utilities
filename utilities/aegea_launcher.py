@@ -236,6 +236,10 @@ if __name__ == '__main__':
 
     logger.info('executing command:\n\t{}'.format(' '.join(aegea_command)))
     if not args.dryrun:
-        output = json.loads(subprocess.check_output(' '.join(aegea_command),
-                                                    shell=True))
-        logger.info('Launched job with jobId: {}'.format(output['jobId']))
+        output = subprocess.check_output(' '.join(aegea_command), shell=True)
+        try:
+            output = json.loads(output)['jobId']
+            logger.info('Launched job with jobId: {}'.format(output))
+        except json.decoder.JSONDecodeError:
+            logged.info(output)
+
