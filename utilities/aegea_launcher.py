@@ -241,5 +241,5 @@ if __name__ == '__main__':
             output = json.loads(output)['jobId']
             logger.info('Launched job with jobId: {}'.format(output))
         except json.decoder.JSONDecodeError:
-            logged.info(output)
+            logger.info(output)
 
