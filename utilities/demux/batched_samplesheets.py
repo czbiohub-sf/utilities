@@ -4,7 +4,7 @@ import os
 
 rc_d = {'A': 'T', 'G': 'C', 'C': 'G', 'T': 'A'}
 
-def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
+def batch_samplesheet(samplesheet_file, run_prefix, exp_id, n,
                       reverse_comp_i7, reverse_comp_i5,
                       s3_input_dir, s3_output_dir,
                       s3_report_dir, s3_sample_sheet_dir,
@@ -12,8 +12,7 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
     """
     samplesheet_file - the giant samplesheet (ideally with the right indexes now)
     run_prefix - shorthand for the run, I usually use something like YYMMDD_A00111
-    runA - the first of the sequencing runs to demux
-    runB - the second run (optional)
+    exp_id - the sequencing run(s) to demux
     n - number of samples to put in each batch. 300 seems to run and doesn't blow up
     reverse_comp_i7 - whether to reverse-complement the first index (it happens)
     reverse_comp_i5 - whether to reverse-complement the second index (for NextSeq runs)
@@ -52,18 +51,17 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
     # print all the run commands to a file so you can just source it
     with open(f'{os.path.dirname(samplesheet_file)}/{run_prefix}.sh', 'w') as OUT:
         for i in range(0, len(rows) + int(len(rows) % n > 0), n):
-            for run in (runA, runB):
-                if run is not None:
-                    print((f'./aegea_launcher.py demux/bcl2fastq.py'
-                           f' "--exp_id {run}'
-                           f' --s3_input_dir {s3_input_dir}'
-                           f' --s3_output_dir {s3_output_dir}'
-                           f' --s3_report_dir {s3_report_dir}/{run}/batch_{i}'
-                           f' --s3_sample_sheet_dir {s3_sample_sheet_dir}/{run_prefix}'
-                           f' --sample_sheet_name batch_{i}.csv'
-                           ' --skip_undetermined'
-                           f' {"--star_structure" if star_structure else ""}"'),
-                          file=OUT)
+            for run in exp_id:
+                print((f'./aegea_launcher.py demux/bcl2fastq.py'
+                       f' "--exp_id {run}'
+                       f' --s3_input_dir {s3_input_dir}'
+                       f' --s3_output_dir {s3_output_dir}'
+                       f' --s3_report_dir {s3_report_dir}/{run}/batch_{i}'
+                       f' --s3_sample_sheet_dir {s3_sample_sheet_dir}/{run_prefix}'
+                       f' --sample_sheet_name batch_{i}.csv'
+                       ' --skip_undetermined'
+                       f' {"--star_structure" if star_structure else ""}"'),
+                      file=OUT)
 
     print(f"""To run the batch:
     1. Upload the samplesheet folder to S3
@@ -79,13 +77,14 @@ if __name__ == '__main__':
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('samplesheet_file')
-    parser.add_argument('run_prefix', default=None,
+    parser.add_argument('samplesheet_file',
+                        help='Local copy of a samplesheet to batch up')
+
+    parser.add_argument('--exp_id', nargs='+',
+                        help='Run ID(s) to demux')
+
+    parser.add_argument('--run_prefix', default=None,
                         help='Name for this batch (defaults to [Date]_[SeqId]')
-
-    parser.add_argument('--runA')
-    parser.add_argument('--runB', default=None)
-
     parser.add_argument('--n', type=int, default=300,
                         help='Number of samples per batch')
     parser.add_argument('--reverse_comp_i7', action='store_true',
@@ -107,11 +106,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.run_prefix is None:
-        args.run_prefix = args.runA.rsplit('_', 2)[0]
+        args.run_prefix = args.exp_id[0].rsplit('_', 2)[0]
 
     batch_samplesheet(
             args.samplesheet_file, args.run_prefix,
-            args.runA, args.runB, args.n,
+            args.exp_id, args.n,
             args.reverse_comp_i7, args.reverse_comp_i5,
             args.s3_input_dir, args.s3_output_dir,
             args.s3_report_dir, args.s3_sample_sheet_dir,
