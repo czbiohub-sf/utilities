@@ -6,7 +6,8 @@ rc_d = {'A': 'T', 'G': 'C', 'C': 'G', 'T': 'A'}
 
 def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
                       reverse_comp_i7, reverse_comp_i5,
-                      s3_input_dir, s3_output_dir, s3_report_dir,
+                      s3_input_dir, s3_output_dir,
+                      s3_report_dir, s3_sample_sheet_dir,
                       star_structure):
     """
     samplesheet_file - the giant samplesheet (ideally with the right indexes now)
@@ -27,7 +28,7 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
         i5_c = rows[1].index('index2')
 
         rows = rows[2:]
-    print(hdr)
+
     print(len(rows), 'rows')
 
     for r in rows:
@@ -41,13 +42,13 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
     if not os.path.exists(run_prefix_dir):
         os.mkdir(run_prefix_dir)
 
-    # need to upload this whole folder to s3://czbiohub-seqbot/sample-sheets
+    # need to upload this whole folder to the sample sheets directory on S3
     for i in range(0, len(rows) + int(len(rows) % n > 0), n):
-        with open(os.path.join(run_prefix_dir, f'novaseq_batch_{i}.csv'), 'w') as OUT:
+        with open(os.path.join(run_prefix_dir, f'batch_{i}.csv'), 'w') as OUT:
             print(hdr, file=OUT)
             for r in rows[i:i+n]:
                 print(','.join(r), file=OUT)
-                
+
     # print all the run commands to a file so you can just source it
     with open(f'{os.path.dirname(samplesheet_file)}/{run_prefix}.sh', 'w') as OUT:
         for i in range(0, len(rows) + int(len(rows) % n > 0), n):
@@ -58,12 +59,18 @@ def batch_samplesheet(samplesheet_file, run_prefix, runA, runB, n,
                            f' --s3_input_dir {s3_input_dir}'
                            f' --s3_output_dir {s3_output_dir}'
                            f' --s3_report_dir {s3_report_dir}/{run}/batch_{i}'
-                           f' --s3_sample_sheet_dir s3://czbiohub-seqbot/sample-sheets/{run_prefix}'
-                           f' --sample_sheet_name novaseq_batch_{i}.csv'
+                           f' --s3_sample_sheet_dir {s3_sample_sheet_dir}/{run_prefix}'
+                           f' --sample_sheet_name batch_{i}.csv'
                            ' --skip_undetermined'
                            f' {"--star_structure" if star_structure else ""}"'),
                           file=OUT)
-                    print('sleep 10', file=OUT)
+
+    print(f"""To run the batch:
+    1. Upload the samplesheet folder to S3
+        aws s3 cp --recursive {run_prefix_dir} {s3_sample_sheet_dir}/{run_prefix}
+    2. Run the shell script of commands
+        source {os.path.dirname(samplesheet_file)}/{run_prefix}.sh
+    """)
 
 
 if __name__ == '__main__':
@@ -93,6 +100,8 @@ if __name__ == '__main__':
                                    default='s3://czbiohub-seqbot/fastqs')
     bcl2fastq_options.add_argument('--s3_report_dir',
                                    default='s3://czbiohub-seqbot/reports')
+    bcl2fastq_options.add_argument('--s3_sample_sheet_dir',
+                                   default='s3://czbiohub-seqbot/sample-sheets')
     bcl2fastq_options.add_argument('--star_structure', action='store_true')
 
     args = parser.parse_args()
@@ -104,7 +113,8 @@ if __name__ == '__main__':
             args.samplesheet_file, args.run_prefix,
             args.runA, args.runB, args.n,
             args.reverse_comp_i7, args.reverse_comp_i5,
-            args.s3_input_dir, args.s3_output_dir, args.s3_report_dir,
+            args.s3_input_dir, args.s3_output_dir,
+            args.s3_report_dir, args.s3_sample_sheet_dir,
             args.star_structure
     )
 
