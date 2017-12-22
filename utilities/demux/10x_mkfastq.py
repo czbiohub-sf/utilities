@@ -12,14 +12,14 @@ S3_LOG_DIR = 's3://jamestwebber-logs/mkfastq_logs/'
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=64, memory=256000, storage=1200,
+    return argparse.Namespace(vcpus=64, memory=256000, storage=2000,
                               queue='aegea_batch_demux',
                               ulimits=['nofile:1000000'])
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
-            prog='bcl2fastq.py',
+            prog='10x_mkfastq.py',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
