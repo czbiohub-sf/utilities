@@ -50,8 +50,6 @@ def get_parser():
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-
-    parser.add_argument('--root_dir', default='/mnt')
     parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
 
     parser.add_argument('--s3_input_dir',
@@ -66,6 +64,7 @@ def get_parser():
                         help='Number of htseq processes to run')
 
     parser.add_argument('--force_realign', action='store_true')
+    parser.add_argument('--root_dir', default='/mnt')
 
     return parser
 
