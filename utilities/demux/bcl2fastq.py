@@ -79,7 +79,7 @@ def main(logger):
 
 
 
-    command = ['aws', 's3', 'cp',
+    command = ['aws', 's3', 'cp', '--quiet',
                os.path.join(args.s3_sample_sheet_dir, args.sample_sheet_name),
                result_path]
     for i in range(S3_RETRY):
@@ -96,7 +96,7 @@ def main(logger):
 
 
     # download the bcl files
-    command = ['aws', 's3', 'sync',
+    command = ['aws', 's3', 'sync', '--quiet',
                os.path.join(args.s3_input_dir, args.exp_id), bcl_path]
     for i in range(S3_RETRY):
         try:
@@ -153,7 +153,7 @@ def main(logger):
     sys.stdout.flush()
 
     # upload fastq files to destination folder
-    command = ['aws', 's3', 'sync', output_path,
+    command = ['aws', 's3', 'sync', '--quiet', output_path,
                os.path.join(args.s3_output_dir, args.exp_id, 'rawdata'),
                '--exclude', '"*"', '--include', '"*fastq.gz"']
     for i in range(S3_RETRY):
@@ -177,7 +177,7 @@ def main(logger):
             "ls -d {}".format(os.path.join(output_path, 'Reports', 'html', '*',
                                            'all', 'all', 'all')),
             shell=True).rstrip()
-    command = ['aws', 's3', 'cp', reports_path,
+    command = ['aws', 's3', 'cp', '--quiet', reports_path,
                os.path.join(args.s3_report_dir, args.exp_id),
                '--recursive']
     for i in range(S3_RETRY):
@@ -226,7 +226,7 @@ if __name__ == "__main__":
         raise
     finally:
         if log_file:
-            log_cmd = 'aws s3 cp {} {}'.format(log_file, S3_LOG_DIR)
+            log_cmd = 'aws s3 cp --quiet {} {}'.format(log_file, S3_LOG_DIR)
             mainlogger.info(log_cmd)
 
             file_handler.close()

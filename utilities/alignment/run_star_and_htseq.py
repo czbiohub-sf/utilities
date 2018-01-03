@@ -103,7 +103,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
 
         # copy fastq.gz from s3 to local
         s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata', sample_name)
-        command = ['aws', 's3', 'cp', '--recursive',
+        command = ['aws', 's3', 'cp', '--quiet', '--recursive',
                    s3_source, os.path.join(dest_dir, 'rawdata'),
                    '--exclude', "'*'",
                    '--include', "'*.fastq.gz'"]
@@ -208,7 +208,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
         ]
 
         for src_file,dest_name in zip(src_files, dest_names):
-            command = ['aws', 's3', 'cp', src_file,
+            command = ['aws', 's3', 'cp', '--quiet', src_file,
                        os.path.join(s3_dest, dest_name)]
 
             log_command_to_queue(log_queue, command, shell=True)
@@ -273,7 +273,7 @@ def main(logger):
 
     # download the genome data
     os.mkdir(os.path.join(args.root_dir, 'genome'))
-    command = ['aws', 's3', 'cp',
+    command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
                os.path.join(args.root_dir, 'genome/')]
     log_command(logger, command, shell=True)
@@ -286,7 +286,7 @@ def main(logger):
 
     # download STAR stuff
     os.mkdir(os.path.join(args.root_dir, 'genome', 'STAR'))
-    command = ['aws', 's3', 'cp',
+    command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
                os.path.join(args.root_dir, 'genome', 'STAR/')]
@@ -438,7 +438,7 @@ if __name__ == "__main__":
         raise
     finally:
         if log_file:
-            log_cmd = 'aws s3 cp {} {}'.format(log_file, S3_LOG_DIR)
+            log_cmd = 'aws s3 cp --quiet {} {}'.format(log_file, S3_LOG_DIR)
             mainlogger.info(log_cmd)
 
             file_handler.close()
