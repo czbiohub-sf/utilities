@@ -26,12 +26,9 @@ def get_parser():
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('--exp_id', required=True)
-    parser.add_argument('--taxon', default='homo', choices=('homo', 'mus'))
-
-    parser.add_argument('--s3_input_dir',
-                        default='s3://czbiohub-seqbot/fastqs')
-    parser.add_argument('--s3_output_dir')
+    parser.add_argument('--s3_input_dir', required=True)
+    parser.add_argument('--s3_output_dir', required=True)
+    parser.add_argument('--taxon', required=True, choices=('homo', 'mus'))
     parser.add_argument('--cell_count', type=int, default=3000)
 
     parser.add_argument('--make_gctable', action='store_true')
@@ -65,22 +62,12 @@ def main(logger):
     genome_base_dir = os.path.join(args.root_dir, "genome", "cellranger")
     os.makedirs(genome_base_dir)
 
-    # required environmental variable
-    # taxon = os.environ.get('TAXON', 'homo')
-    # s3_input_dir = os.environ['S3_INPUT_DIR'].rstrip('/')
-    # s3_output_dir = os.environ['S3_OUTPUT_DIR'].rstrip('/')
-    # cell_count = os.environ['CELL_COUNT']
-
-
     if args.taxon == 'homo':
         genome_name = 'HG38-PLUS'
     elif args.taxon == 'mus':
         genome_name = 'MM10-PLUS'
     else:
         raise ValueError("unknown taxon {}".format(args.taxon))
-
-
-
 
     # files that should be uploaded outside of the massive tgz
     # path should be relative to the run folder
@@ -98,7 +85,8 @@ def main(logger):
     genome_dir = os.path.join(genome_base_dir, genome_name)
 
     # download the ref genome data
-    command = ["aws", "s3", "cp", genome_tar_source, genome_base_dir]
+    command = ['aws', 's3', 'cp', '--quiet',
+               genome_tar_source, genome_base_dir]
     log_command(logger, command, shell=True)
 
     genome_tar_file = os.path.basename(genome_tar_source)
@@ -110,7 +98,8 @@ def main(logger):
     sys.stdout.flush()
 
     # download the fastq files
-    command = ['aws', 's3', 'cp', '--recursive', args.s3_input_dir, fastq_path]
+    command = ['aws', 's3', 'cp', '--quiet', '--recursive',
+               args.s3_input_dir, fastq_path]
     log_command(logger, command, shell=True)
 
 
@@ -127,7 +116,7 @@ def main(logger):
 
     # Move results(websummary, cell-gene table, tarball) data back to S3
     for file_name in files_to_upload:
-        command = ['aws', 's3', 'cp',
+        command = ['aws', 's3', 'cp', '--quiet',
                    os.path.join(result_path, sample_id, file_name),
                    '{}/'.format(args.s3_output_dir)]
         for i in range(S3_RETRY):
@@ -145,7 +134,7 @@ def main(logger):
     log_command(logger, command, shell=True)
 
 
-    command = ['aws', 's3', 'cp',
+    command = ['aws', 's3', 'cp', '--quiet',
                '{}.tgz'.format(os.path.join(result_path, sample_id)),
                '{}/'.format(args.s3_output_dir)]
     for i in range(S3_RETRY):
@@ -166,7 +155,7 @@ def main(logger):
                    '-m', '500']
         log_command(logger, command, shell=True)
 
-        command = ['aws', 's3', 'cp',
+        command = ['aws', 's3', 'cp', '--quiet',
                    '{}.{}.cell-gene.csv'.format(sample_id, args.taxon),
                    '{}/'.format(args.s3_output_dir)]
 
@@ -216,7 +205,7 @@ if __name__ == "__main__":
         raise
     finally:
         if log_file:
-            log_cmd = 'aws s3 cp {} {}'.format(log_file, S3_LOG_DIR)
+            log_cmd = 'aws s3 cp --quiet {} {}'.format(log_file, S3_LOG_DIR)
             mainlogger.info(log_cmd)
 
             file_handler.close()
