@@ -188,7 +188,9 @@ if __name__ == "__main__":
     mainlogger.addHandler(stream_handler)
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        log_file = '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
+        log_file = os.path.abspath(
+                '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
+        )
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
