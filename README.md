@@ -152,3 +152,16 @@ See https://github.com/czbiohub/utilities for more examples
 
 ```
 
+### How to share data on s3://czbiohub-seqbot with an outside collaborator
+
+They don't need an AWS account but they _do_ need to install the [AWS CLI](aws.amazon.com/cli).
+
+This script generates an access token for your collaborator to download from our S3 storage, and writes instructions to the console (the command below will redirect the instructions to a text file you can email to your collaborator). The token is good for 36 hours&mdash;if they need more time, just generate another one.
+
+To use the script, just give it the path to the folder you want to share (not including the bucket name, as shown below)
+
+**Note:** This script _only_ applies to the `czbiohub-seqbot` bucket. In the future we'll hopefully have more general tools for sharing our data.
+
+```
+➜  utilities git:(master) ./aws_access fastqs/171127_A00111_0087_AH2C5TDSXX > 1229_token.txt
+```
