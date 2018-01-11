@@ -33,7 +33,7 @@ Now we'll change to that folder with `cd` and install the program with `pip inst
 
 ### How to run a script on AWS, in general:
 
-The `aegea_launcher.py` script just wraps aegea (which can be tricky to use). It has sane defaults so you don't need to choose most of them.
+The `evros` script just wraps aegea (which can be tricky to use). It has sane defaults so you don't need to choose most of them.
 
 ```
 ➜  utilities git:(master) ./aegea_launcher.py --help 
@@ -81,7 +81,7 @@ other options:
   -h, --help            show this help message and exit
 ```
 
-To run a script, you pass the path to a local copy along with any options and arguments. `aegea_launcher.py` will read that script and test the arguments you are passing (by calling a function named `get_parser` in the script) to make sure they are acceptable.
+To run a script, you pass the path to a local copy along with any options and arguments. `evros` will read that script and test the arguments you are passing (by calling a function named `get_parser` in the script) to make sure they are acceptable.
 
 If the script defines a function named `get_default_requirements` it will call that function to set instance requirements for your job, so you do not need to specify them.
 

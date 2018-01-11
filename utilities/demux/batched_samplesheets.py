@@ -52,7 +52,7 @@ def batch_samplesheet(samplesheet_file, run_prefix, exp_id, n,
     with open(f'{os.path.dirname(samplesheet_file)}/{run_prefix}.sh', 'w') as OUT:
         for i in range(0, len(rows) + int(len(rows) % n > 0), n):
             for run in exp_id:
-                print((f'./aegea_launcher.py demux/bcl2fastq.py'
+                print((f'./evros demux/bcl2fastq.py'
                        f' "--exp_id {run}'
                        f' --s3_input_dir {s3_input_dir}'
                        f' --s3_output_dir {s3_output_dir}'

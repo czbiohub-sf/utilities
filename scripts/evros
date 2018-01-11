@@ -50,10 +50,10 @@ def get_logger(debug, dryrun):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-            prog='aegea_launcher.py',
+            prog='evros',
             description=(
                 "Run any script as a batch job\n"
-                "e.g. aegea_launcher.py path/to/my_script.py "
+                "e.g. evros path/to/my_script.py "
                 "[script args...]"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",

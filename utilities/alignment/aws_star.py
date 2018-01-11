@@ -11,7 +11,7 @@ parser.add_argument('exp_ids', nargs='+')
 args = parser.parse_args()
 
 for i in range(args.num_partitions):
-    print(' '.join(('python3 aegea_launcher.py',
+    print(' '.join(('python3 evros',
                     'alignment/run_star_and_htseq.py',
                     '"--taxon {}'.format(args.taxon),
                     '--num_partitions {}'.format(args.num_partitions),
