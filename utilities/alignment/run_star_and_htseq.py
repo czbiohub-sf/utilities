@@ -232,13 +232,11 @@ def main(logger):
 
     if args.taxon == 'homo':
         genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/")
-        ref_genome_file = 'hg38-plus.tgz'
         ref_genome_star_file = 'HG38-PLUS.tgz'
         sjdb_gtf = os.path.join(args.root_dir, 'genome', 'hg38-plus',
                                 'hg38-plus.gtf')
     elif args.taxon == 'mus':
         genome_dir = os.path.join(args.root_dir, "genome/STAR/MM10-PLUS/")
-        ref_genome_file = 'mm10-plus.tgz'
         ref_genome_star_file = 'MM10-PLUS.tgz'
         sjdb_gtf = os.path.join(args.root_dir, 'genome', 'mm10-plus',
                                 'mm10-plus.gtf')
@@ -256,7 +254,6 @@ def main(logger):
                    star_proc:\t{}
                   htseq_proc:\t{}
                   genome_dir:\t{}
-             ref_genome_file:\t{}
         ref_genome_star_file:\t{}
                     sjdb_gtf:\t{}
                        taxon:\t{}
@@ -264,28 +261,15 @@ def main(logger):
                      exp_ids:\t{}'''.format(
                     args.partition_id, args.num_partitions,
                     args.star_proc, args.htseq_proc,
-                    genome_dir, ref_genome_file,
+                    genome_dir,
                     ref_genome_star_file, sjdb_gtf,
                     args.taxon, args.s3_input_dir,
                     ', '.join(args.exp_ids)
             )
     )
 
-    # download the genome data
-    os.mkdir(os.path.join(args.root_dir, 'genome'))
-    command = ['aws', 's3', 'cp', '--quiet',
-               os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
-               os.path.join(args.root_dir, 'genome/')]
-    log_command(logger, command, shell=True)
-
-    logger.debug('Extracting {}'. format(ref_genome_file))
-    with tarfile.open(os.path.join(args.root_dir, 'genome',
-                                   ref_genome_file)) as tf:
-        tf.extractall(path=os.path.join(args.root_dir, 'genome'))
-
-
     # download STAR stuff
-    os.mkdir(os.path.join(args.root_dir, 'genome', 'STAR'))
+    os.makedirs(os.path.join(args.root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
