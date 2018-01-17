@@ -2,11 +2,12 @@
 
 # Example: TAXON=homo CELL_COUNT=3000 S3_DIR=s3://biohub-spyros/data/10X_data/CK_Healthy/ ./10x_count.py
 import argparse
-import logging
 import os
 import sys
 import subprocess
 import tarfile
+
+from utilities.util import get_logger, log_command
 
 
 CELLRANGER = 'cellranger'
@@ -35,12 +36,6 @@ def get_parser():
     parser.add_argument('--root_dir', default='/mnt')
 
     return parser
-
-
-def log_command(logger, command, **kwargs):
-    logger.info(' '.join(command))
-    output = subprocess.check_output(' '.join(command), **kwargs)
-    logger.debug(output)
 
 
 def main(logger):
@@ -172,33 +167,7 @@ def main(logger):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    mainlogger = logging.getLogger(__name__)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-
-    # create a logging format
-    formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-
-    stream_handler.setFormatter(formatter)
-
-    mainlogger.addHandler(stream_handler)
-
-    if os.environ.get('AWS_BATCH_JOB_ID'):
-        log_file = os.path.abspath(
-                '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
-        )
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-
-        # add the handlers to the logger
-        mainlogger.addHandler(file_handler)
-    else:
-        log_file = None
+    mainlogger, log_file, file_handler = get_logger(__name__)
 
     try:
         main(mainlogger)

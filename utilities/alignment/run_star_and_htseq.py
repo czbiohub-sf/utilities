@@ -2,16 +2,17 @@
 import argparse
 import datetime
 import glob
+import logging
 import os
 import re
 import subprocess
 import tarfile
 
-
 import threading
 import multiprocessing as mp
 
-import logging
+import utilities.util as ut
+
 
 S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/star_logs/'
@@ -69,26 +70,6 @@ def get_parser():
     return parser
 
 
-def process_logs(q, logger):
-    for msg,level in iter(q.get, 'STOP'):
-        if level == logging.INFO:
-            logger.info(msg)
-        else:
-            logger.debug(msg)
-
-
-def log_command(logger, command, **kwargs):
-    logger.info(' '.join(command))
-    output = subprocess.check_output(' '.join(command), **kwargs)
-    logger.debug(output)
-
-
-def log_command_to_queue(log_queue, command, **kwargs):
-    log_queue.put((' '.join(command), logging.INFO))
-    output = subprocess.check_output(' '.join(command), **kwargs)
-    log_queue.put((output, logging.DEBUG))
-
-
 # def run_sample(sample_name, exp_id):
 def run_sample(star_queue, htseq_queue, log_queue,
                s3_input_dir, genome_dir, run_dir, n_proc):
@@ -109,7 +90,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
                    '--include', "'*.fastq.gz'"]
         for i in range(S3_RETRY):
             try:
-                log_command_to_queue(log_queue, command, shell=True)
+                ut.log_command_to_queue(log_queue, command, shell=True)
                 break
             except subprocess.CalledProcessError:
                 log_queue.put(("retrying data download - {}".format(i),
@@ -129,19 +110,19 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command.extend(('--runThreadN', str(n_proc),
                         '--genomeDir', genome_dir,
                         '--readFilesIn', ' '.join(reads)))
-        log_command_to_queue(log_queue, command, shell=True,
-                             cwd=os.path.join(dest_dir, 'results', 'Pass1'))
+        ut.log_command_to_queue(log_queue, command, shell=True,
+                                cwd=os.path.join(dest_dir, 'results', 'Pass1'))
 
         # running sam tools
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-o',
                    './Pass1/Aligned.out.sorted.bam', './Pass1/Aligned.out.bam']
-        log_command_to_queue(log_queue, command, shell=True,
-                             cwd=os.path.join(dest_dir, 'results'))
+        ut.log_command_to_queue(log_queue, command, shell=True,
+                                cwd=os.path.join(dest_dir, 'results'))
 
         # running samtools index -b
         command = [SAMTOOLS, 'index', '-b', 'Aligned.out.sorted.bam']
-        log_command_to_queue(log_queue, command, shell=True,
-                             cwd=os.path.join(dest_dir, 'results', 'Pass1'))
+        ut.log_command_to_queue(log_queue, command, shell=True,
+                                cwd=os.path.join(dest_dir, 'results', 'Pass1'))
 
 
         # remove unsorted bam files
@@ -155,8 +136,8 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-n', '-o',
                    './Pass1/Aligned.out.sorted-byname.bam',
                    './Pass1/Aligned.out.sorted.bam']
-        log_command_to_queue(log_queue, command, shell=True,
-                             cwd=os.path.join(dest_dir, 'results'))
+        ut.log_command_to_queue(log_queue, command, shell=True,
+                                cwd=os.path.join(dest_dir, 'results'))
 
         # ready to be htseq-ed and cleaned up
         htseq_queue.put((exp_id, sample_name, dest_dir))
@@ -172,8 +153,8 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
                    os.path.join(dest_dir, 'results', 'Pass1',
                                 'Aligned.out.sorted-byname.bam'),
                    sjdb_gtf, '>', 'htseq-count.txt']
-        log_command_to_queue(log_queue, command, shell=True,
-                             cwd=os.path.join(dest_dir, 'results'))
+        ut.log_command_to_queue(log_queue, command, shell=True,
+                                cwd=os.path.join(dest_dir, 'results'))
         os.remove(os.path.join(dest_dir, 'results', 'Pass1',
                                'Aligned.out.sorted-byname.bam'))
 
@@ -182,7 +163,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
         command = ['tar', '-cvzf',
                    '{}.{}.tgz'.format(sample_name, taxon),
                    'results']
-        log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
+        ut.log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
 
         # copy specific htseq and log files out to s3 on their own
         s3_dest = os.path.join(s3_input_dir, exp_id, 'results/')
@@ -211,11 +192,11 @@ def run_htseq(htseq_queue, log_queue, s3_input_dir, taxon, sjdb_gtf):
             command = ['aws', 's3', 'cp', '--quiet', src_file,
                        os.path.join(s3_dest, dest_name)]
 
-            log_command_to_queue(log_queue, command, shell=True)
+            ut.log_command_to_queue(log_queue, command, shell=True)
 
         # rm all the files
         command = ['rm', '-rf', dest_dir]
-        log_command_to_queue(log_queue, command, shell=True)
+        ut.log_command_to_queue(log_queue, command, shell=True)
 
 
 def main(logger):
@@ -276,7 +257,7 @@ def main(logger):
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
                os.path.join(args.root_dir, 'genome/')]
-    log_command(logger, command, shell=True)
+    ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'. format(ref_genome_file))
     with tarfile.open(os.path.join(args.root_dir, 'genome',
@@ -290,7 +271,7 @@ def main(logger):
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
                os.path.join(args.root_dir, 'genome', 'STAR/')]
-    log_command(logger, command, shell=True)
+    ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'.format(ref_genome_star_file))
     with tarfile.open(os.path.join(args.root_dir, 'genome',
@@ -300,10 +281,10 @@ def main(logger):
 
     # Load Genome Into Memory
     command = [STAR, '--genomeDir', genome_dir, '--genomeLoad', 'LoadAndExit']
-    log_command(logger, command, shell=True)
+    ut.log_command(logger, command, shell=True)
 
     log_queue = mp.Queue()
-    log_thread = threading.Thread(target=process_logs,
+    log_thread = threading.Thread(target=ut.process_logs,
                                   args=(log_queue, logger))
     log_thread.start()
 
@@ -399,37 +380,13 @@ def main(logger):
 
     # Remove Genome from Memory
     command = [STAR, '--genomeDir', genome_dir, '--genomeLoad', 'Remove']
-    log_command(logger, command, shell=True)
+    ut.log_command(logger, command, shell=True)
 
     logger.info('Job completed')
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    mainlogger = logging.getLogger(__name__)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-
-    # create a logging format
-    formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-
-    stream_handler.setFormatter(formatter)
-
-    mainlogger.addHandler(stream_handler)
-
-    if os.environ.get('AWS_BATCH_JOB_ID'):
-        log_file = '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-
-        # add the handlers to the logger
-        mainlogger.addHandler(file_handler)
-    else:
-        log_file = None
+    mainlogger, log_file, file_handler = ut.get_logger(__name__)
 
     try:
         main(mainlogger)

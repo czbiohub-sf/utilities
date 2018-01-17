@@ -52,9 +52,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             prog='evros',
             description=(
-                "Run any script as a batch job\n"
-                "e.g. evros path/to/my_script.py "
-                "[script args...]"
+                "Run batch jobs on AWS\n"
+                "e.g. evros demux.bcl2fastq [script args...]"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",
             add_help=False,
@@ -65,7 +64,7 @@ if __name__ == '__main__':
     basic_group = parser.add_argument_group('basic arguments')
     basic_group.add_argument(
             'script_name',
-            help='Local path of the script to run, e.g. demux/bcl2fastq.py'
+            help='Local path of the script to run, e.g. demux.bcl2fastq'
     )
     basic_group.add_argument(
             'script_args',
@@ -77,9 +76,8 @@ if __name__ == '__main__':
     instance_group = parser.add_argument_group('customize the instance')
     image_group = instance_group.add_mutually_exclusive_group()
     image_group.add_argument('--ecr-image', metavar='ECR',
+                             default='sra_download',
                              help='ECR image to use for the job')
-    image_group.add_argument('--ami',
-                             help='AMI to use for the job')
 
     instance_group.add_argument(
             '--queue', default='aegea_batch',
@@ -120,20 +118,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.script_name):
-        raise ValueError("Can't find script: {}".format(args.script_name))
-
     logger = get_logger(args.debug, args.dryrun)
 
-    script_base = os.path.basename(args.script_name)
-
-
     logger.debug('Importing script as a module')
-    module_name = os.path.splitext(script_base)[0]
-    spec = importlib.util.spec_from_file_location(module_name,
-                                                  args.script_name)
-    script_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(script_module)
+    script_module = importlib.import_module(args.script_name, 'utilities')
+    script_base = os.path.basename(script_module.__file__)
 
     logger.debug('Checking for script default requirements')
 
@@ -149,9 +138,6 @@ if __name__ == '__main__':
                         args.script_name
                 )
         )
-
-    if not (args.ecr_image or args.ami):
-        args.ecr_image = 'sra_download'
 
     logger.debug('Testing script args')
 
@@ -184,17 +170,17 @@ if __name__ == '__main__':
 
     if args.upload:
         logger.info("Uploading {} to s3://{}".format(
-                args.script_name, os.path.join(args.s3_script_bucket, s3_key))
+                script_base, os.path.join(args.s3_script_bucket, s3_key))
         )
         if not args.dryrun:
             client.upload_file(
-                    Filename=args.script_name,
+                    Filename=os.path.abspath(script_module.__file__),
                     Bucket=args.s3_script_bucket,
                     Key=s3_key
             )
     else:
         logger.info("Checking s3://{} for {}".format(
-                os.path.join(args.s3_script_bucket, s3_key), args.script_name)
+                os.path.join(args.s3_script_bucket, s3_key), script_base)
         )
         try:
             client.head_object(
@@ -214,14 +200,8 @@ if __name__ == '__main__':
     aegea_command = ['aegea', 'batch', 'submit',
                      '--queue', args.queue,
                      '--vcpus', str(args.vcpus),
-                     '--memory', str(args.memory)]
-
-    if args.ecr_image:
-        aegea_command.extend(['--ecr-image', args.ecr_image])
-    elif args.ami:
-        aegea_command.extend(['--ami', args.ami])
-    else:
-        raise ValueError('either --ecr-image or --ami is required')
+                     '--memory', str(args.memory),
+                     '--ecr-image', args.ecr_image]
 
     if args.storage:
         aegea_command.extend(['--storage', '/mnt={}'.format(args.storage)])
@@ -242,4 +222,3 @@ if __name__ == '__main__':
             logger.info('Launched job with jobId: {}'.format(output))
         except json.decoder.JSONDecodeError:
             logger.info(output)
-
