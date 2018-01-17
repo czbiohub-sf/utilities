@@ -3,7 +3,7 @@
 import glob
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version = '0.3.0'
 
@@ -19,7 +19,7 @@ setup(
     author='James Webber',
     author_email='james.webber@czbiohub.org',
     url='https://github.com/czbiohub/utilities',
-    packages=['utilities'],
+    packages=find_packages(),
     install_requires=install_requires,
     scripts=glob.glob('scripts/*'),
     long_description='See https://github.com/czbiohub/utilities',

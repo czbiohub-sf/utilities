@@ -5,7 +5,6 @@ import logging
 import importlib.util
 import json
 import os
-import shlex
 import subprocess
 
 import boto3
@@ -53,7 +52,7 @@ if __name__ == '__main__':
             prog='evros',
             description=(
                 "Run batch jobs on AWS\n"
-                "e.g. evros demux.bcl2fastq [script args...]"
+                "e.g. evros [options] demux.bcl2fastq [script args...]"
             ),
             epilog="See https://github.com/czbiohub/utilities for more examples",
             add_help=False,
@@ -67,17 +66,18 @@ if __name__ == '__main__':
             help='Local path of the script to run, e.g. demux.bcl2fastq'
     )
     basic_group.add_argument(
-            'script_args',
-            help='Script arguments as a string. e.g. "--exp_id 170823_A001..".'
+            'script_args', nargs=argparse.REMAINDER,
+            help='Arguments for the script (everything after script_name)'
     )
 
 
     # instance requirements
     instance_group = parser.add_argument_group('customize the instance')
     image_group = instance_group.add_mutually_exclusive_group()
-    image_group.add_argument('--ecr-image', metavar='ECR',
-                             default='sra_download',
-                             help='ECR image to use for the job')
+    image_group.add_argument(
+            '--ecr-image', metavar='ECR', default='sra_download',
+            help='ECR image to use for the job'
+    )
 
     instance_group.add_argument(
             '--queue', default='aegea_batch',
@@ -121,6 +121,8 @@ if __name__ == '__main__':
     logger = get_logger(args.debug, args.dryrun)
 
     logger.debug('Importing script as a module')
+    if not args.script_name.startswith('.'):
+        args.script_name = '.{}'.format(args.script_name)
     script_module = importlib.import_module(args.script_name, 'utilities')
     script_base = os.path.basename(script_module.__file__)
 
@@ -144,7 +146,7 @@ if __name__ == '__main__':
     if hasattr(script_module, 'get_parser'):
         script_parser = script_module.get_parser()
         try:
-            script_parser.parse_args(shlex.split(args.script_args))
+            script_parser.parse_args(args.script_args)
         except:
             logger.error(
                     "{} failed with the given arg string\n\t{}".format(
