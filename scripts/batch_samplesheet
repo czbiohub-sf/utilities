@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import csv
 import os
@@ -52,15 +54,15 @@ def batch_samplesheet(samplesheet_file, run_prefix, exp_id, n,
     with open(f'{os.path.dirname(samplesheet_file)}/{run_prefix}.sh', 'w') as OUT:
         for i in range(0, len(rows) + int(len(rows) % n > 0), n):
             for run in exp_id:
-                print((f'./evros demux/bcl2fastq.py'
-                       f' "--exp_id {run}'
+                print((f'evros demux.bcl2fastq'
+                       f' --exp_id {run}'
                        f' --s3_input_dir {s3_input_dir}'
                        f' --s3_output_dir {s3_output_dir}'
                        f' --s3_report_dir {s3_report_dir}/{run}/batch_{i}'
                        f' --s3_sample_sheet_dir {s3_sample_sheet_dir}/{run_prefix}'
                        f' --sample_sheet_name batch_{i}.csv'
                        ' --skip_undetermined'
-                       f' {"--star_structure" if star_structure else ""}"'),
+                       f' {"--star_structure" if star_structure else ""}'),
                       file=OUT)
 
     print(f"""To run the batch:
@@ -73,7 +75,7 @@ def batch_samplesheet(samplesheet_file, run_prefix, exp_id, n,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-            prog='batched_samplesheets.py',
+            prog='batched_samplesheet',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
