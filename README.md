@@ -1,6 +1,18 @@
 # utilities
 A collection of scripts for common data management and processing tasks
 
+## Quick Reference
+
+| Task | Command | Description |
+| ----------- | -------- | ----------- |
+| Demux a standard sequencing run | `evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID` | Assumes your sample sheet is uploaded to S3. If planning to run the alignment script, use `--star_structure` |
+| Demux a 10X run | `evros demux.10x_mkfastq --exp_id YYMMDD_EXP_ID` | Again, assumes a sample sheet is present on S3 | 
+| Align using STAR and htseq | `aws_star [mus or homo] [# partitions] YYMMDD_EXP_ID > your_script.sh` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
+| Align a 10X run | `evros alignment.10x_count --taxon [mus or homo] --s3_input_dir s3://czbiohub-seqbot/fastqs/YYMMDD_EXP_ID/SAMPLE --s3_output_dir s3://output-bucket/` | Run once for each channel of the run. Very slow! |
+| Create a download token | `aws_access fastqs/YYMMDD_EXP_ID > download_instructions.txt` | Currently only works for paths within `s3://czbiohub-seqbot` |
+
+
+
 ## Installation
 
 Clone this report and make a new environment, then install the package:
