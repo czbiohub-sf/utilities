@@ -38,7 +38,7 @@ def maybe_exit_process():
     for pid in pids:
         with open(os.path.join('/proc', pid, 'cmdline')) as f:
             # get the cmdline and match against this script
-            line = f.read().split('\x00')[0]
+            line = f.read().split('\x00')[1]
             if line == sys.argv[0]:
                 cmds += 1
 
