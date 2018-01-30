@@ -41,7 +41,7 @@ Now we'll change to that folder with `cd` and install the program with `pip inst
 
 ```
 (utilities-env) ➜ cd utilities
-(utilities-env) ➜ utilities git:(master) pip install -e .
+(utilities-env) ➜ pip install -e .
 ```
 
 ## Usage
