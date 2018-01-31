@@ -115,24 +115,24 @@ If you write custom scripts that follow these conventions, you can put them in `
 If your BCLs were uploaded to czbiohub-seqbot/bcl and your sample sheet is in czbiohub-seqbot/sample-sheets, you can do this:
 
 ```
-(utilities-env) ➜ evros demux.bcl2fastq --exp_id 171103_M05295_0051_000000000-BDHHB
+(utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID
 ```
 
 If you want to stick the results somewhere other than czbiohub-seqbot/fastqs, you can change that option:
 
 ```
-(utilities-env) ➜ evros demux.bcl2fastq --exp_id 171103_M05295_0051_000000000-BDHHB --s3_output_dir s3://my-special-bucket
+(utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID --s3_output_dir s3://my-special-bucket
 ```
 
 ### How to align some stuff:
 
 ```
-(utilities-env) ➜ aws_star mus 10 171101_NB501961_0026_AHL33MBGX3 > giana_star.sh
-(utilities-env) ➜ cat giana_star.sh
-evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --exp_ids 171101_NB501961_0026_AHL33MBGX3
+(utilities-env) ➜ aws_star mus 10 YYMMDD_EXP_ID > my_star_jobs.sh
+(utilities-env) ➜ cat my_star_jobs.sh
+evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --exp_ids YYMMDD_EXP_ID
 sleep 10
 [...lots more...]
-(utilities-env) ➜ source giana_star.sh
+(utilities-env) ➜ source my_star_jobs.sh
 ```
 
 
@@ -146,11 +146,11 @@ usage: gene_cell_table [--s3_bucket S3_BUCKET] [--dryrun] [--debug] [-h]
                        s3_path output_file
 
 Construct the gene-cell table for an experiment e.g. gene_cell_table
---s3_bucket czbiohub-maca data/170823_A00111_etc path/to/output.csv
+--s3_bucket czbiohub-maca data/YYMMDD_EXP_ID path/to/output.csv
 
 basic arguments:
   s3_path               Path to experiment. e.g.
-                        fastqs/171101_NB501961_0026_AHL33MBGX3
+                        fastqs/YYMMDD_EXP_ID
   output_file           File to save the output, e.g. my_gc_table.csv
 
 other options:
@@ -163,15 +163,15 @@ other options:
 
 See https://github.com/czbiohub/utilities for more examples
 
-(utilities-env) ➜ gene_cell_table fastqs/171101_NB501961_0026_AHL33MBGX3 171101_NB501961_0026_AHL33MBGX3.csv --dryrun
+(utilities-env) ➜ gene_cell_table fastqs/YYMMDD_EXP_ID YYMMDD_EXP_ID.csv --dryrun
 2017-11-08 18:19:22,494 - __main__ - INFO - (DRYRUN) - Starting
 2017-11-08 18:19:22,494 - __main__ - INFO - (DRYRUN) - Starting S3 client
 2017-11-08 18:19:22,594 - __main__ - INFO - (DRYRUN) - Getting htseq file list
 2017-11-08 18:19:23,176 - __main__ - INFO - (DRYRUN) - 19 htseq files found
 2017-11-08 18:19:23,176 - __main__ - INFO - (DRYRUN) - Downloaded 19 files
-2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Writing to 171101_NB501961_0026_AHL33MBGX3.csv
+2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Writing to YYMMDD_EXP_ID.csv
 2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Downloaded 19 files
-2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Writing to 171101_NB501961_0026_AHL33MBGX3.log.csv
+2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Writing to YYMMDD_EXP_ID.log.csv
 2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Done!
 
 ```
@@ -187,5 +187,5 @@ To use the script, just give it the path to the folder you want to share (not in
 **Note:** This script _only_ applies to the `czbiohub-seqbot` bucket. In the future we'll hopefully have more general tools for sharing our data.
 
 ```
-(utilities-env) ➜ aws_access fastqs/171127_A00111_0087_AH2C5TDSXX > 1229_token.txt
+(utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_token.txt
 ```
