@@ -25,8 +25,10 @@ def batch_samplesheet(samplesheet_file, run_prefix, exp_id, n,
         rdr = csv.reader(f)
         rows = list(rdr)
         hdr = '\n'.join(','.join(r) for r in rows[:2])
-        i7_c = rows[1].index('index')
-        i5_c = rows[1].index('index2')
+        if reverse_comp_i7:
+            i7_c = list(map(str.lower, rows[1])).index('index')
+        if reverse_comp_i5:
+            i5_c = list(map(str.lower, rows[1])).index('index2')
 
         rows = rows[2:]
 
