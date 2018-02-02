@@ -4,15 +4,21 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-for job in `aegea batch ls --status FAILED -c jobId | grep "minutes ago" | cut -c 2-37 | grep -a "-"`
+script_base=`echo $(basename $1) | rev | cut -f 2- -d '.' | rev`
+
+for job in `aegea batch ls --status FAILED -c jobId | grep "hours ago" | cut -c 2-37 | grep -a "-"`
     do echo $job
-    aegea batch describe $job | grep "partition_id" | sed -e 's/.*\(partition_id [0-9]*\).*/\1/' >> ${1}_failed_jobs
+    partition=`aegea batch describe $job | grep "partition_id" | sed -e 's/.*\(partition_id [0-9]*\).*/\1/'`
+    exp_id=`aegea batch describe $job | grep "partition_id" | sed -e 's/.*\(--exp_ids [0-9A-Za-z_]*\).*/\1/'`
+    echo $partition
+    echo $exp_id
+    echo "$partition $exp_id" >> ${script_base}_failed_jobs
 done
 
-if [ -f ${1}_failed_jobs ]
+if [ -f ${script_base}_failed_jobs ]
 then
-    grep -f ${1}_failed_jobs $1 | awk '{print $0, "\nsleep 20"}' > ${1}_failed_jobs.sh
-    rm ${1}_failed_jobs
+    grep -f ${script_base}_failed_jobs $1 | awk '{print $0, "\nsleep 20"}' > ${script_base}_failed_jobs.sh
+    rm ${script_base}_failed_jobs
 else
     echo "looks like nothing failed!"
 fi
