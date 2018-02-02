@@ -135,6 +135,20 @@ sleep 10
 (utilities-env) ➜ source my_star_jobs.sh
 ```
 
+#### How to check for failed alignment jobs:
+
+For some reason, a fraction of alignment jobs fail to start because of AWS problems. It happens enough that there's a script to help with the problem:
+
+```
+(utilities-env) ➜ starfails my_star_jobs.sh
+8d920e9f-313a-465a-ae4d-df77bdbe990d
+(utilities-env) ➜ cat my_star_jobs_failed_jobs.sh 
+evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --exp_ids YYMMDD_EXP_ID
+sleep 20
+(utilities-env) ➜ source my_star_jobs_failed_jobs.sh 
+```
+
+This new file contains the command to re-try the failed jobs.
 
 ### How to make a gene-cell table from an alignment:
 
