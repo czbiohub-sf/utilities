@@ -285,10 +285,7 @@ def main(logger):
     command = [STAR, '--genomeDir', genome_dir, '--genomeLoad', 'LoadAndExit']
     ut.log_command(logger, command, shell=True)
 
-    log_queue = mp.Queue()
-    log_thread = threading.Thread(target=ut.process_logs,
-                                  args=(log_queue, logger))
-    log_thread.start()
+    log_queue, log_thread = ut.get_thread_logger(logger)
 
     star_queue = mp.Queue()
     htseq_queue = mp.Queue()
