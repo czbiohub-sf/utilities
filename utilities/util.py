@@ -1,6 +1,9 @@
 import logging
 import os
 import subprocess
+import threading
+
+import multiprocessing as mp
 
 
 def log_command(logger, command, **kwargs):
@@ -54,3 +57,12 @@ def get_logger(name):
         file_handler = None
 
     return logger, log_file, file_handler
+
+
+def get_thread_logger(logger):
+    log_queue = mp.Queue()
+    log_thread = threading.Thread(target=process_logs,
+                                  args=(log_queue, logger))
+    log_thread.start()
+
+    return log_queue, log_thread
