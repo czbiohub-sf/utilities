@@ -77,7 +77,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
         log_queue.put(('{} - {}'.format(exp_id, sample_name), logging.INFO))
         dest_dir = os.path.join(run_dir, exp_id, sample_name)
         if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
+            ut.maybe_make_directory(dest_dir)
             os.mkdir(os.path.join(dest_dir, 'rawdata'))
             os.mkdir(os.path.join(dest_dir, 'results'))
             os.mkdir(os.path.join(dest_dir, 'results', 'Pass1'))
@@ -209,7 +209,7 @@ def main(logger):
                                      os.environ['AWS_BATCH_JOB_ID'])
 
     run_dir = os.path.join(args.root_dir, 'data', 'hca')
-    os.makedirs(run_dir)
+    ut.maybe_make_directory(run_dir)
 
     if args.taxon == 'homo':
         genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/")
@@ -250,7 +250,7 @@ def main(logger):
     )
 
     # download STAR stuff
-    os.makedirs(os.path.join(args.root_dir, 'genome', 'STAR'))
+    ut.maybe_make_directory(os.path.join(args.root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
                             ref_genome_star_file),
