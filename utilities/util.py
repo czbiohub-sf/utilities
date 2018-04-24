@@ -54,3 +54,10 @@ def get_logger(name):
         file_handler = None
 
     return logger, log_file, file_handler
+
+
+def maybe_make_directory(folder):
+    try:
+        os.makedirs(folder)
+    except OSError:
+        pass
