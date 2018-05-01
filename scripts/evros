@@ -10,6 +10,7 @@ import subprocess
 import boto3
 import botocore.exceptions
 
+REPO_ADDRESS = 'https://github.com/czbiohub/utilities.git'
 
 def resource_range(name, min_val, max_val):
     def range_validator(s):
@@ -193,10 +194,11 @@ if __name__ == '__main__':
             raise ValueError("{} is not on S3, you should upload it.".format(
                     script_base))
 
-
-    job_command = "aws s3 cp s3://{} .; chmod 755 {}; ./{} {}".format(
-            os.path.join(args.s3_script_bucket, s3_key),
-            script_base, script_base, ' '.join(args.script_args)
+    job_command = '; '.join(
+            ('git clone {}'.format(REPO_ADDRESS),
+             'cd utilities',
+             'pip install -e .',
+             'python -m {} {}'.format(args.script_name, ' '.join(args.script_args)))
     )
 
     aegea_command = ['aegea', 'batch', 'submit',
