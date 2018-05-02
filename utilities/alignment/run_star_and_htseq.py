@@ -83,11 +83,11 @@ def run_sample(star_queue, htseq_queue, log_queue,
             os.mkdir(os.path.join(dest_dir, 'results', 'Pass1'))
 
         # copy fastq.gz from s3 to local
-        s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata', sample_name)
+        s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata')
         command = ['aws', 's3', 'cp', '--quiet', '--recursive',
                    s3_source, os.path.join(dest_dir, 'rawdata'),
                    '--exclude', "'*'",
-                   '--include', "'*.fastq.gz'"]
+                   '--include', "'{}*.fastq.gz'".format(sample_name)]
         for i in range(S3_RETRY):
             try:
                 ut.log_command_to_queue(log_queue, command, shell=True)
@@ -294,6 +294,8 @@ def main(logger):
         p.start()
 
 
+    sample_re = re.compile("([\d\w\-.]+)_R\d_S\d\d\d.fastq.gz")
+
     for exp_id in args.exp_ids:
         if exp_id.startswith('Undetermined'):
             logger.info("Skipping file: %s" % exp_id)
@@ -321,20 +323,21 @@ def main(logger):
                 args.partition_id, args.num_partitions, exp_id)
         )
 
-        command = ['aws', 's3', 'ls',
+        command = ['aws', 's3', 'ls', '--recursive',
                    os.path.join(args.s3_input_dir, exp_id, 'rawdata/')]
         logger.info(' '.join(command))
         try:
             output = subprocess.check_output(' '.join(command),
                                              shell=True).split("\n")
+            output = [fn for fn in output if fn.endswith('fastq.gz')]
         except subprocess.CalledProcessError:
             logger.info("Nothing in the rawdata directory", exc_info=True)
             output = []
 
         sample_list = []
 
-        for f in output:
-            matched = re.search("\s([\d\w\-.]+)/", f)
+        for fn in output:
+            matched = sample_re.match(os.path.basename(fn))
             if matched:
                 sample_list.append(matched.group(1))
 
