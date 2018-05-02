@@ -87,7 +87,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command = ['aws', 's3', 'cp', '--quiet', '--recursive',
                    s3_source, os.path.join(dest_dir, 'rawdata'),
                    '--exclude', "'*'",
-                   '--include', "'{}*.fastq.gz'".format(sample_name)]
+                   '--include', "'*{}*.fastq.gz'".format(sample_name)]
         for i in range(S3_RETRY):
             try:
                 ut.log_command_to_queue(log_queue, command, shell=True)
@@ -294,7 +294,7 @@ def main(logger):
         p.start()
 
 
-    sample_re = re.compile("([\d\w\-.]+)_R\d_S\d\d\d.fastq.gz")
+    sample_re = re.compile("([\d\w\-.]+)_R\d_S\d\d\d.fastq.gz$")
 
     for exp_id in args.exp_ids:
         if exp_id.startswith('Undetermined'):
@@ -329,7 +329,7 @@ def main(logger):
         try:
             output = subprocess.check_output(' '.join(command),
                                              shell=True).split("\n")
-            output = [fn for fn in output if fn.endswith('fastq.gz')]
+            output = [fn.split()[-1] for fn in output if fn.endswith('fastq.gz')]
         except subprocess.CalledProcessError:
             logger.info("Nothing in the rawdata directory", exc_info=True)
             output = []
@@ -337,7 +337,7 @@ def main(logger):
         sample_list = []
 
         for fn in output:
-            matched = sample_re.match(os.path.basename(fn))
+            matched = sample_re.search(os.path.basename(fn))
             if matched:
                 sample_list.append(matched.group(1))
 
