@@ -142,7 +142,7 @@ if __name__ == '__main__':
         'cd utilities',
         'git checkout {}'.format(args.branch),
         'pip install -e .',
-        'python -m {} {}'.format(args.script_name, ' '.join(args.script_args))
+        'python -m utilities.{} {}'.format(args.script_name, ' '.join(args.script_args))
     ))
 
     aegea_command = ['aegea', 'batch', 'submit',
