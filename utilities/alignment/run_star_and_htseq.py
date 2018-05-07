@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 import argparse
 import datetime
-import glob
 import logging
 import os
 import re
 import subprocess
 import tarfile
 
-import threading
 import multiprocessing as mp
 
 import utilities.util as ut
@@ -259,7 +257,7 @@ def main(logger):
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
                os.path.join(args.root_dir, 'genome/')]
-    log_command(logger, command, shell=True)
+    ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'. format(ref_genome_file))
     with tarfile.open(os.path.join(args.root_dir, 'genome',
