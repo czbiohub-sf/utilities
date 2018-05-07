@@ -26,18 +26,22 @@ def process_logs(q, logger):
             logger.debug(msg)
 
 
-def get_logger(name):
+def get_logger(name, debug=False, dryrun=False):
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(name)
 
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-
     # create a logging format
-    formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    if dryrun:
+        formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - (DRYRUN) - %(message)s'
+        )
+    else:
+        formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
 
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG if debug else logging.INFO)
     stream_handler.setFormatter(formatter)
 
     logger.addHandler(stream_handler)
