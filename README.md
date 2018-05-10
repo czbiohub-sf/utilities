@@ -9,8 +9,7 @@ A collection of scripts for common data management and processing tasks
 | Demux a 10X run | `evros demux.10x_mkfastq --exp_id YYMMDD_EXP_ID` | Again, assumes a sample sheet is present on S3 | 
 | Align using STAR and htseq | `aws_star [mus or homo] [# partitions] YYMMDD_EXP_ID > your_script.sh` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
 | Align a 10X run | `evros alignment.10x_count --taxon [mus or homo] --s3_input_dir s3://czbiohub-seqbot/fastqs/YYMMDD_EXP_ID/SAMPLE --s3_output_dir s3://output-bucket/` | Run once for each channel of the run. Very slow! |
-| Create a download token | `aws_access fastqs/YYMMDD_EXP_ID > download_instructions.txt` | Currently only works for paths within `s3://czbiohub-seqbot` |
-
+| Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czbiohub-seqbot` bucket |
 
 
 ## Installation
@@ -44,6 +43,8 @@ Now we'll change to that folder with `cd` and install the program with `pip inst
 (utilities-env) ➜ pip install -e .
 ```
 
+The `-e` option tells pip to install the repo as an editable package. This means that you can get updates from GitHub with `git pull`, rather than reinstalling.
+
 ## Usage
 
 As of the latest version of this repository, you *do not* need to be in the `utilities` folder to run scripts, but you *must* activate the environment:
@@ -63,9 +64,8 @@ The `evros` script wraps aegea (which can be tricky to use). It has sane default
 (utilities-env) ➜ evros --help
 usage: evros [--ecr-image ECR] [--queue QUEUE] [--vcpus VCPUS]
              [--memory MEMORY] [--storage STORAGE] [--ulimits U [U ...]]
-             [--environment ENV [ENV ...]] [--dryrun]
-             [--s3_script_bucket S3_SCRIPT_BUCKET]
-             [--s3_script_dir S3_SCRIPT_DIR] [-u] [-d] [-h]
+             [--environment ENV [ENV ...]] [--dryrun] [--branch BRANCH] [-d]
+             [-h]
              script_name ...
 
 Run batch jobs on AWS e.g. evros [options] demux.bcl2fastq [script args...]
@@ -76,7 +76,7 @@ basic arguments:
                         script_name)
 
 customize the instance:
-  --ecr-image ECR       ECR image to use for the job (default: sra_download)
+  --ecr-image ECR       ECR image to use for the job (default: demuxer)
   --queue QUEUE         Queue to submit the job (default: aegea_batch)
   --vcpus VCPUS         Number of vCPUs needed, e.g. 16 (default: None)
   --memory MEMORY       Amount of memory needed, in MB, e.g. 16000 (default:
@@ -91,13 +91,7 @@ customize the instance:
 other options:
   --dryrun              Print the command but don't launch the job (default:
                         False)
-  --s3_script_bucket S3_SCRIPT_BUCKET
-                        S3 bucket containing scripts (default: czbiohub-
-                        scripts)
-  --s3_script_dir S3_SCRIPT_DIR
-                        Path to scripts in S3 bucket, if any (default: None)
-  -u, --upload          Upload the script to S3 before running (default:
-                        False)
+  --branch BRANCH       branch of utilities repo to use (default: master)
   -d, --debug           Set logging to debug level (default: False)
   -h, --help            show this help message and exit
 
@@ -108,7 +102,23 @@ Scripts are located inside this repository. Scripts are referred to using *Pytho
 
 If the script defines a function named `get_default_requirements` it will call that function to set instance requirements for your job, so you do not need to specify them.
 
-If you write custom scripts that follow these conventions, you can put them in `utilities/utilities/custom` and run them with `evros custom.your_script`. A template script is included as an example.
+If you write custom scripts that follow these conventions, `evros` will be able to run them. A template script is included as an example. To run custom scripts, use the `--branch` option. First, create a new branch of the repo, then write your script (or modify an existing one). Once you've committed your changes, push them back to this repo. The batch job will run `git checkout [branch]` at runtime.
+
+
+```
+(utilities-env) ➜ git checkout -b my_custom_branch
+Switched to a new branch 'my_custom_branch'
+
+...[ make your changes to the code, e.g. create custom.my_custom_script ]...
+
+(utilities-env) ➜ git commit -am "here are all my changes"
+(utilities-env) ➜ git push --set-upstream origin my_custom_branch
+Total #### (delta ###), reused ### (delta ####)
+To github.com:czbiohub/utilities.git
+ * [new branch]      my_custom_branch -> my_custom_branch
+Branch 'my_custom_branch' set up to track remote branch 'my_custom_branch' from 'origin'.
+(utilities-env) ➜ evros --branch my_custom_branch custom.my_custom_script --arg1 --arg2
+```
 
 ### How to demux a thing using the standard workflow:
 
@@ -190,7 +200,7 @@ See https://github.com/czbiohub/utilities for more examples
 
 ```
 
-### How to share data on s3://czbiohub-seqbot with an outside collaborator
+### How to share data with an outside collaborator
 
 They don't need an AWS account but they _do_ need to install the [AWS CLI](aws.amazon.com/cli).
 
@@ -198,8 +208,11 @@ This script generates an access token for your collaborator to download from our
 
 To use the script, just give it the path to the folder you want to share (not including the bucket name, as shown below)
 
-**Note:** This script _only_ applies to the `czbiohub-seqbot` bucket. In the future we'll hopefully have more general tools for sharing our data.
+By default this will share data in the `czbiohub-seqbot` bucket. If you want to share data from somewhere else, give it the bucket name:
 
 ```
 (utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_token.txt
+(utilities-env) ➜ aws_access some/data/here my-own-bucket > download_token_for_my_bucket.txt
 ```
+
+If you need someone to _upload_ data to our S3 storage, there is a separate script for that, called `aws_upload`, which works similarly.
