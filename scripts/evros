@@ -54,7 +54,7 @@ if __name__ == '__main__':
     instance_group = parser.add_argument_group('customize the instance')
     image_group = instance_group.add_mutually_exclusive_group()
     image_group.add_argument(
-            '--ecr-image', metavar='ECR', default='sra_download',
+            '--ecr-image', metavar='ECR', default='demuxer',
             help='ECR image to use for the job'
     )
 
