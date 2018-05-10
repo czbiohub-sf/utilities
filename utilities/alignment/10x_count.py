@@ -103,9 +103,11 @@ def main(logger):
 
     # Run cellranger
     os.chdir(result_path)
-    command = [CELLRANGER, 'count', '--localmem=240',
-               '--nosecondary', '--cells={}'.format(args.cell_count),
-               '--sample={}'.format(sample_id), '--id={}'.format(sample_id),
+    command = [CELLRANGER, 'count',
+               '--localmem=240', '--nosecondary', '--disable-ui',
+               '--expect-cells={}'.format(args.cell_count),
+               '--sample={}'.format(sample_id),
+               '--id={}'.format(sample_id),
                '--fastqs={}'.format(fastq_path),
                '--transcriptome={}'.format(genome_dir)]
     log_command(logger, command, shell=True,
