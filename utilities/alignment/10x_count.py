@@ -11,14 +11,14 @@ from utilities.util import get_logger, log_command
 
 
 CELLRANGER = 'cellranger'
-GC_TABLE_GENERATOR = 'generate_gc_table_from_cellranger.py'
 
 S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/10xcount_logs/'
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=64, memory=256000, storage=2000)
+    return argparse.Namespace(vcpus=64, memory=256000, storage=2000,
+                              ecr_image='demuxer')
 
 
 def get_parser():
@@ -32,7 +32,7 @@ def get_parser():
     parser.add_argument('--taxon', required=True, choices=('homo', 'mus'))
     parser.add_argument('--cell_count', type=int, default=3000)
 
-    parser.add_argument('--make_gctable', action='store_true')
+    parser.add_argument('--glacier', action='store_true')
     parser.add_argument('--root_dir', default='/mnt')
 
     return parser
@@ -93,16 +93,21 @@ def main(logger):
     sys.stdout.flush()
 
     # download the fastq files
-    command = ['aws', 's3', 'cp', '--quiet', '--recursive',
+    command = ['aws', 's3', 'cp',
+               '--no-progress',
+               '--recursive',
+               '--force-glacier-transfer' if args.glacier else '',
                args.s3_input_dir, fastq_path]
     log_command(logger, command, shell=True)
 
 
     # Run cellranger
     os.chdir(result_path)
-    command = [CELLRANGER, 'count', '--localmem=240',
-               '--nosecondary', '--cells={}'.format(args.cell_count),
-               '--sample={}'.format(sample_id), '--id={}'.format(sample_id),
+    command = [CELLRANGER, 'count',
+               '--localmem=240', '--nosecondary', '--disable-ui',
+               '--expect-cells={}'.format(args.cell_count),
+               '--sample={}'.format(sample_id),
+               '--id={}'.format(sample_id),
                '--fastqs={}'.format(fastq_path),
                '--transcriptome={}'.format(genome_dir)]
     log_command(logger, command, shell=True,
@@ -140,30 +145,6 @@ def main(logger):
             logger.info("retrying cp {}.tgz".format(sample_id))
     else:
         raise RuntimeError("couldn't sync {}.tgz".format(sample_id))
-
-
-    if args.make_gctable:
-        command = [GC_TABLE_GENERATOR, '-d',
-                   os.path.join(sample_id, 'outs',
-                                'raw_gene_bc_matrices', genome_name),
-                   '-f', '{}.{}.cell-gene.csv'.format(sample_id, args.taxon),
-                   '-m', '500']
-        log_command(logger, command, shell=True)
-
-        command = ['aws', 's3', 'cp', '--quiet',
-                   '{}.{}.cell-gene.csv'.format(sample_id, args.taxon),
-                   '{}/'.format(args.s3_output_dir)]
-
-        for i in range(S3_RETRY):
-            try:
-                log_command(logger, command, shell=True)
-                break
-            except subprocess.CalledProcessError:
-                logger.info("retrying cp {}.{}.cell-gene.csv".format(
-                        sample_id, args.taxon))
-        else:
-            raise RuntimeError("couldn't sync {}.{}.cell-gene.csv".format(
-                    sample_id, args.taxon))
 
 
 if __name__ == "__main__":

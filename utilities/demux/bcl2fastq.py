@@ -19,6 +19,7 @@ S3_LOG_DIR = 's3://jamestwebber-logs/bcl2fastq_logs/'
 def get_default_requirements():
     return argparse.Namespace(vcpus=64, memory=256000, storage=2000,
                               queue='aegea_batch_demux',
+                              ecr_image='demuxer',
                               ulimits=['nofile:1000000'])
 
 

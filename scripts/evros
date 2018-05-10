@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
 import argparse
-import logging
 import importlib.util
 import json
 import os
 import subprocess
 
-import boto3
-import botocore.exceptions
+import utilities.util as ut
+
+REPO_ADDRESS = 'https://github.com/czbiohub/utilities.git'
 
 
+# helper function to check arguments are within a given range
 def resource_range(name, min_val, max_val):
     def range_validator(s):
         value = int(s)
@@ -23,28 +24,6 @@ def resource_range(name, min_val, max_val):
         return value
 
     return range_validator
-
-
-def get_logger(debug, dryrun):
-    new_logger = logging.getLogger(__name__)
-    new_logger.setLevel(logging.DEBUG if debug else logging.INFO)
-
-    # create a logging format
-    if dryrun:
-        formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - (DRYRUN) - %(message)s'
-        )
-    else:
-        formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
-    new_logger.addHandler(handler)
-
-    return new_logger
 
 
 if __name__ == '__main__':
@@ -105,12 +84,8 @@ if __name__ == '__main__':
     other_group = parser.add_argument_group('other options')
     other_group.add_argument('--dryrun', action='store_true',
                              help="Print the command but don't launch the job")
-    other_group.add_argument('--s3_script_bucket', default='czbiohub-scripts',
-                             help="S3 bucket containing scripts")
-    other_group.add_argument('--s3_script_dir',
-                             help="Path to scripts in S3 bucket, if any")
-    other_group.add_argument('-u', '--upload', action='store_true',
-                             help="Upload the script to S3 before running")
+    other_group.add_argument('--branch', default='master',
+                             help="branch of utilities repo to use")
     other_group.add_argument('-d', '--debug', action='store_true',
                              help="Set logging to debug level")
     other_group.add_argument('-h', '--help', action='help',
@@ -118,7 +93,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    logger = get_logger(args.debug, args.dryrun)
+    logger = ut.get_logger(__name__, args.debug, args.dryrun)[0]
 
     logger.debug('Importing script as a module')
     if not args.script_name.startswith('.'):
@@ -162,42 +137,13 @@ if __name__ == '__main__':
 
     logger.debug('Script parsed args successfully')
 
-    logger.debug("Starting S3 client")
-    client = boto3.client('s3')
-
-    s3_key = os.path.join(args.s3_script_dir or '', script_base)
-    logger.debug("Filename: {}, Bucket: {}, Key: {}".format(
-            args.script_name, args.s3_script_bucket, s3_key)
-    )
-
-    if args.upload:
-        logger.info("Uploading {} to s3://{}".format(
-                script_base, os.path.join(args.s3_script_bucket, s3_key))
-        )
-        if not args.dryrun:
-            client.upload_file(
-                    Filename=os.path.abspath(script_module.__file__),
-                    Bucket=args.s3_script_bucket,
-                    Key=s3_key
-            )
-    else:
-        logger.info("Checking s3://{} for {}".format(
-                os.path.join(args.s3_script_bucket, s3_key), script_base)
-        )
-        try:
-            client.head_object(
-                    Bucket=args.s3_script_bucket,
-                    Key=s3_key
-            )
-        except botocore.exceptions.ClientError:
-            raise ValueError("{} is not on S3, you should upload it.".format(
-                    script_base))
-
-
-    job_command = "aws s3 cp s3://{} .; chmod 755 {}; ./{} {}".format(
-            os.path.join(args.s3_script_bucket, s3_key),
-            script_base, script_base, ' '.join(args.script_args)
-    )
+    job_command = '; '.join((
+        'cd utilities',
+        'git checkout {}'.format(args.branch),
+        'git pull',
+        'python -m utilities.{} {}'.format(args.script_name,
+                                           ' '.join(args.script_args))
+    ))
 
     aegea_command = ['aegea', 'batch', 'submit',
                      '--queue', args.queue,
