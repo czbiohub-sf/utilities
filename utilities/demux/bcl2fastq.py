@@ -41,12 +41,15 @@ def get_parser():
                         default='s3://czbiohub-seqbot/sample-sheets')
 
     parser.add_argument('--star_structure', action='store_true')
-    parser.add_argument('--bcl2fastq_options', default='--no-lane-splitting')
     parser.add_argument('--skip_undetermined', action='store_true')
 
     parser.add_argument('--sample_sheet_name', default=None,
                         help='Defaults to [exp_id].csv')
     parser.add_argument('--root_dir', default='/mnt')
+
+    parser.add_argument('--bcl2fastq_options',
+                        default=['--no-lane-splitting'],
+                        nargs=argparse.REMAINDER)
 
     return parser
 
