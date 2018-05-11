@@ -117,7 +117,7 @@ def main(logger):
     p = subprocess.Popen([command], shell=True)
 
     # Run bcl2 fastq
-    command = [BCL2FASTQ, args.bcl2fastq_options,
+    command = [BCL2FASTQ, ' '.join(args.bcl2fastq_options),
                '--sample-sheet', os.path.join(result_path,
                                               args.sample_sheet_name),
                '-R', bcl_path, '-o', output_path]
