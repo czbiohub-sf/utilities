@@ -1,0 +1,19 @@
+build_docker_image:
+  base_image: ubuntu:16.04
+
+build_image:
+  commands:
+    $extend:
+      - "apt-get update"
+      - "apt-get install --yes alien"
+      - "apt-get install --yes unzip"
+      - "wget -P /tmp/ https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-0-linux-x86-64.zip"
+      - "unzip /tmp/bcl2fastq2-v2-20-0-linux-x86-64.zip -d /tmp/"
+      - "alien -i /tmp/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm"
+      - "curl -L https://s3.amazonaws.com/czbiohub-scripts/other_software/cellranger-2.1.1.tar.gz > cellranger.tar.gz"
+      - "tar xfz cellranger.tar.gz"
+      - "mv cellranger-2.1.1/* /usr/bin/"
+      - "git clone https://github.com/czbiohub/utilities.git"
+      - "cd utilities"
+      - "pip upgrade"
+      - "pip install --upgrade -e ."

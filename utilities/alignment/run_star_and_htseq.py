@@ -40,7 +40,7 @@ CURR_MIN_VER = datetime.date(2017, 3, 1)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=16, memory=64000, storage=500)
+    return argparse.Namespace(vcpus=16, memory=64000, storage=500, ecr_image='aligner')
 
 
 def get_parser():
