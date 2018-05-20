@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# a simple script to set up a GPU-enabled Jupyter notebook on Fry
-# assumes you have an account on Fry already
+# a simple script to set up a GPU-enabled Jupyter notebook on Fry/Fry2
+# assumes you have an account on there already
 
 import argparse
 import signal
@@ -11,62 +11,45 @@ import threading
 import time
 import webbrowser
 
+# TODO: have some kinda config file for this
+
 def launch_tab(port):
     time.sleep(5)
     webbrowser.get('chrome').open_new_tab(f'http://localhost:{port}')
 
 
-USERS = ('batson', 'botvinnik', 'kefayati', 'webber')
-
-PORTS = {'batson': 8890,
-         'botvinnik': 7788,
-         'kefayati': 8899,
-         'webber': 8889}
-
-GPUS = {'batson': '0',
-        'botvinnik': '1',
-        'kefayati': '2',
-        'webber': '3'}
-
 parser = argparse.ArgumentParser(
         prog='frython',
         description=(
-            "Set up a tensorflow-gpu-py3 docker on Fry\n"
-            "and forward it to a local port so you can use it"
+            "Launch a docker instance on Fry (default: TensorFlow)\n"
+            "and forward it to a local port so you can use jupyter"
         )
 )
 
-parser.add_argument('--port', type=int,
+parser.add_argument('-u', '--username', required=True, help='Username on Fry')
+parser.add_argument('-p', '--port', type=int, required=True,
                     help='Port to use on Fry and locally')
-parser.add_argument('--username', required=True, choices=USERS,
-                    help='Username on Fry')
-parser.add_argument('--gpus', help='GPU(s) to use. Be nice!')
-parser.add_argument('--container',
+parser.add_argument('-g', '--gpus', required=True, help='GPU(s) to use. Be nice!')
+parser.add_argument('-c', '--container',
                     default='gcr.io/tensorflow/tensorflow:latest-gpu-py3',
                     help='Container to run. Default: latest tensorflow-gpu-py3')
+parser.add_argument('-x', '--command', default=None)
+
+parser.add_argument('--server', default='fry', choices=('fry', 'fry2'))
 
 args = parser.parse_args()
 
-if args.port is None and args.username in PORTS:
-    args.port = PORTS[args.username]
-elif args.port is None:
-    raise ValueError(f'No port reserved for {args.username}, open a PR')
-
-if args.gpus is None and args.username in GPUS:
-    args.gpus = GPUS[args.username]
-elif args.gpus is None:
-    raise ValueError(f'No default GPU for {args.username}, open a PR')
-
 
 gpu_cmd = [
-    'ssh', '-tt', '{}@fry'.format(args.username),
+    'ssh', '-tt', '{}@{}'.format(args.username, args.server),
     ' '.join((f'NV_GPU={args.gpus} nvidia-docker run -it --rm',
               f'-p {args.port}:8888',
               f'-v /home/{args.username}:/notebooks/{args.username}',
-              args.container))
+              args.container,
+              args.command or ''))
 ]
 port_cmd = ['ssh', '-NL', 'localhost:{}:localhost:{}'.format(args.port, args.port),
-            '{}@fry'.format(args.username)]
+            '{}@{}'.format(args.username, args.server)]
 
 print('Running\n\t{}'.format(' '.join(port_cmd)))
 port_proc = subprocess.Popen(' '.join(port_cmd), shell=True)
