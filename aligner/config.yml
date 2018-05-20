@@ -4,13 +4,14 @@ build_docker_image:
 build_image:
   commands:
     $extend:
-      - "apt-get update"
+      - "yes | apt-get update"
+      - "yes | apt-get install libbz2-1.0 libbz2-dev liblzma-dev"
+      - "pip install htseq"
       - "curl -L https://github.com/alexdobin/STAR/archive/2.6.0c.tar.gz | tar xz"
       - "mv STAR-2.6.0c/bin/Linux_x86_64_static/* /usr/local/bin"
       - "rm -rf STAR-2.6.0c"
       - "curl -L https://sourceforge.net/projects/samtools/files/samtools/1.8/samtools-1.8.tar.bz2/download | tar xj"
-      - "cd samtools-1.8; make; make install; samtools --version"
+      - "cd samtools-1.8; ./configure; make; make install; samtools --version; cd -"
       - "git clone https://github.com/czbiohub/utilities.git"
       - "cd utilities"
-      - "pip upgrade"
       - "pip install --upgrade -e ."
