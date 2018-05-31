@@ -14,6 +14,7 @@ BCL2FASTQ = 'bcl2fastq'
 
 S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/bcl2fastq_logs/'
+ROOT_DIR = '/mnt'
 
 
 def get_default_requirements():
@@ -32,24 +33,32 @@ def get_parser():
     parser.add_argument('--exp_id', required=True)
 
     parser.add_argument('--s3_input_dir',
-                        default='s3://czbiohub-seqbot/bcl')
+                        default='s3://czbiohub-seqbot/bcl',
+                        help='S3 path for [exp_id] folder of BCL files')
     parser.add_argument('--s3_output_dir',
-                        default='s3://czbiohub-seqbot/fastqs')
+                        default='s3://czbiohub-seqbot/fastqs',
+                        help='S3 path to put fastq files')
     parser.add_argument('--s3_report_dir',
-                        default='s3://czbiohub-seqbot/reports')
+                        default='s3://czbiohub-seqbot/reports',
+                        help='S3 path to put the bcl2fastq report')
     parser.add_argument('--s3_sample_sheet_dir',
-                        default='s3://czbiohub-seqbot/sample-sheets')
+                        default='s3://czbiohub-seqbot/sample-sheets',
+                        help='S3 path to look for the sample sheet')
 
-    parser.add_argument('--star_structure', action='store_true')
-    parser.add_argument('--skip_undetermined', action='store_true')
+    parser.add_argument('--star_structure', action='store_true',
+                        help='Group the fastq files into folders based on sample name')
+    parser.add_argument('--skip_undetermined', action='store_true',
+                        help="Don't upload the Undetermined files (can save time)")
 
     parser.add_argument('--sample_sheet_name', default=None,
                         help='Defaults to [exp_id].csv')
-    parser.add_argument('--root_dir', default='/mnt')
+    parser.add_argument('--force-glacier', action='store_true',
+                        help='Force a transfer from Glacier storage')
 
     parser.add_argument('--bcl2fastq_options',
                         default=['--no-lane-splitting'],
-                        nargs=argparse.REMAINDER)
+                        nargs=argparse.REMAINDER,
+                        help='Options to pass to bcl2fastq')
 
     return parser
 
@@ -60,15 +69,14 @@ def main(logger):
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        args.root_dir = os.path.join(args.root_dir,
-                                     os.environ['AWS_BATCH_JOB_ID'])
+        ROOT_DIR = os.path.join(ROOT_DIR, os.environ['AWS_BATCH_JOB_ID'])
 
 
     if args.sample_sheet_name is None:
         args.sample_sheet_name = '{}.csv'.format(args.exp_id)
 
     # local directories
-    result_path = os.path.join(args.root_dir, 'data', 'hca', args.exp_id)
+    result_path = os.path.join(ROOT_DIR, 'data', 'hca', args.exp_id)
     bcl_path = os.path.join(result_path, 'bcl')
     output_path = os.path.join(result_path, 'fastqs')
 
@@ -96,6 +104,7 @@ def main(logger):
 
     # download the bcl files
     command = ['aws', 's3', 'sync', '--quiet',
+               '--force-glacier-transfer' if args.force_glacier else '',
                os.path.join(args.s3_input_dir, args.exp_id), bcl_path]
     for i in range(S3_RETRY):
         try:
