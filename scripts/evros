@@ -139,8 +139,8 @@ if __name__ == '__main__':
 
     job_command = '; '.join((
         'cd utilities',
-        'git checkout {}'.format(args.branch),
         'git pull',
+        'git checkout {}'.format(args.branch),
         'python -m utilities.{} {}'.format(args.script_name,
                                            ' '.join(args.script_args))
     ))
