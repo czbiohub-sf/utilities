@@ -14,7 +14,6 @@ import utilities.util as ut
 
 S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/star_logs/'
-ROOT_DIR = '/mnt'
 
 STAR = "/usr/local/bin/STAR"
 HTSEQ = "htseq-count"
@@ -209,21 +208,23 @@ def main(logger):
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        ROOT_DIR = os.path.join(ROOT_DIR, os.environ['AWS_BATCH_JOB_ID'])
+        root_dir = os.path.join('/mnt', os.environ['AWS_BATCH_JOB_ID'])
+    else:
+        root_dir = '/mnt'
 
-    run_dir = os.path.join(ROOT_DIR, 'data', 'hca')
+    run_dir = os.path.join(root_dir, 'data', 'hca')
     os.makedirs(run_dir)
 
     if args.taxon == 'homo':
-        genome_dir = os.path.join(ROOT_DIR, "genome/STAR/HG38-PLUS/")
+        genome_dir = os.path.join(root_dir, "genome/STAR/HG38-PLUS/")
         ref_genome_file = 'hg38-plus.tgz'
         ref_genome_star_file = 'HG38-PLUS.tgz'
-        sjdb_gtf = os.path.join(ROOT_DIR, 'genome', 'hg38-plus', 'hg38-plus.gtf')
+        sjdb_gtf = os.path.join(root_dir, 'genome', 'hg38-plus', 'hg38-plus.gtf')
     elif args.taxon == 'mus':
-        genome_dir = os.path.join(ROOT_DIR, "genome/STAR/MM10-PLUS/")
+        genome_dir = os.path.join(root_dir, "genome/STAR/MM10-PLUS/")
         ref_genome_file = 'mm10-plus.tgz'
         ref_genome_star_file = 'MM10-PLUS.tgz'
-        sjdb_gtf = os.path.join(ROOT_DIR, 'genome', 'mm10-plus', 'mm10-plus.gtf')
+        sjdb_gtf = os.path.join(root_dir, 'genome', 'mm10-plus', 'mm10-plus.gtf')
 
     else:
         raise ValueError('Invalid taxon {}'.format(args.taxon))
@@ -254,27 +255,27 @@ def main(logger):
     )
 
     # download the genome data
-    os.mkdir(os.path.join(ROOT_DIR, 'genome'))
+    os.mkdir(os.path.join(root_dir, 'genome'))
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
-               os.path.join(ROOT_DIR, 'genome/')]
+               os.path.join(root_dir, 'genome/')]
     ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'. format(ref_genome_file))
-    with tarfile.open(os.path.join(ROOT_DIR, 'genome', ref_genome_file)) as tf:
-        tf.extractall(path=os.path.join(ROOT_DIR, 'genome'))
+    with tarfile.open(os.path.join(root_dir, 'genome', ref_genome_file)) as tf:
+        tf.extractall(path=os.path.join(root_dir, 'genome'))
 
 
     # download STAR stuff
-    os.mkdir(os.path.join(ROOT_DIR, 'genome', 'STAR'))
+    os.mkdir(os.path.join(root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', 'STAR', ref_genome_star_file),
-               os.path.join(ROOT_DIR, 'genome', 'STAR/')]
+               os.path.join(root_dir, 'genome', 'STAR/')]
     ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'.format(ref_genome_star_file))
-    with tarfile.open(os.path.join(ROOT_DIR, 'genome', 'STAR', ref_genome_star_file)) as tf:
-        tf.extractall(path=os.path.join(ROOT_DIR ,'genome', 'STAR'))
+    with tarfile.open(os.path.join(root_dir, 'genome', 'STAR', ref_genome_star_file)) as tf:
+        tf.extractall(path=os.path.join(root_dir ,'genome', 'STAR'))
 
 
     # Load Genome Into Memory

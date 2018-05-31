@@ -14,7 +14,6 @@ BCL2FASTQ = 'bcl2fastq'
 
 S3_RETRY = 5
 S3_LOG_DIR = 's3://jamestwebber-logs/bcl2fastq_logs/'
-ROOT_DIR = '/mnt'
 
 
 def get_default_requirements():
@@ -69,14 +68,15 @@ def main(logger):
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        ROOT_DIR = os.path.join(ROOT_DIR, os.environ['AWS_BATCH_JOB_ID'])
-
+        root_dir = os.path.join('/mnt', os.environ['AWS_BATCH_JOB_ID'])
+    else:
+        root_dir = '/mnt'
 
     if args.sample_sheet_name is None:
         args.sample_sheet_name = '{}.csv'.format(args.exp_id)
 
     # local directories
-    result_path = os.path.join(ROOT_DIR, 'data', 'hca', args.exp_id)
+    result_path = os.path.join(root_dir, 'data', 'hca', args.exp_id)
     bcl_path = os.path.join(result_path, 'bcl')
     output_path = os.path.join(result_path, 'fastqs')
 
