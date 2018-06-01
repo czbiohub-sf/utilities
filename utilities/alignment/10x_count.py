@@ -106,7 +106,6 @@ def main(logger):
     command = [CELLRANGER, 'count',
                '--localmem=240', '--nosecondary', '--disable-ui',
                '--expect-cells={}'.format(args.cell_count),
-               '--sample={}'.format(sample_id),
                '--id={}'.format(sample_id),
                '--fastqs={}'.format(fastq_path),
                '--transcriptome={}'.format(genome_dir)]
