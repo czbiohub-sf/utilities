@@ -62,15 +62,17 @@ def get_parser():
     parser.add_argument('--htseq_proc', type=int, default=4,
                         help='Number of htseq processes to run')
 
-    parser.add_argument('--force_realign', action='store_true')
-    parser.add_argument('--root_dir', default='/mnt')
+    parser.add_argument('--force_realign', action='store_true',
+                        help='Align files even when results already exist')
+    parser.add_argument('--force-glacier', action='store_true',
+                        help='Force a transfer from Glacier storage')
 
     return parser
 
 
 # def run_sample(sample_name, exp_id):
 def run_sample(star_queue, htseq_queue, log_queue,
-               s3_input_dir, genome_dir, run_dir, n_proc):
+               s3_input_dir, genome_dir, run_dir, n_proc, force_glacier):
     for sample_name,exp_id in iter(star_queue.get, 'STOP'):
         log_queue.put(('{} - {}'.format(exp_id, sample_name), logging.INFO))
         dest_dir = os.path.join(run_dir, exp_id, sample_name)
@@ -83,6 +85,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
         # copy fastq.gz from s3 to local
         s3_source = os.path.join(s3_input_dir, exp_id, 'rawdata')
         command = ['aws', 's3', 'cp', '--quiet', '--recursive',
+                   '--force-glacier-transfer' if force_glacier else '',
                    s3_source, os.path.join(dest_dir, 'rawdata'),
                    '--exclude', "'*'",
                    '--include', "'*{}*.fastq.gz'".format(sample_name)]
@@ -205,24 +208,23 @@ def main(logger):
     args = parser.parse_args()
 
     if os.environ.get('AWS_BATCH_JOB_ID'):
-        args.root_dir = os.path.join(args.root_dir,
-                                     os.environ['AWS_BATCH_JOB_ID'])
+        root_dir = os.path.join('/mnt', os.environ['AWS_BATCH_JOB_ID'])
+    else:
+        root_dir = '/mnt'
 
-    run_dir = os.path.join(args.root_dir, 'data', 'hca')
+    run_dir = os.path.join(root_dir, 'data', 'hca')
     os.makedirs(run_dir)
 
     if args.taxon == 'homo':
-        genome_dir = os.path.join(args.root_dir, "genome/STAR/HG38-PLUS/")
+        genome_dir = os.path.join(root_dir, "genome/STAR/HG38-PLUS/")
         ref_genome_file = 'hg38-plus.tgz'
         ref_genome_star_file = 'HG38-PLUS.tgz'
-        sjdb_gtf = os.path.join(args.root_dir, 'genome', 'hg38-plus',
-                                'hg38-plus.gtf')
+        sjdb_gtf = os.path.join(root_dir, 'genome', 'hg38-plus', 'hg38-plus.gtf')
     elif args.taxon == 'mus':
-        genome_dir = os.path.join(args.root_dir, "genome/STAR/MM10-PLUS/")
+        genome_dir = os.path.join(root_dir, "genome/STAR/MM10-PLUS/")
         ref_genome_file = 'mm10-plus.tgz'
         ref_genome_star_file = 'MM10-PLUS.tgz'
-        sjdb_gtf = os.path.join(args.root_dir, 'genome', 'mm10-plus',
-                                'mm10-plus.gtf')
+        sjdb_gtf = os.path.join(root_dir, 'genome', 'mm10-plus', 'mm10-plus.gtf')
 
     else:
         raise ValueError('Invalid taxon {}'.format(args.taxon))
@@ -253,30 +255,27 @@ def main(logger):
     )
 
     # download the genome data
-    os.mkdir(os.path.join(args.root_dir, 'genome'))
+    os.mkdir(os.path.join(root_dir, 'genome'))
     command = ['aws', 's3', 'cp', '--quiet',
                os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
-               os.path.join(args.root_dir, 'genome/')]
+               os.path.join(root_dir, 'genome/')]
     ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'. format(ref_genome_file))
-    with tarfile.open(os.path.join(args.root_dir, 'genome',
-                                   ref_genome_file)) as tf:
-        tf.extractall(path=os.path.join(args.root_dir, 'genome'))
+    with tarfile.open(os.path.join(root_dir, 'genome', ref_genome_file)) as tf:
+        tf.extractall(path=os.path.join(root_dir, 'genome'))
 
 
     # download STAR stuff
-    os.mkdir(os.path.join(args.root_dir, 'genome', 'STAR'))
+    os.mkdir(os.path.join(root_dir, 'genome', 'STAR'))
     command = ['aws', 's3', 'cp', '--quiet',
-               os.path.join('s3://czi-hca', 'ref-genome', 'STAR',
-                            ref_genome_star_file),
-               os.path.join(args.root_dir, 'genome', 'STAR/')]
+               os.path.join('s3://czi-hca', 'ref-genome', 'STAR', ref_genome_star_file),
+               os.path.join(root_dir, 'genome', 'STAR/')]
     ut.log_command(logger, command, shell=True)
 
     logger.debug('Extracting {}'.format(ref_genome_star_file))
-    with tarfile.open(os.path.join(args.root_dir, 'genome',
-                                   'STAR', ref_genome_star_file)) as tf:
-        tf.extractall(path=os.path.join(args.root_dir ,'genome', 'STAR'))
+    with tarfile.open(os.path.join(root_dir, 'genome', 'STAR', ref_genome_star_file)) as tf:
+        tf.extractall(path=os.path.join(root_dir ,'genome', 'STAR'))
 
 
     # Load Genome Into Memory
@@ -291,7 +290,7 @@ def main(logger):
     n_star_procs = mp.cpu_count() / args.star_proc
 
     star_args = (star_queue, htseq_queue, log_queue, args.s3_input_dir,
-                 genome_dir, run_dir, args.star_proc)
+                 genome_dir, run_dir, args.star_proc, args.force_glacier)
     star_procs = [mp.Process(target=run_sample, args=star_args)
                   for i in range(n_star_procs)]
 
