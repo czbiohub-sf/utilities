@@ -1,13 +1,12 @@
 #!/bin/bash -e
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <S3_DIR> <S3_BUCKET>"
+  echo "Usage: $0 <S3_PATH> <S3_BUCKET>"
   exit 1
 fi
 
-s3_dir=$1
+s3_path=$1
 s3_bucket=$2
-
 
 # Build and run aws command to share the folder
 cmd="aws sts get-federation-token --name ro_upload_access --duration-seconds 129600 --policy '{
@@ -24,14 +23,14 @@ cmd="aws sts get-federation-token --name ro_upload_access --duration-seconds 129
      \"Sid\": \"AllowListingOfSpecificFolder\",
      \"Action\": [\"s3:ListBucket\"],
      \"Effect\": \"Allow\",
-     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_dir\"]
-     \"Condition\":{\"StringLike\":{\"s3:prefix\":[\"$s3_dir/*\"]}}
+     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path\"]
+     \"Condition\":{\"StringLike\":{\"s3:prefix\":[\"$s3_path*\"]}}
    },
    {
      \"Sid\": \"AllowAllS3ActionsInUserFolder\",
      \"Effect\": \"Allow\",
      \"Action\": [\"s3:Get*\", \"s3:Put*\"],
-     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_dir/*\"]
+     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path*\"]
    }
  ]
 }'"
@@ -58,10 +57,10 @@ echo Mac/Linux instructions:
 echo  export AWS_ACCESS_KEY_ID=$ACCESSKEY
 echo  export AWS_SECRET_ACCESS_KEY=$SECRETKEY
 echo  export AWS_SESSION_TOKEN=$TOKEN
-echo  aws s3 sync some_file_or_folder s3://$s3_bucket/$s3_dir
+echo  aws s3 sync some_file_or_folder s3://$s3_bucket/$s3_path
 echo
 echo Windows instructions:
 echo  SET AWS_ACCESS_KEY_ID=$ACCESSKEY
 echo  SET AWS_SECRET_ACCESS_KEY=$SECRETKEY
 echo  SET AWS_SESSION_TOKEN=$TOKEN
-echo  aws s3 sync some_file_or_folder s3://$s3_bucket/$s3_dir
+echo  aws s3 sync some_file_or_folder s3://$s3_bucket/$s3_path
