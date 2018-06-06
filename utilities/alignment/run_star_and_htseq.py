@@ -102,9 +102,10 @@ def run_sample(star_queue, htseq_queue, log_queue,
         # start running STAR
         # getting input files first
 
-        reads = [os.path.join(d, fn)
-                 for d,sd,fns in os.walk(os.path.join(dest_dir, 'rawdata'))
-                 for fn in fns if fn.endswith('fastq.gz')]
+        reads = sorted(os.path.join(d, fn)
+                       for d,sd,fns in os.walk(os.path.join(dest_dir, 'rawdata'))
+                       for fn in fns if fn.endswith('fastq.gz'))
+
         if not reads:
             log_queue.put(("Empty reads for %s" % s3_source, logging.INFO))
             return
