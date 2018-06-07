@@ -10,7 +10,7 @@ build_image:
       - "curl -L https://github.com/alexdobin/STAR/archive/2.6.0c.tar.gz | tar xz"
       - "mv STAR-2.6.0c/bin/Linux_x86_64_static/* /usr/local/bin"
       - "rm -rf STAR-2.6.0c"
-      - "curl -L https://sourceforge.net/projects/samtools/files/samtools/1.8/samtools-1.8.tar.bz2/download | tar xj"
+      - "curl -L https://github.com/samtools/samtools/releases/download/1.8/samtools-1.8.tar.bz2 | tar xj"
       - "cd samtools-1.8; ./configure; make; make install; samtools --version; cd -"
       - "git clone https://github.com/czbiohub/utilities.git"
       - "cd utilities"
