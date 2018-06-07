@@ -10,6 +10,9 @@ import tarfile
 import multiprocessing as mp
 
 import utilities.util as ut
+import utilities.s3_util as s3u
+
+import boto3
 
 
 S3_RETRY = 5
@@ -51,6 +54,9 @@ def get_parser():
 
     parser.add_argument('--taxon', choices=('homo', 'mus'))
 
+    parser.add_argument('--s3_input_bucket', default='czbiohub-seqbot',
+                        help='Bucket containing fastq files')
+    parser.add_argument('--s3_output_bucket')
     parser.add_argument('--s3_input_dir',
                         default='s3://czbiohub-seqbot/fastqs')
     parser.add_argument('--num_partitions', type=int, required=True)
@@ -102,9 +108,10 @@ def run_sample(star_queue, htseq_queue, log_queue,
         # start running STAR
         # getting input files first
 
-        reads = [os.path.join(d, fn)
-                 for d,sd,fns in os.walk(os.path.join(dest_dir, 'rawdata'))
-                 for fn in fns if fn.endswith('fastq.gz')]
+        reads = sorted(os.path.join(d, fn)
+                       for d,sd,fns in os.walk(os.path.join(dest_dir, 'rawdata'))
+                       for fn in fns if fn.endswith('fastq.gz'))
+
         if not reads:
             log_queue.put(("Empty reads for %s" % s3_source, logging.INFO))
             return
@@ -218,12 +225,12 @@ def main(logger):
     if args.taxon == 'homo':
         genome_dir = os.path.join(root_dir, "genome/STAR/HG38-PLUS/")
         ref_genome_file = 'hg38-plus.tgz'
-        ref_genome_star_file = 'HG38-PLUS.tgz'
+        ref_genome_star_file = 'STAR/HG38-PLUS.tgz'
         sjdb_gtf = os.path.join(root_dir, 'genome', 'hg38-plus', 'hg38-plus.gtf')
     elif args.taxon == 'mus':
         genome_dir = os.path.join(root_dir, "genome/STAR/MM10-PLUS/")
         ref_genome_file = 'mm10-plus.tgz'
-        ref_genome_star_file = 'MM10-PLUS.tgz'
+        ref_genome_star_file = 'STAR/MM10-PLUS.tgz'
         sjdb_gtf = os.path.join(root_dir, 'genome', 'mm10-plus', 'mm10-plus.gtf')
 
     else:
@@ -254,28 +261,27 @@ def main(logger):
             )
     )
 
+
+    s3 = boto3.resource('s3')
+
     # download the genome data
     os.mkdir(os.path.join(root_dir, 'genome'))
-    command = ['aws', 's3', 'cp', '--quiet',
-               os.path.join('s3://czi-hca', 'ref-genome', ref_genome_file),
-               os.path.join(root_dir, 'genome/')]
-    ut.log_command(logger, command, shell=True)
+    logger.info('Downloading and extracting genome data {}'.format(ref_genome_file))
 
-    logger.debug('Extracting {}'. format(ref_genome_file))
-    with tarfile.open(os.path.join(root_dir, 'genome', ref_genome_file)) as tf:
+    object = s3.Object('czbiohub-reference', ref_genome_file)
+
+    with tarfile.open(fileobj=object.get()['Body'], mode='r:gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome'))
 
 
     # download STAR stuff
     os.mkdir(os.path.join(root_dir, 'genome', 'STAR'))
-    command = ['aws', 's3', 'cp', '--quiet',
-               os.path.join('s3://czi-hca', 'ref-genome', 'STAR', ref_genome_star_file),
-               os.path.join(root_dir, 'genome', 'STAR/')]
-    ut.log_command(logger, command, shell=True)
+    logger.info('Downloading and extracting STAR data {}'.format(ref_genome_star_file))
 
-    logger.debug('Extracting {}'.format(ref_genome_star_file))
-    with tarfile.open(os.path.join(root_dir, 'genome', 'STAR', ref_genome_star_file)) as tf:
-        tf.extractall(path=os.path.join(root_dir ,'genome', 'STAR'))
+    object = s3.Object('czbiohub-reference', ref_genome_star_file)
+
+    with tarfile.open(fileobj=object.get()['Body'], mode='r:gz') as tf:
+        tf.extractall(path=os.path.join(root_dir, 'genome', 'STAR'))
 
 
     # Load Genome Into Memory
@@ -314,14 +320,10 @@ def main(logger):
             continue
 
         # Check the exp_id folder for existing runs
-        try:
-            command = ['aws', 's3', 'ls',
-                       os.path.join(args.s3_input_dir, exp_id, 'results/')]
-            logger.info(' '.join(command))
-            output = subprocess.check_output(' '.join(command),
-                                             shell=True).split('\n')
-        except subprocess.CalledProcessError:
-            logger.info("Nothing in the results directory")
+        if not args.force_realign:
+            output = list(s3_util.get_files(bucket=args.s3_input_bucket,
+                                            prefix=args.s3_input_dir))
+        else:
             output = []
 
         output_files = {(tuple(line[:10].split('-')), line.split()[-1])
@@ -329,22 +331,26 @@ def main(logger):
                         if line.strip().endswith('htseq-count.txt')}
         output_files = {fn for dt,fn in output_files
                         if datetime.date(*map(int, dt)) > CURR_MIN_VER}
-        logger.info("number of files: {}".format(len(output_files)))
+        logger.info("Skipping {} existing results".format(len(output_files)))
 
         logger.info("Running partition {} of {} for exp {}".format(
                 args.partition_id, args.num_partitions, exp_id)
         )
 
-        command = ['aws', 's3', 'ls', '--recursive',
-                   os.path.join(args.s3_input_dir, exp_id, 'rawdata/')]
-        logger.info(' '.join(command))
-        try:
-            output = subprocess.check_output(' '.join(command),
-                                             shell=True).split("\n")
-            output = [fn.split()[-1] for fn in output if fn.endswith('fastq.gz')]
-        except subprocess.CalledProcessError:
-            logger.info("Nothing in the rawdata directory", exc_info=True)
-            output = []
+        output = list(s3_util.get_files(bucket=args.s3_input_bucket,
+                                        prefix=args.s3_input_dir))
+        output = [fn.split()[-1] for fn in output if fn.endswith('fastq.gz')]
+
+#         command = ['aws', 's3', 'ls', '--recursive',
+#                    os.path.join(args.s3_input_dir, exp_id, 'rawdata/')]
+#         logger.info(' '.join(command))
+#         try:
+#             output = subprocess.check_output(' '.join(command),
+#                                              shell=True).split("\n")
+#             output = [fn.split()[-1] for fn in output if fn.endswith('fastq.gz')]
+#         except subprocess.CalledProcessError:
+#             logger.info("Nothing in the rawdata directory", exc_info=True)
+#             output = []
 
         logger.info("number of fastq files: {}".format(len(output)))
 

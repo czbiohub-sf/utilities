@@ -131,3 +131,24 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
     finally:
         p.close()
         p.join()
+
+
+def download_file(k):
+    key, dest = k
+    s3c.download_file(Bucket=bucket, Key=key, Filename=dest)
+
+
+def download_files(src_list, dest_list, *, b, n_proc=16):
+    """Download a list of file to local storage"""
+
+    global s3c
+    s3c = boto3.client('s3')
+    global bucket
+    bucket = b
+
+    try:
+        multiprocessing.Pool(processes=n_proc)
+        p.map(download_file, src_list, dest_list, chunksize=100)
+    finally:
+        p.close()
+        p.join()
