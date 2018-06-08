@@ -27,8 +27,8 @@ def process_logs(q, logger):
 
 
 def get_logger(name, debug=False, dryrun=False):
-    logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
 
     # create a logging format
     if dryrun:
