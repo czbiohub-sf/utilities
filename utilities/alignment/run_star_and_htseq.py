@@ -19,7 +19,7 @@ import boto3
 
 S3_LOG_DIR = 's3://jamestwebber-logs/star_logs/'
 
-STAR = "/usr/local/bin/STAR"
+STAR = "STAR"
 HTSEQ = "htseq-count"
 SAMTOOLS = "samtools"
 
