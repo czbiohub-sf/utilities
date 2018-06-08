@@ -282,7 +282,7 @@ def main(logger):
     star_queue = mp.Queue()
     htseq_queue = mp.Queue()
 
-    n_star_procs = mp.cpu_count() / args.star_proc
+    n_star_procs = mp.cpu_count() // args.star_proc
 
     star_args = (star_queue, htseq_queue, log_queue, s3_input_bucket,
                  genome_dir, run_dir, args.star_proc)
