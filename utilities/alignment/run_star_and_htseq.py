@@ -329,8 +329,8 @@ def main(logger):
         )
 
         output = [
-            fn for fn in s3u.get_files(args.s3_input_bucket,
-                                       os.path.join(args.s3_input_prefix, input_dir))
+            fn for fn in s3u.get_files(s3_input_bucket,
+                                       os.path.join(s3_input_prefix, input_dir))
             if fn.endswith('fastq.gz')
         ]
 
