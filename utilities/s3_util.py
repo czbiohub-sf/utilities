@@ -9,6 +9,13 @@ import multiprocessing
 from collections import defaultdict, Counter
 
 
+# cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
+def s3_bucket_and_key(s3_uri):
+    prefix = "s3://"
+    assert s3_uri.startswith(prefix)
+    return s3_uri[len(prefix):].split("/", 1)
+
+
 def prefix_gen(bucket, prefix, fn=None):
     """Generic generator of fn(result) from an S3 paginator"""
     client = boto3.client('s3')
