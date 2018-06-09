@@ -106,23 +106,26 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command.extend(('--runThreadN', str(n_proc),
                         '--genomeDir', genome_dir,
                         '--readFilesIn', ' '.join(reads)))
-        ut.log_command_to_queue(log_queue, command, shell=True,
-                                cwd=os.path.join(dest_dir, 'results', 'Pass1'))
+        failed = ut.log_command_to_queue(
+            log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results', 'Pass1')
+        )
 
         # running sam tools
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-o',
                    './Pass1/Aligned.out.sorted.bam', './Pass1/Aligned.out.bam']
-        ut.log_command_to_queue(log_queue, command, shell=True,
-                                cwd=os.path.join(dest_dir, 'results'))
+        failed = failed or ut.log_command_to_queue(
+            log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
+        )
 
         # running samtools index -b
         command = [SAMTOOLS, 'index', '-b', 'Aligned.out.sorted.bam']
-        ut.log_command_to_queue(log_queue, command, shell=True,
-                                cwd=os.path.join(dest_dir, 'results', 'Pass1'))
-
+        failed = failed or ut.log_command_to_queue(
+            log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results', 'Pass1')
+        )
 
         # remove unsorted bam files
-        os.remove(os.path.join(dest_dir, 'results', 'Pass1', 'Aligned.out.bam'))
+        if not failed:
+            os.remove(os.path.join(dest_dir, 'results', 'Pass1', 'Aligned.out.bam'))
 
         # remove fastq files
         for fastq_file in reads:
@@ -132,11 +135,13 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-n', '-o',
                    './Pass1/Aligned.out.sorted-byname.bam',
                    './Pass1/Aligned.out.sorted.bam']
-        ut.log_command_to_queue(log_queue, command, shell=True,
-                                cwd=os.path.join(dest_dir, 'results'))
+        failed = failed or ut.log_command_to_queue(
+            log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
+        )
 
         # ready to be htseq-ed and cleaned up
-        htseq_queue.put((input_dir, sample_name, dest_dir))
+        if not failed:
+            htseq_queue.put((input_dir, sample_name, dest_dir))
 
 
 def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb_gtf):
@@ -144,15 +149,20 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
 
     for input_dir, sample_name, dest_dir in iter(htseq_queue.get, 'STOP'):
         # running htseq
-
         command = [HTSEQ,
                    '-r', 'name', '-s', 'no', '-f', 'bam',
                    '-m', 'intersection-nonempty',
                    os.path.join(dest_dir, 'results', 'Pass1',
                                 'Aligned.out.sorted-byname.bam'),
                    sjdb_gtf, '>', 'htseq-count.txt']
-        ut.log_command_to_queue(log_queue, command, shell=True,
-                                cwd=os.path.join(dest_dir, 'results'))
+        failed = ut.log_command_to_queue(
+            log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
+        )
+        if failed:
+            command = ['rm', '-rf', dest_dir]
+            ut.log_command_to_queue(log_queue, command, shell=True)
+            continue
+
         os.remove(os.path.join(dest_dir, 'results', 'Pass1',
                                'Aligned.out.sorted-byname.bam'))
 
