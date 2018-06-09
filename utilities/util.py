@@ -18,7 +18,7 @@ def log_command_to_queue(log_queue, command, **kwargs):
         output = subprocess.check_output(' '.join(command), **kwargs)
         failed = False
     except subprocess.CalledProcessError:
-        output = "Command failed with output {}".format(output)
+        output = "Command failed!"
         failed = True
 
     log_queue.put((output, logging.DEBUG))
