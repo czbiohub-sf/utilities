@@ -106,7 +106,7 @@ def main(logger):
 
     # upload fastq files to destination folder
     command = ['aws', 's3', 'sync', '--quiet',
-               output_path, args.s3_output_dir]
+               output_path, os.path.join(args.s3_output_dir, args.exp_id)]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
