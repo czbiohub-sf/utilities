@@ -9,6 +9,13 @@ import multiprocessing
 from collections import defaultdict, Counter
 
 
+# cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
+def s3_bucket_and_key(s3_uri):
+    prefix = "s3://"
+    assert s3_uri.startswith(prefix)
+    return s3_uri[len(prefix):].split("/", 1)
+
+
 def prefix_gen(bucket, prefix, fn=None):
     """Generic generator of fn(result) from an S3 paginator"""
     client = boto3.client('s3')
@@ -128,6 +135,27 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
     try:
         p = multiprocessing.Pool(processes=n_proc)
         p.map(remove_file, file_list, chunksize=100)
+    finally:
+        p.close()
+        p.join()
+
+
+def download_file(k):
+    key, dest = k
+    s3c.download_file(Bucket=bucket, Key=key, Filename=dest)
+
+
+def download_files(src_list, dest_list, *, b, n_proc=16):
+    """Download a list of file to local storage"""
+
+    global s3c
+    s3c = boto3.client('s3')
+    global bucket
+    bucket = b
+
+    try:
+        multiprocessing.Pool(processes=n_proc)
+        p.map(download_file, src_list, dest_list, chunksize=100)
     finally:
         p.close()
         p.join()
