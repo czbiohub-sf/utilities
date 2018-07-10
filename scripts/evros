@@ -138,11 +138,11 @@ if __name__ == '__main__':
     logger.debug('Script parsed args successfully')
 
     job_command = '; '.join((
+        'PATH=$HOME/anaconda/bin:$PATH',
         'cd utilities',
         'git pull',
         'git checkout {}'.format(args.branch),
-        'python -m utilities.{} {}'.format(args.script_name,
-                                           ' '.join(args.script_args))
+        'python -m utilities.{} {}'.format(args.script_name, ' '.join(args.script_args))
     ))
 
     aegea_command = ['aegea', 'batch', 'submit',
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     if args.environment:
         aegea_command.extend(['--environment', ' '.join(args.environment)])
 
-    aegea_command.extend(['--command', '"{}"'.format(job_command)])
+    aegea_command.extend(['--command', "'{}'".format(job_command)])
 
     logger.info('executing command:\n\t{}'.format(' '.join(aegea_command)))
     if not args.dryrun:
