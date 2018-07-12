@@ -18,7 +18,7 @@ for i in range(args.num_partitions):
                     '--taxon {}'.format(args.taxon),
                     '--num_partitions {}'.format(args.num_partitions),
                     '--partition_id {}'.format(i),
-                    '--exp_ids {}'.format(' '.join(args.exp_ids)),
+                    '--input_dirs {}'.format(' '.join(args.exp_ids)),
                     ' '.join(args.script_args)))
           )
     print('sleep 10')
