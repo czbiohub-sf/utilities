@@ -11,7 +11,7 @@ import multiprocessing as mp
 
 from collections import defaultdict
 
-import utilities.util as ut
+import utilities.logging as ut_log
 import utilities.s3_util as s3u
 
 import boto3
@@ -106,20 +106,20 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command.extend(('--runThreadN', str(n_proc),
                         '--genomeDir', genome_dir,
                         '--readFilesIn', ' '.join(reads)))
-        failed = ut.log_command_to_queue(
+        failed = ut_log.log_command_to_queue(
             log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results', 'Pass1')
         )
 
         # running sam tools
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-o',
                    './Pass1/Aligned.out.sorted.bam', './Pass1/Aligned.out.bam']
-        failed = failed or ut.log_command_to_queue(
+        failed = failed or ut_log.log_command_to_queue(
             log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
         )
 
         # running samtools index -b
         command = [SAMTOOLS, 'index', '-b', 'Aligned.out.sorted.bam']
-        failed = failed or ut.log_command_to_queue(
+        failed = failed or ut_log.log_command_to_queue(
             log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results', 'Pass1')
         )
 
@@ -135,7 +135,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
         command = [SAMTOOLS, 'sort', '-m', '6000000000', '-n', '-o',
                    './Pass1/Aligned.out.sorted-byname.bam',
                    './Pass1/Aligned.out.sorted.bam']
-        failed = failed or ut.log_command_to_queue(
+        failed = failed or ut_log.log_command_to_queue(
             log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
         )
 
@@ -155,12 +155,12 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
                    os.path.join(dest_dir, 'results', 'Pass1',
                                 'Aligned.out.sorted-byname.bam'),
                    sjdb_gtf, '>', 'htseq-count.txt']
-        failed = ut.log_command_to_queue(
+        failed = ut_log.log_command_to_queue(
             log_queue, command, shell=True, cwd=os.path.join(dest_dir, 'results')
         )
         if failed:
             command = ['rm', '-rf', dest_dir]
-            ut.log_command_to_queue(log_queue, command, shell=True)
+            ut_log.log_command_to_queue(log_queue, command, shell=True)
             continue
 
         os.remove(os.path.join(dest_dir, 'results', 'Pass1',
@@ -170,7 +170,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
         command = ['tar', '-cvzf',
                    '{}.{}.tgz'.format(sample_name, taxon),
                    'results']
-        ut.log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
+        ut_log.log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
 
         if s3_output_path is None:
             s3_output_path = os.path.join(s3_input_path, input_dir, 'results')
@@ -204,7 +204,7 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
 
         # rm all the files
         command = ['rm', '-rf', dest_dir]
-        ut.log_command_to_queue(log_queue, command, shell=True)
+        ut_log.log_command_to_queue(log_queue, command, shell=True)
 
 
 def main(logger):
@@ -285,9 +285,9 @@ def main(logger):
 
     # Load Genome Into Memory
     command = [STAR, '--genomeDir', genome_dir, '--genomeLoad', 'LoadAndExit']
-    ut.log_command(logger, command, shell=True)
+    ut_log.log_command(logger, command, shell=True)
 
-    log_queue, log_thread = ut.get_thread_logger(logger)
+    log_queue, log_thread = ut_log.get_thread_logger(logger)
 
     star_queue = mp.Queue()
     htseq_queue = mp.Queue()
@@ -378,13 +378,13 @@ def main(logger):
 
     # Remove Genome from Memory
     command = [STAR, '--genomeDir', genome_dir, '--genomeLoad', 'Remove']
-    ut.log_command(logger, command, shell=True)
+    ut_log.log_command(logger, command, shell=True)
 
     logger.info('Job completed')
 
 
 if __name__ == "__main__":
-    mainlogger, log_file, file_handler = ut.get_logger(__name__)
+    mainlogger, log_file, file_handler = ut_log.get_logger(__name__)
 
     try:
         main(mainlogger)

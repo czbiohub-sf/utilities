@@ -7,7 +7,7 @@ import sys
 import subprocess
 import tarfile
 
-from utilities.util import get_logger, log_command
+from utilities.logging import get_logger, log_command
 
 
 CELLRANGER = 'cellranger'

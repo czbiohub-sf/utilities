@@ -5,7 +5,7 @@ import logging
 import os
 import subprocess
 
-from utilities.util import get_logger, log_command
+from utilities.logging import get_logger, log_command
 
 CELLRANGER = 'cellranger'
 

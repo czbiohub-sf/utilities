@@ -5,7 +5,7 @@
 import argparse
 import subprocess
 
-from utilities.util import get_logger, log_command
+from utilities.logging import get_logger, log_command
 
 
 # an s3 bucket to upload your logs, if you want them
