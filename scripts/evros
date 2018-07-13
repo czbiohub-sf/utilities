@@ -6,7 +6,7 @@ import json
 import os
 import subprocess
 
-import utilities.util as ut
+import utilities.logging as ut_log
 
 REPO_ADDRESS = 'https://github.com/czbiohub/utilities.git'
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    logger = ut.get_logger(__name__, args.debug, args.dryrun)[0]
+    logger = ut_log.get_logger(__name__, args.debug, args.dryrun)[0]
 
     logger.debug('Importing script as a module')
     if not args.script_name.startswith('.'):
