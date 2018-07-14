@@ -11,7 +11,7 @@ import multiprocessing as mp
 
 from collections import defaultdict
 
-import utilities.logging as ut_log
+import utilities.log_util as ut_log
 import utilities.s3_util as s3u
 
 import boto3

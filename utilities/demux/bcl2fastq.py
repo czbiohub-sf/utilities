@@ -7,7 +7,7 @@ import re
 import subprocess
 import sys
 
-from utilities.logging import get_logger, log_command
+from utilities.log_util import get_logger, log_command
 
 
 BCL2FASTQ = 'bcl2fastq'
