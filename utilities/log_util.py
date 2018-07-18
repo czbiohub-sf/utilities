@@ -5,6 +5,8 @@ import threading
 
 import multiprocessing as mp
 
+from logging.handlers import TimedRotatingFileHandler
+
 
 def log_command(logger, command, **kwargs):
     logger.info(' '.join(command))
@@ -77,3 +79,26 @@ def get_thread_logger(logger):
     log_thread.start()
 
     return log_queue, log_thread
+
+
+def get_trfh_logger(name, *args):
+    # function to create a rotating-file logger
+    # with potentially multiple file handlers
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+
+    # create a logging format
+    formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+
+    for file_name, log_level, when, backup_count in args:
+        log_handler = TimedRotatingFileHandler(file_name, when=when,
+                                               backupCount=backup_count)
+        log_handler.setLevel(log_level)
+        log_handler.setFormatter(formatter)
+        logger.addHandler(log_handler)
+
+    return logger
+

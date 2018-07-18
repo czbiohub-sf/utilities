@@ -46,17 +46,13 @@ def get_status(file_list, bucket_name='czbiohub-seqbot'):
 
     for fn in file_list:
         obj = s3r.Object(bucket_name, fn)
-        storage_class = obj.storage_class
-        restore = obj.restore
         print(obj.key, obj.storage_class, obj.restore)
 
 
 def restore_file(k):
     obj = s3r.Object('czbiohub-seqbot', k)
-    storage_class = obj.storage_class
-    restore = obj.restore
     if not obj.restore:
-        resp = bucket.meta.client.restore_object(
+        bucket.meta.client.restore_object(
             Bucket='czbiohub-seqbot',
             Key=k,
             RestoreRequest={'Days': 3}
