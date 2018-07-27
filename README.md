@@ -204,15 +204,15 @@ See https://github.com/czbiohub/utilities for more examples
 
 They don't need an AWS account but they _do_ need to install the [AWS CLI](aws.amazon.com/cli).
 
-This script generates an access token for your collaborator to download from our S3 storage, and writes instructions to the console (the command below will redirect the instructions to a text file you can email to your collaborator). The token is good for 36 hours&mdash;if they need more time, just generate another one.
+This script generates an access token for your collaborator to download from our S3 storage, and writes instructions to the console. The command below will redirect the instructions to a shell script you can email to your collaborator, which they can execute with `source`. The token is good for 36 hours&mdash;if they need more time, just generate another one.
 
 To use the script, just give it the path to the folder you want to share (not including the bucket name, as shown below)
 
 By default this will share data in the `czbiohub-seqbot` bucket. If you want to share data from somewhere else, give it the bucket name:
 
 ```
-(utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_token.txt
-(utilities-env) ➜ aws_access some/data/here my-own-bucket > download_token_for_my_bucket.txt
+(utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_script.sh
+(utilities-env) ➜ aws_access some/data/here my-own-bucket > download_script_for_my_bucket.sh
 ```
 
 If you need someone to _upload_ data to our S3 storage, there is a separate script for that, called `aws_upload`, which works similarly.
