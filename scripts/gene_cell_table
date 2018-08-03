@@ -2,44 +2,18 @@
 
 import argparse
 import csv
-import logging
 import io
 import os
-import re
-import tempfile
 
 import boto3
-import botocore.exceptions
 
-import subprocess
-
-
-def get_logger(debug, dryrun):
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG if debug else logging.INFO)
-
-    # create a logging format
-    if dryrun:
-        formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - (DRYRUN) - %(message)s'
-        )
-    else:
-        formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
-    logger.addHandler(handler)
-
-    return logger
+from utilities.log_util import get_logger
 
 
-def get_htseq_counts(client, args, htseq_file):
+def get_htseq_counts(client, bucket, htseq_file):
     fb = io.BytesIO()
 
-    client.download_fileobj(Bucket=args.s3_bucket, Key=htseq_file, Fileobj=fb)
+    client.download_fileobj(Bucket=bucket, Key=htseq_file, Fileobj=fb)
 
     fb.seek(0)
     gene_list,counts = list(zip(*[map(str.strip, line.decode().split('\t'))
@@ -48,10 +22,10 @@ def get_htseq_counts(client, args, htseq_file):
     return gene_list, counts
 
 
-def get_log_file(client, args, log_file):
+def get_log_file(client, bucket, log_file):
     fb = io.BytesIO()
 
-    client.download_fileobj(Bucket=args.s3_bucket, Key=log_file, Fileobj=fb)
+    client.download_fileobj(Bucket=bucket, Key=log_file, Fileobj=fb)
 
     fb.seek(0)
     metric_names, values = list(
@@ -101,7 +75,9 @@ def main(args, logger, dryrun):
     for htseq_file in htseq_files:
         logger.debug('Downloading {}'.format(htseq_file))
         if not dryrun:
-            gene_list, gene_count = get_htseq_counts(client, args, htseq_file)
+            gene_list, gene_count = get_htseq_counts(
+                    client, args.s3_bucket, htseq_file
+            )
             gene_lists.add(gene_list)
             gene_counts.append(gene_count)
 
@@ -124,7 +100,9 @@ def main(args, logger, dryrun):
     for log_file in log_files:
         logger.debug('Downloading {}'.format(log_file))
         if not dryrun:
-            metric_names, values = get_log_file(client, args, log_file)
+            metric_names, values = get_log_file(
+                    client, args.s3_bucket, log_file
+            )
             log_metrics.add(metric_names)
             log_values.append(values)
 
@@ -184,7 +162,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main_logger = get_logger(args.debug, args.dryrun)
+    main_logger, _lf, _fh = get_logger(
+            __name__, args.debug, args.dryrun
+    )
 
     main(args, main_logger, args.dryrun)
 
