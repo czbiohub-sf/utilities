@@ -15,6 +15,7 @@ import utilities.log_util as ut_log
 import utilities.s3_util as s3u
 
 import boto3
+from boto3.s3.transfer import TransferConfig
 
 
 S3_LOG_DIR = 's3://jamestwebber-logs/star_logs/'
@@ -80,6 +81,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
                s3_input_bucket, genome_dir, run_dir, n_proc):
 
     s3c = boto3.client('s3')
+    t_config = TransferConfig(use_threads=False)
 
     for input_dir, sample_name, sample_fns in iter(star_queue.get, 'STOP'):
         log_queue.put(('{} - {}'.format(input_dir, sample_name), logging.INFO))
@@ -93,7 +95,8 @@ def run_sample(star_queue, htseq_queue, log_queue,
         for sample_fn in sample_fns:
             s3c.download_file(
                 Bucket=s3_input_bucket, Key=sample_fn,
-                Filename=os.path.join(dest_dir, os.path.basename(sample_fn))
+                Filename=os.path.join(dest_dir, os.path.basename(sample_fn)),
+                Config=t_config
             )
 
         # start running STAR
@@ -146,6 +149,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
 
 def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb_gtf):
     s3c = boto3.client('s3')
+    t_config = TransferConfig(use_threads=False)
 
     for input_dir, sample_name, dest_dir in iter(htseq_queue.get, 'STOP'):
         # running htseq
@@ -200,7 +204,8 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
         for src_file,dest_name in zip(src_files, dest_names):
             log_queue.put(('Uploading {}'.format(dest_name), logging.INFO))
             s3c.upload_file(Filename=src_file, Bucket=s3_output_bucket,
-                            Key=os.path.join(s3_output_prefix, dest_name))
+                            Key=os.path.join(s3_output_prefix, dest_name),
+                            Config=t_config)
 
         # rm all the files
         command = ['rm', '-rf', dest_dir]
@@ -267,9 +272,9 @@ def main(logger):
     os.mkdir(os.path.join(root_dir, 'genome'))
     logger.info('Downloading and extracting genome data {}'.format(ref_genome_file))
 
-    object = s3.Object('czbiohub-reference', ref_genome_file)
+    s3_object = s3.Object('czbiohub-reference', ref_genome_file)
 
-    with tarfile.open(fileobj=object.get()['Body'], mode='r:gz') as tf:
+    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome'))
 
 
@@ -277,9 +282,9 @@ def main(logger):
     os.mkdir(os.path.join(root_dir, 'genome', 'STAR'))
     logger.info('Downloading and extracting STAR data {}'.format(ref_genome_star_file))
 
-    object = s3.Object('czbiohub-reference', ref_genome_star_file)
+    s3_object = s3.Object('czbiohub-reference', ref_genome_star_file)
 
-    with tarfile.open(fileobj=object.get()['Body'], mode='r:gz') as tf:
+    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome', 'STAR'))
 
 
