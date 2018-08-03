@@ -19,6 +19,8 @@ from boto3.s3.transfer import TransferConfig
 
 
 S3_LOG_DIR = 's3://jamestwebber-logs/star_logs/'
+S3_REFERENCE = {'east': 'czi-hca',
+                'west': 'czbiohub-reference'}
 
 STAR = "STAR"
 HTSEQ = "htseq-count"
@@ -60,6 +62,11 @@ def get_parser():
                         help='Location of input folders')
     parser.add_argument('--s3_output_path', default=None,
                         help='Location for output, default [input_dir]/results')
+    parser.add_argument('--region', default='east',
+                        choices=('east', 'west'),
+                        help=("Region you're running jobs in."
+                              " Should match the location of"
+                              " the fastq.gz files"))
 
     parser.add_argument('--num_partitions', type=int, required=True)
     parser.add_argument('--partition_id', type=int, required=True)
@@ -235,9 +242,12 @@ def main(logger):
         ref_genome_file = 'mm10-plus.tgz'
         ref_genome_star_file = 'STAR/MM10-PLUS.tgz'
         sjdb_gtf = os.path.join(root_dir, 'genome', 'mm10-plus', 'mm10-plus.gtf')
-
     else:
         raise ValueError('Invalid taxon {}'.format(args.taxon))
+
+    if args.region == 'east':
+        ref_genome_file = os.path.join('ref-genome', ref_genome_file)
+        ref_genome_star_file = os.path.join('ref-genome', ref_genome_star_file)
 
     if args.star_proc > mp.cpu_count():
         raise ValueError('Not enough CPUs to give {} processes to STAR'.format(
@@ -272,7 +282,7 @@ def main(logger):
     os.mkdir(os.path.join(root_dir, 'genome'))
     logger.info('Downloading and extracting genome data {}'.format(ref_genome_file))
 
-    s3_object = s3.Object('czbiohub-reference', ref_genome_file)
+    s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_file)
 
     with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome'))
@@ -282,7 +292,7 @@ def main(logger):
     os.mkdir(os.path.join(root_dir, 'genome', 'STAR'))
     logger.info('Downloading and extracting STAR data {}'.format(ref_genome_star_file))
 
-    s3_object = s3.Object('czbiohub-reference', ref_genome_star_file)
+    s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_star_file)
 
     with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome', 'STAR'))
