@@ -15,7 +15,7 @@ def s3_bucket_and_key(s3_uri):
 
 
 # function to init a pool process with an s3 client and bucket
-def init_resource(b, nb=None):
+def init_client(b, nb=None):
     global s3c
     s3c = boto3.client('s3')
 
@@ -28,7 +28,7 @@ def init_resource(b, nb=None):
 
 
 # function to init a pool process with an s3 resource and bucket
-def init_client(b):
+def init_resource(b):
     global s3r
     s3r = boto3.resource('s3')
 
@@ -102,8 +102,8 @@ def copy_file(k):
     except botocore.exceptions.ClientError:
         s3c.copy(CopySource={'Bucket': bucket, 'Key': key},
                  Bucket=new_bucket,
-                 Key=new_key,
-                 Config=TransferConfig(use_threads=False))
+                 Key=new_key)
+                 # Config=TransferConfig(use_threads=False))
 
 
 def copy_files(src_list, dest_list, *, b, nb, n_proc=16):
