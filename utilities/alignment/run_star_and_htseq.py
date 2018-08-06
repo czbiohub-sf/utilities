@@ -80,6 +80,9 @@ def get_parser():
 
     parser.add_argument('--force_realign', action='store_true',
                         help='Align files even when results already exist')
+    parser.add_argument('--min_size', type=int, default=50000,
+                        help=('Minimum file size (in bytes) for'
+                              ' a sample to be aligned.'))
 
     return parser
 
@@ -354,27 +357,35 @@ def main(logger):
         )
 
         output = [
-            fn for fn in s3u.get_files(s3_input_bucket,
-                                       os.path.join(s3_input_prefix, input_dir))
-            if fn.endswith('fastq.gz')
+            (fn,s) for fn,s in s3u.get_size(
+                s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+            ) if fn.endswith('fastq.gz')
         ]
 
-        logger.info("number of fastq.gz files: {}".format(len(output)))
+        logger.info(f"number of fastq.gz files: {len(output)}")
 
         sample_lists = defaultdict(list)
+        sample_sizes = defaultdict(list)
 
-        for fn in output:
+        for fn,s in output:
             matched = sample_re.search(os.path.basename(fn))
             if matched:
                 sample_lists[matched.group(1)].append(fn)
+                sample_sizes[matched.group(1)].append(s)
 
         for sample_name in sorted(sample_lists)[args.partition_id::args.num_partitions]:
             if (sample_name, args.taxon) in output_files:
-                logger.info("{} already exists, skipping".format(sample_name))
+                logger.info(f"{sample_name} already exists, skipping")
                 continue
 
-            logger.info("Adding sample {} to queue".format(sample_name))
-            star_queue.put((input_dir, sample_name, sorted(sample_lists[sample_name])))
+            if sum(sample_sizes[sample_name]) < args.min_size:
+                logger.info(f"{sample_name} is below min_size, skipping")
+                continue
+
+            logger.info(f"Adding sample {sample_name} to queue")
+            star_queue.put(
+                (input_dir, sample_name, sorted(sample_lists[sample_name]))
+            )
 
     for i in range(n_star_procs):
         star_queue.put('STOP')
