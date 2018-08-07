@@ -91,7 +91,7 @@ def run_sample(star_queue, htseq_queue, log_queue,
                s3_input_bucket, genome_dir, run_dir, n_proc):
 
     s3c = boto3.client('s3')
-    t_config = TransferConfig(use_threads=False)
+    t_config = TransferConfig(use_threads=False, num_download_attempts=25)
 
     for input_dir, sample_name, sample_fns in iter(star_queue.get, 'STOP'):
         log_queue.put(('{} - {}'.format(input_dir, sample_name), logging.INFO))
@@ -287,7 +287,7 @@ def main(logger):
 
     s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_file)
 
-    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
+    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r|gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome'))
 
 
@@ -297,7 +297,7 @@ def main(logger):
 
     s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_star_file)
 
-    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r:gz') as tf:
+    with tarfile.open(fileobj=s3_object.get()['Body'], mode='r|gz') as tf:
         tf.extractall(path=os.path.join(root_dir, 'genome', 'STAR'))
 
 
