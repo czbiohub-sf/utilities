@@ -59,7 +59,7 @@ echo  export AWS_SECRET_ACCESS_KEY=$SECRETKEY
 echo  export AWS_SESSION_TOKEN=$TOKEN
 echo  aws s3 sync some_file_or_folder s3://$s3_bucket/$s3_path
 echo
-echo \# Windows instructions (comment out the above section and run this instead):
+echo \# Windows instructions \(comment out the above section and run this instead\):
 echo \# SET AWS_ACCESS_KEY_ID=$ACCESSKEY
 echo \# SET AWS_SECRET_ACCESS_KEY=$SECRETKEY
 echo \# SET AWS_SESSION_TOKEN=$TOKEN
