@@ -23,7 +23,7 @@ cmd="aws sts get-federation-token --name ro_upload_access --duration-seconds 129
      \"Sid\": \"AllowListingOfSpecificFolder\",
      \"Action\": [\"s3:ListBucket\"],
      \"Effect\": \"Allow\",
-     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path\"]
+     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path\"],
      \"Condition\":{\"StringLike\":{\"s3:prefix\":[\"$s3_path*\"]}}
    },
    {
