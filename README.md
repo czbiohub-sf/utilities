@@ -14,15 +14,15 @@ A collection of scripts for common data management and processing tasks
 
 ## Installation
 
-Clone this report and make a new environment, then install the package:
+Clone this repo and install it, preferably in a fresh conda environment.
+
+**Note: this package is written for Python 3, it is not compatible with 2.7**
 
 Create a conda environment called `utilities-env` specific to this Python package:
 
-**Note: this package is written for Python 3, if you are using anaconda2 this will not work (and you should update)**
-
 ```
 # Create an environment called `utilities-env` with Python and pip
-➜  conda create --name utilities-env python pip
+➜  conda create --name utilities-env python=3.6 pip
 ➜  source activate utilities-env
 (utilities-env) ➜
 ```
