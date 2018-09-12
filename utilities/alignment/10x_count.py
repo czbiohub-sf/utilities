@@ -29,8 +29,15 @@ def get_parser():
 
     parser.add_argument('--s3_input_dir', required=True)
     parser.add_argument('--s3_output_dir', required=True)
-    parser.add_argument('--taxon', required=True, choices=('homo', 'mus'))
+    parser.add_argument('--taxon', required=True,
+                        choices=('homo', 'mus', 'mus-premrna'))
     parser.add_argument('--cell_count', type=int, default=3000)
+
+    parser.add_argument('--region', default='east',
+                        choices=('east', 'west'),
+                        help=("Region you're running jobs in."
+                              " Should match the location of"
+                              " the fastq.gz files"))
 
     parser.add_argument('--glacier', action='store_true')
     parser.add_argument('--root_dir', default='/mnt')
@@ -61,6 +68,10 @@ def main(logger):
         genome_name = 'HG38-PLUS'
     elif args.taxon == 'mus':
         genome_name = 'MM10-PLUS'
+    elif args.taxon == 'mus-premrna':
+        genome_name = 'mm10-1.2.0-premrna'
+        if args.region != 'west':
+            logger.warn('Copying genome from west region, it might fail!')
     else:
         raise ValueError("unknown taxon {}".format(args.taxon))
 
@@ -75,8 +86,13 @@ def main(logger):
         'outs/metrics_summary.csv'
     ]
 
-    genome_tar_source = os.path.join('s3://czi-hca/ref-genome/cellranger/',
-                                     genome_name + '.tgz')
+    if args.region == 'east':
+        genome_tar_source = os.path.join('s3://czi-hca/ref-genome/cellranger/',
+                                         genome_name + '.tgz')
+    else:
+        genome_tar_source = os.path.join('s3://czbiohub-reference/cellranger/',
+                                         genome_name + '.tgz')
+
     genome_dir = os.path.join(genome_base_dir, genome_name)
 
     # download the ref genome data
