@@ -71,7 +71,7 @@ def main(logger):
     elif args.taxon == 'mus-premrna':
         genome_name = 'mm10-1.2.0-premrna'
         if args.region != 'west':
-            logger.warn('Copying genome from west region, it might fail!')
+            raise ValueError("you must use --region west for the premrna genome")
     else:
         raise ValueError("unknown taxon {}".format(args.taxon))
 
