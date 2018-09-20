@@ -8,8 +8,8 @@ A collection of scripts for common data management and processing tasks
 | Demux a standard sequencing run | `evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID` | Assumes your sample sheet is uploaded to S3. If planning to run the alignment script, use `--star_structure` |
 | Demux a 10X run | `evros demux.10x_mkfastq --exp_id YYMMDD_EXP_ID` | Again, assumes a sample sheet is present on S3 | 
 | Align using STAR and htseq | `aws_star [mus or homo] [# partitions] YYMMDD_EXP_ID > your_script.sh` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
-| Align a 10X run | `evros alignment.10x_count --taxon [mus or homo] --s3_input_dir s3://czbiohub-seqbot/fastqs/YYMMDD_EXP_ID/SAMPLE --s3_output_dir s3://output-bucket/` | Run once for each channel of the run. Very slow! |
-| Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czbiohub-seqbot` bucket |
+| Align a 10X run | `evros alignment.10x_count --taxon [mus or homo] --s3_input_dir s3://czb-seqbot/fastqs/YYMMDD_EXP_ID/SAMPLE --s3_output_dir s3://output-bucket/` | Run once for each channel of the run. Very slow! |
+| Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czb-seqbot` bucket |
 
 
 ## Installation
@@ -122,13 +122,13 @@ Branch 'my_custom_branch' set up to track remote branch 'my_custom_branch' from 
 
 ### How to demux a thing using the standard workflow:
 
-If your BCLs were uploaded to czbiohub-seqbot/bcl and your sample sheet is in czbiohub-seqbot/sample-sheets, you can do this:
+If your BCLs were uploaded to czb-seqbot/bcl and your sample sheet is in czb-seqbot/sample-sheets, you can do this:
 
 ```
 (utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID
 ```
 
-If you want to stick the results somewhere other than czbiohub-seqbot/fastqs, you can change that option:
+If you want to stick the results somewhere other than czb-seqbot/fastqs, you can change that option:
 
 ```
 (utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID --s3_output_dir s3://my-special-bucket
@@ -179,8 +179,7 @@ basic arguments:
 
 other options:
   --s3_bucket S3_BUCKET
-                        S3 bucket. e.g. czbiohub-seqbot (default: czbiohub-
-                        seqbot)
+                        S3 bucket. e.g. czb-seqbot (default: czb-seqbot)
   --dryrun              Don't actually download any files (default: False)
   --debug               Set logging to debug level (default: False)
   -h, --help            Show this help message and exit
@@ -208,7 +207,7 @@ This script generates an access token for your collaborator to download from our
 
 To use the script, just give it the path to the folder you want to share (not including the bucket name, as shown below)
 
-By default this will share data in the `czbiohub-seqbot` bucket. If you want to share data from somewhere else, give it the bucket name:
+By default this will share data in the `czb-seqbot` bucket. If you want to share data from somewhere else, give it the bucket name:
 
 ```
 (utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_script.sh
