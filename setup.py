@@ -37,5 +37,14 @@ setuptools.setup(
         "boto3 >= 1.7.41",
         "click >= 6.7",
     ],
-    entry_points={"console_scripts": ["frython = czb"]},
+    entry_points={
+        "console_scripts": [
+            "aws_star = czb_util.scripts.aws_star:main",
+            "batch_samplesheet = czb_util.scripts.batch_samplesheet:main",
+            "evros = czb_util.scripts.evros:main",
+            "frython = czb_util.scripts.frython:main",
+            "gene_cell_table = czb_util.scripts.gene_cell_table:main",
+        ]
+    },
+    scripts=glob.glob("scripts/*/"),
 )

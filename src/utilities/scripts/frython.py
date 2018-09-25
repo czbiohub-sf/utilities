@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+# a simple script to set up a GPU-enabled Jupyter notebook on Fry/Fry2
+# assumes you have an account on there already
+
+import argparse
+import signal
+import subprocess
+
+import threading
+import time
+import webbrowser
+
+# TODO: have some kinda config file for this
+
+
+def launch_tab(port):
+    time.sleep(5)
+    webbrowser.get("chrome").open_new_tab(f"http://localhost:{port}")
+
+
+parser = argparse.ArgumentParser(
+    prog="frython",
+    description=(
+        "Launch a docker instance on Fry (default: TensorFlow)\n"
+        "and forward it to a local port so you can use jupyter"
+    ),
+)
+
+parser.add_argument("-u", "--username", required=True, help="Username on Fry")
+parser.add_argument(
+    "-p", "--port", type=int, required=True, help="Port to use on Fry and locally"
+)
+parser.add_argument("-g", "--gpus", required=True, help="GPU(s) to use. Be nice!")
+parser.add_argument(
+    "-c",
+    "--container",
+    default="gcr.io/tensorflow/tensorflow:latest-gpu-py3",
+    help="Container to run. Default: latest tensorflow-gpu-py3",
+)
+parser.add_argument("-x", "--command", default=None)
+
+parser.add_argument("--server", default="fry", choices=("fry", "fry2"))
+
+args = parser.parse_args()
+
+
+gpu_cmd = [
+    "ssh",
+    "-tt",
+    "{}@{}".format(args.username, args.server),
+    " ".join(
+        (
+            f"NV_GPU={args.gpus} nvidia-docker run -it --rm",
+            f"-p {args.port}:8888",
+            f"-v /home/{args.username}:/notebooks/{args.username}",
+            args.container,
+            args.command or "",
+        )
+    ),
+]
+port_cmd = [
+    "ssh",
+    "-NL",
+    "localhost:{}:localhost:{}".format(args.port, args.port),
+    "{}@{}".format(args.username, args.server),
+]
+
+print("Running\n\t{}".format(" ".join(port_cmd)))
+port_proc = subprocess.Popen(" ".join(port_cmd), shell=True)
+
+tab = threading.Thread(target=launch_tab, args=(args.port,))
+tab.start()
+
+print("Running\n\t{}".format(" ".join(gpu_cmd)))
+gpu_proc = subprocess.call(" ".join(gpu_cmd), shell=True)
+
+port_proc.send_signal(signal.SIGKILL)

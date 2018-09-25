@@ -9,15 +9,15 @@ from logging.handlers import TimedRotatingFileHandler
 
 
 def log_command(logger, command, **kwargs):
-    logger.info(' '.join(command))
-    output = subprocess.check_output(' '.join(command), **kwargs)
+    logger.info(" ".join(command))
+    output = subprocess.check_output(" ".join(command), **kwargs)
     logger.debug(output)
 
 
 def log_command_to_queue(log_queue, command, **kwargs):
-    log_queue.put((' '.join(command), logging.INFO))
+    log_queue.put((" ".join(command), logging.INFO))
     try:
-        output = subprocess.check_output(' '.join(command), **kwargs)
+        output = subprocess.check_output(" ".join(command), **kwargs)
         failed = False
     except subprocess.CalledProcessError:
         output = "Command failed!"
@@ -28,7 +28,7 @@ def log_command_to_queue(log_queue, command, **kwargs):
 
 
 def process_logs(q, logger):
-    for msg,level in iter(q.get, 'STOP'):
+    for msg, level in iter(q.get, "STOP"):
         if level == logging.INFO:
             logger.info(msg)
         else:
@@ -42,11 +42,11 @@ def get_logger(name, debug=False, dryrun=False):
     # create a logging format
     if dryrun:
         formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - (DRYRUN) - %(message)s'
+            "%(asctime)s - %(name)s - %(levelname)s - (DRYRUN) - %(message)s"
         )
     else:
         formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
 
     stream_handler = logging.StreamHandler()
@@ -55,10 +55,8 @@ def get_logger(name, debug=False, dryrun=False):
 
     logger.addHandler(stream_handler)
 
-    if os.environ.get('AWS_BATCH_JOB_ID'):
-        log_file = os.path.abspath(
-                '{}.log'.format(os.environ['AWS_BATCH_JOB_ID'])
-        )
+    if os.environ.get("AWS_BATCH_JOB_ID"):
+        log_file = os.path.abspath("{}.log".format(os.environ["AWS_BATCH_JOB_ID"]))
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
@@ -74,8 +72,7 @@ def get_logger(name, debug=False, dryrun=False):
 
 def get_thread_logger(logger):
     log_queue = mp.Queue()
-    log_thread = threading.Thread(target=process_logs,
-                                  args=(log_queue, logger))
+    log_thread = threading.Thread(target=process_logs, args=(log_queue, logger))
     log_thread.start()
 
     return log_queue, log_thread
@@ -90,15 +87,15 @@ def get_trfh_logger(name, *args):
 
     # create a logging format
     formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     for file_name, log_level, when, backup_count in args:
-        log_handler = TimedRotatingFileHandler(file_name, when=when,
-                                               backupCount=backup_count)
+        log_handler = TimedRotatingFileHandler(
+            file_name, when=when, backupCount=backup_count
+        )
         log_handler.setLevel(log_level)
         log_handler.setFormatter(formatter)
         logger.addHandler(log_handler)
 
     return logger
-

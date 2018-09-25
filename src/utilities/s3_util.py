@@ -12,36 +12,34 @@ def s3_bucket_and_key(s3_uri):
     prefix = "s3://"
     assert s3_uri.startswith(prefix)
 
-    return s3_uri[len(prefix):].split("/", 1)
+    return s3_uri[len(prefix) :].split("/", 1)
 
 
 def prefix_gen(bucket, prefix, fn=None):
     """Generic generator of fn(result) from an S3 paginator"""
-    client = boto3.client('s3')
-    paginator = client.get_paginator('list_objects')
+    client = boto3.client("s3")
+    paginator = client.get_paginator("list_objects")
 
-    response_iterator = paginator.paginate(
-            Bucket=bucket, Prefix=prefix
-    )
+    response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix)
 
     for result in response_iterator:
-        if 'Contents' in result:
-            yield from (fn(r) for r in result['Contents'])
+        if "Contents" in result:
+            yield from (fn(r) for r in result["Contents"])
 
 
-def get_files(bucket='czb-seqbot', prefix=None):
+def get_files(bucket="czb-seqbot", prefix=None):
     """Generator of keys for a given S3 prefix"""
-    yield from prefix_gen(bucket, prefix, lambda r: r['Key'])
+    yield from prefix_gen(bucket, prefix, lambda r: r["Key"])
 
 
-def get_size(bucket='czb-seqbot', prefix=None):
+def get_size(bucket="czb-seqbot", prefix=None):
     """Generator of (key,size) for a given S3 prefix"""
-    yield from prefix_gen(bucket, prefix, lambda r: (r['Key'], r['Size']))
+    yield from prefix_gen(bucket, prefix, lambda r: (r["Key"], r["Size"]))
 
 
-def get_status(file_list, bucket_name='czb-seqbot'):
+def get_status(file_list, bucket_name="czb-seqbot"):
     """Print the storage/restore status for a list of keys"""
-    s3res = boto3.resource('s3')
+    s3res = boto3.resource("s3")
 
     for fn in file_list:
         obj = s3res.Object(bucket_name, fn)
@@ -49,12 +47,10 @@ def get_status(file_list, bucket_name='czb-seqbot'):
 
 
 def restore_file(k):
-    obj = s3r.Object('czbiohub-seqbot', k)
-    if obj.storage_class == 'GLACIER' and not obj.restore:
+    obj = s3r.Object("czbiohub-seqbot", k)
+    if obj.storage_class == "GLACIER" and not obj.restore:
         bucket.meta.client.restore_object(
-            Bucket='czbiohub-seqbot',
-            Key=k,
-            RestoreRequest={'Days': 7}
+            Bucket="czbiohub-seqbot", Key=k, RestoreRequest={"Days": 7}
         )
 
 
@@ -62,14 +58,14 @@ def restore_files(file_list, *, n_proc=16):
     """Restore a list of files from czbiohub-seqbot in parallel"""
 
     global s3r
-    s3r = boto3.resource('s3')
+    s3r = boto3.resource("s3")
     global bucket
-    bucket = s3r.Bucket('czbiohub-seqbot')
+    bucket = s3r.Bucket("czbiohub-seqbot")
 
-    print('creating pool')
+    print("creating pool")
     p = multiprocessing.Pool(processes=n_proc)
 
-    print('restoring files...')
+    print("restoring files...")
     p.map(restore_file, file_list, chunksize=64)
 
     p.close()
@@ -77,10 +73,12 @@ def restore_files(file_list, *, n_proc=16):
 
 
 def copy_file(key, new_key):
-    s3c.copy(CopySource={'Bucket': bucket, 'Key': key},
-             Bucket=new_bucket,
-             Key=new_key,
-             Config=TransferConfig(use_threads=False))
+    s3c.copy(
+        CopySource={"Bucket": bucket, "Key": key},
+        Bucket=new_bucket,
+        Key=new_key,
+        Config=TransferConfig(use_threads=False),
+    )
 
 
 def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
@@ -91,7 +89,7 @@ def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
     """
 
     global s3c
-    s3c = boto3.client('s3')
+    s3c = boto3.client("s3")
 
     global bucket
     bucket = b
@@ -99,20 +97,25 @@ def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
     new_bucket = nb
 
     if not force_copy:
-        existing_files = set(get_files(
-            bucket=nb, prefix=os.path.commonprefix(dest_list)
-        )) & set(dest_list)
+        existing_files = set(
+            get_files(bucket=nb, prefix=os.path.commonprefix(dest_list))
+        ) & set(dest_list)
     else:
         existing_files = set()
 
-    print('creating pool')
+    print("creating pool")
     p = multiprocessing.Pool(processes=n_proc)
 
-    print('copying files')
-    p.starmap(copy_file,
-              ((src,dest) for src,dest in zip(src_list, dest_list)
-               if dest not in existing_files),
-              chunksize=64)
+    print("copying files")
+    p.starmap(
+        copy_file,
+        (
+            (src, dest)
+            for src, dest in zip(src_list, dest_list)
+            if dest not in existing_files
+        ),
+        chunksize=64,
+    )
 
     p.close()
     p.join()
@@ -128,12 +131,12 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
     assert really
 
     global s3c
-    s3c = boto3.client('s3')
+    s3c = boto3.client("s3")
 
     global bucket
     bucket = b
 
-    print('creating pool')
+    print("creating pool")
     p = multiprocessing.Pool(processes=n_proc)
 
     print("Removing {} files!".format(len(file_list)))
@@ -144,17 +147,16 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
 
 
 def download_file(key, dest):
-    s3c.download_file(Bucket=bucket,
-                      Key=key,
-                      Filename=dest,
-                      Config=TransferConfig(use_threads=False))
+    s3c.download_file(
+        Bucket=bucket, Key=key, Filename=dest, Config=TransferConfig(use_threads=False)
+    )
 
 
 def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
     """Download a list of file to local storage"""
 
     global s3c
-    s3c = boto3.client('s3')
+    s3c = boto3.client("s3")
 
     global bucket
     bucket = b
@@ -167,10 +169,15 @@ def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
     p = multiprocessing.Pool(processes=n_proc)
 
     # downloading files
-    p.starmap(download_file,
-              ((src, dest) for src, dest in zip(src_list, dest_list)
-               if dest not in existing_files),
-              chunksize=64)
+    p.starmap(
+        download_file,
+        (
+            (src, dest)
+            for src, dest in zip(src_list, dest_list)
+            if dest not in existing_files
+        ),
+        chunksize=64,
+    )
 
     p.close()
     p.join()
