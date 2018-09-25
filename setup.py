@@ -46,5 +46,5 @@ setuptools.setup(
             "gene_cell_table = czb_util.scripts.gene_cell_table:main",
         ]
     },
-    scripts=glob.glob("scripts/*/"),
+    scripts=glob.glob("scripts/*"),
 )
