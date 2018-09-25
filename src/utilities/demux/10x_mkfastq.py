@@ -4,7 +4,7 @@ import argparse
 import os
 import subprocess
 
-from src.utilities import get_logger, log_command
+from utilities.log_util import get_logger, log_command
 
 CELLRANGER = "cellranger"
 

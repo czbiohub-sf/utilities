@@ -15,7 +15,7 @@ def read(*names, **kwargs):
 
 
 setuptools.setup(
-    name="czb_util",
+    name="czb-util",
     version="0.3.0",
     license="MIT License",
     description="A collection of scripts for some common Biohub tasks",
@@ -39,11 +39,11 @@ setuptools.setup(
     ],
     entry_points={
         "console_scripts": [
-            "aws_star = czb_util.scripts.aws_star:main",
-            "batch_samplesheet = czb_util.scripts.batch_samplesheet:main",
-            "evros = czb_util.scripts.evros:main",
-            "frython = czb_util.scripts.frython:main",
-            "gene_cell_table = czb_util.scripts.gene_cell_table:main",
+            "aws_star = utilities.scripts.aws_star:main",
+            "batch_samplesheet = utilities.scripts.batch_samplesheet:main",
+            "evros = utilities.scripts.evros:main",
+            "frython = utilities.scripts.frython:main",
+            "gene_cell_table = utilities.scripts.gene_cell_table:main",
         ]
     },
     scripts=glob.glob("scripts/*"),

@@ -7,7 +7,7 @@ import os
 
 import boto3
 
-from src.utilities import get_logger
+from utilities.log_util import get_logger
 
 
 def get_htseq_counts(client, bucket, htseq_file):

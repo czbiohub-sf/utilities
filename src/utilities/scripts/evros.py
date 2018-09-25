@@ -6,7 +6,7 @@ import json
 import os
 import subprocess
 
-from src import utilities as ut_log
+import utilities.log_util as ut_log
 
 
 REPO_ADDRESS = "https://github.com/czbiohub/utilities.git"
