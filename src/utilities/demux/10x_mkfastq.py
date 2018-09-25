@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
-import logging
 import os
 import subprocess
 
-from utilities.log_util import get_logger, log_command
+from src.utilities import get_logger, log_command
 
 CELLRANGER = 'cellranger'
 

@@ -1,4 +1,0 @@
-awscli-cwlogs
-botocore
-boto3
-aegea

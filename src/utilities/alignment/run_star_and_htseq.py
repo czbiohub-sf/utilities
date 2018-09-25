@@ -11,8 +11,7 @@ import multiprocessing as mp
 
 from collections import defaultdict
 
-import utilities.log_util as ut_log
-import utilities.s3_util as s3u
+from src import utilities as ut_log, utilities as s3u
 
 import boto3
 from boto3.s3.transfer import TransferConfig
