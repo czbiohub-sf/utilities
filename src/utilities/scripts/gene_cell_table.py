@@ -36,8 +36,8 @@ def get_log_file(client, bucket, log_file):
     return metric_names, values
 
 
-def main(args, logger, dryrun):
-    main_logger.info("Starting")
+def gene_cell_table(args, logger, dryrun):
+    logger.info("Starting")
 
     if args.output_file.endswith(".txt"):
         sep = "\t"
@@ -88,8 +88,8 @@ def main(args, logger, dryrun):
         assert len(gene_lists) == 1
         gene_list = gene_lists.pop()
 
-    logger.info("Writing to {}".format(args.output_file))
-    if not dryrun:
+        logger.info("Writing to {}".format(args.output_file))
+
         with open(args.output_file, "w") as OUT:
             wtr = csv.writer(OUT, delimiter=sep)
             wtr.writerow(("gene",) + sample_names)
@@ -124,7 +124,7 @@ def main(args, logger, dryrun):
     logger.info("Done!")
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description=(
             "Construct the gene-cell table for an experiment\n"
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     basic_group = parser.add_argument_group("basic arguments")
     basic_group.add_argument(
         "s3_path",
-        help=("Path to experiment." " e.g. fastqs/171101_NB501961_0026_AHL33MBGX3"),
+        help="Path to experiment. e.g. fastqs/171101_NB501961_0026_AHL33MBGX3",
     )
     basic_group.add_argument(
         "output_file", help="File to save the output, e.g. my_gc_table.csv"
@@ -165,4 +165,4 @@ if __name__ == "__main__":
 
     main_logger, _lf, _fh = get_logger(__name__, args.debug, args.dryrun)
 
-    main(args, main_logger, args.dryrun)
+    gene_cell_table(args, main_logger, args.dryrun)

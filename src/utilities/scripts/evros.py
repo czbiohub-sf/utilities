@@ -27,7 +27,7 @@ def resource_range(name, min_val, max_val):
     return range_validator
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         prog="evros",
         description=(
