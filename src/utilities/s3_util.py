@@ -1,10 +1,10 @@
+import itertools
 import os
 
+from concurrent.futures import ProcessPoolExecutor
+
 import boto3
-
 from boto3.s3.transfer import TransferConfig
-
-import multiprocessing
 
 
 # cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
@@ -49,9 +49,28 @@ def get_status(file_list, bucket_name="czb-seqbot"):
 def restore_file(k):
     obj = s3r.Object("czbiohub-seqbot", k)
     if obj.storage_class == "GLACIER" and not obj.restore:
-        bucket.meta.client.restore_object(
+        bucket_resource.meta.client.restore_object(
             Bucket="czbiohub-seqbot", Key=k, RestoreRequest={"Days": 7}
         )
+
+
+def copy_file(bucket, new_bucket, key, new_key):
+    s3c.copy(
+        CopySource={"Bucket": bucket, "Key": key},
+        Bucket=new_bucket,
+        Key=new_key,
+        Config=TransferConfig(use_threads=False),
+    )
+
+
+def remove_file(bucket, key):
+    s3c.delete_object(Bucket=bucket, Key=key)
+
+
+def download_file(bucket, key, dest):
+    s3c.download_file(
+        Bucket=bucket, Key=key, Filename=dest, Config=TransferConfig(use_threads=False)
+    )
 
 
 def restore_files(file_list, *, n_proc=16):
@@ -59,26 +78,12 @@ def restore_files(file_list, *, n_proc=16):
 
     global s3r
     s3r = boto3.resource("s3")
-    global bucket
-    bucket = s3r.Bucket("czbiohub-seqbot")
+    global bucket_resource
+    bucket_resource = s3r.Bucket("czbiohub-seqbot")
 
-    print("creating pool")
-    p = multiprocessing.Pool(processes=n_proc)
-
-    print("restoring files...")
-    p.map(restore_file, file_list, chunksize=64)
-
-    p.close()
-    p.join()
-
-
-def copy_file(key, new_key):
-    s3c.copy(
-        CopySource={"Bucket": bucket, "Key": key},
-        Bucket=new_bucket,
-        Key=new_key,
-        Config=TransferConfig(use_threads=False),
-    )
+    print(f"restoring {len(file_list)} files")
+    with ProcessPoolExecutor(max_workers=n_proc) as executor:
+        list(executor.map(restore_file, file_list, chunksize=64))
 
 
 def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
@@ -91,38 +96,30 @@ def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
     global s3c
     s3c = boto3.client("s3")
 
-    global bucket
-    bucket = b
-    global new_bucket
-    new_bucket = nb
-
     if not force_copy:
         existing_files = set(
             get_files(bucket=nb, prefix=os.path.commonprefix(dest_list))
         ) & set(dest_list)
-    else:
-        existing_files = set()
+        src_list, dest_list = zip(
+            *[
+                (src, dest)
+                for src, dest in zip(src_list, dest_list)
+                if dest not in existing_files
+            ]
+        )
 
-    print("creating pool")
-    p = multiprocessing.Pool(processes=n_proc)
-
-    print("copying files")
-    p.starmap(
-        copy_file,
-        (
-            (src, dest)
-            for src, dest in zip(src_list, dest_list)
-            if dest not in existing_files
-        ),
-        chunksize=64,
-    )
-
-    p.close()
-    p.join()
-
-
-def remove_file(k):
-    s3c.delete_object(Bucket=bucket, Key=k)
+    print(f"copying {len(src_list)} files")
+    with ProcessPoolExecutor(max_workers=n_proc) as executor:
+        list(
+            executor.map(
+                copy_file,
+                itertools.repeat(b),
+                itertools.repeat(nb),
+                src_list,
+                dest_list,
+                chunksize=64,
+            )
+        )
 
 
 def remove_files(file_list, *, b, really=False, n_proc=16):
@@ -133,23 +130,9 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
     global s3c
     s3c = boto3.client("s3")
 
-    global bucket
-    bucket = b
-
-    print("creating pool")
-    p = multiprocessing.Pool(processes=n_proc)
-
-    print("Removing {} files!".format(len(file_list)))
-    p.map(remove_file, file_list, chunksize=64)
-
-    p.close()
-    p.join()
-
-
-def download_file(key, dest):
-    s3c.download_file(
-        Bucket=bucket, Key=key, Filename=dest, Config=TransferConfig(use_threads=False)
-    )
+    print(f"Removing {len(file_list)} files!")
+    with ProcessPoolExecutor(max_workers=n_proc) as executor:
+        list(executor.map(remove_file, itertools.repeat(b), file_list, chunksize=64))
 
 
 def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
@@ -158,26 +141,18 @@ def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
     global s3c
     s3c = boto3.client("s3")
 
-    global bucket
-    bucket = b
-
     if not force_download:
-        existing_files = set(fn for fn in dest_list if os.path.exists(fn))
-    else:
-        existing_files = set()
+        src_list, dest_list = zip(
+            *[
+                (src, dest)
+                for src, dest in zip(src_list, dest_list)
+                if not os.path.exists(dest)
+            ]
+        )
 
-    p = multiprocessing.Pool(processes=n_proc)
-
-    # downloading files
-    p.starmap(
-        download_file,
-        (
-            (src, dest)
-            for src, dest in zip(src_list, dest_list)
-            if dest not in existing_files
-        ),
-        chunksize=64,
-    )
-
-    p.close()
-    p.join()
+    with ProcessPoolExecutor(max_workers=n_proc) as executor:
+        list(
+            executor.map(
+                download_file, itertools.repeat(b), src_list, dest_list, chunksize=64
+            )
+        )
