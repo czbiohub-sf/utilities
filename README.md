@@ -36,7 +36,7 @@ Now let's clone the environment into a `code` folder:
 
 ```
 
-Now we'll change to that folder with `cd` and install the package with by running the `setup.py` script.
+Now we'll change to that folder with `cd` and install the package by running the `setup.py` script.
 
 ```
 (utilities-env) ➜ cd utilities
