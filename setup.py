@@ -35,7 +35,6 @@ setuptools.setup(
         "awscli >= 1.15.41",
         "awscli-cwlogs >= 1.4.4",
         "boto3 >= 1.7.41",
-        "click >= 6.7",
     ],
     entry_points={
         "console_scripts": [

@@ -3,7 +3,6 @@
 import argparse
 import importlib.util
 import json
-import os
 import subprocess
 
 import utilities.log_util as ut_log
@@ -118,7 +117,6 @@ def main():
     if not args.script_name.startswith("."):
         args.script_name = ".{}".format(args.script_name)
     script_module = importlib.import_module(args.script_name, "utilities")
-    script_base = os.path.basename(script_module.__file__)
 
     logger.debug("Checking for script default requirements")
 
