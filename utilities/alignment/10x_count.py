@@ -30,7 +30,7 @@ def get_parser():
     parser.add_argument('--s3_input_dir', required=True)
     parser.add_argument('--s3_output_dir', required=True)
     parser.add_argument('--taxon', required=True,
-                        choices=('homo', 'mus', 'mus-premrna'))
+                        choices=('homo', 'mus', 'mus-premrna', 'microcebus'))
     parser.add_argument('--cell_count', type=int, default=3000)
 
     parser.add_argument('--region', default='east',
@@ -68,6 +68,8 @@ def main(logger):
         genome_name = 'HG38-PLUS'
     elif args.taxon == 'mus':
         genome_name = 'MM10-PLUS'
+    elif args.taxon == 'microcebus':
+        genome_name = 'MicMur3-PLUS'
     elif args.taxon == 'mus-premrna':
         genome_name = 'mm10-1.2.0-premrna'
         if args.region != 'west':

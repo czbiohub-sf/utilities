@@ -56,7 +56,7 @@ def get_parser():
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('--taxon', choices=('homo', 'mus'))
+    parser.add_argument('--taxon', choices=('homo', 'mus', 'microcebus'))
 
     parser.add_argument('--s3_input_path', default='s3://czbiohub-seqbot/fastqs',
                         help='Location of input folders')
@@ -245,6 +245,11 @@ def main(logger):
         ref_genome_file = 'mm10-plus.tgz'
         ref_genome_star_file = 'STAR/MM10-PLUS.tgz'
         sjdb_gtf = os.path.join(root_dir, 'genome', 'mm10-plus', 'mm10-plus.gtf')
+    elif args.taxon == 'microcebus':
+            genome_dir = os.path.join(root_dir, "genome/STAR/MicMur3-PLUS/")
+            ref_genome_file = 'MicMur3-plus.tgz'
+            ref_genome_star_file = 'STAR/MicMur3-PLUS.tgz'
+            sjdb_gtf = os.path.join(root_dir, 'genome', 'MicMur3-plus', 'MicMur3-plus.gtf')
     else:
         raise ValueError('Invalid taxon {}'.format(args.taxon))
 
