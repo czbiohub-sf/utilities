@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('taxon', choices=('mus', 'homo'))
+parser.add_argument('taxon', choices=('mus', 'homo', 'microcebus'))
 parser.add_argument('num_partitions', type=int)
 parser.add_argument('input_dirs', nargs='+',
                     help='The folder(s) containing fastq.gz files to align')
