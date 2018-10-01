@@ -31,11 +31,11 @@ def get_parser():
     parser.add_argument('--s3_input_dir',
                         default='s3://czbiohub-seqbot/bcl')
     parser.add_argument('--s3_output_dir',
-                        default='s3://czbiohub-seqbot/fastqs')
+                        default='s3://czb-seqbot/fastqs')
     parser.add_argument('--s3_report_dir',
-                        default='s3://czbiohub-seqbot/reports')
+                        default='s3://czb-seqbot/reports')
     parser.add_argument('--s3_sample_sheet_dir',
-                        default='s3://czbiohub-seqbot/sample-sheets')
+                        default='s3://czb-seqbot/sample-sheets')
 
     parser.add_argument('--sample_sheet_name', default=None,
                         help='Defaults to [exp_id].csv')

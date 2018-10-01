@@ -6,7 +6,7 @@ if [ $# -lt 1 ]; then
 fi
 
 s3_path=$1
-s3_bucket=${2:-"czbiohub-seqbot"}
+s3_bucket=${2:-"czb-seqbot"}
 
 # Build and run aws command to share the folder
 cmd="aws sts get-federation-token --name ro_access_to_czbiohub_s3 --duration-seconds 129600 --policy '{

@@ -100,11 +100,11 @@ if __name__ == '__main__':
     bcl2fastq_options.add_argument('--s3_input_dir',
                                    default='s3://czbiohub-seqbot/bcl')
     bcl2fastq_options.add_argument('--s3_output_dir',
-                                   default='s3://czbiohub-seqbot/fastqs')
+                                   default='s3://czb-seqbot/fastqs')
     bcl2fastq_options.add_argument('--s3_report_dir',
-                                   default='s3://czbiohub-seqbot/reports')
+                                   default='s3://czb-seqbot/reports')
     bcl2fastq_options.add_argument('--s3_sample_sheet_dir',
-                                   default='s3://czbiohub-seqbot/sample-sheets')
+                                   default='s3://czb-seqbot/sample-sheets')
     bcl2fastq_options.add_argument('--star_structure', action='store_true')
 
     args = parser.parse_args()
