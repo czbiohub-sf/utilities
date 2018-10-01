@@ -35,13 +35,13 @@ def get_parser():
                         default='s3://czbiohub-seqbot/bcl',
                         help='S3 path for [exp_id] folder of BCL files')
     parser.add_argument('--s3_output_dir',
-                        default='s3://czbiohub-seqbot/fastqs',
+                        default='s3://czb-seqbot/fastqs',
                         help='S3 path to put fastq files')
     parser.add_argument('--s3_report_dir',
-                        default='s3://czbiohub-seqbot/reports',
+                        default='s3://czb-seqbot/reports',
                         help='S3 path to put the bcl2fastq report')
     parser.add_argument('--s3_sample_sheet_dir',
-                        default='s3://czbiohub-seqbot/sample-sheets',
+                        default='s3://czb-seqbot/sample-sheets',
                         help='S3 path to look for the sample sheet')
 
     parser.add_argument('--star_structure', action='store_true',

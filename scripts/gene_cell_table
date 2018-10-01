@@ -151,8 +151,8 @@ if __name__ == "__main__":
     # other arguments
     other_group = parser.add_argument_group('other options')
     other_group.add_argument('--s3_bucket',
-                             help='S3 bucket. e.g. czbiohub-seqbot',
-                             default='czbiohub-seqbot')
+                             help='S3 bucket. e.g. czb-seqbot',
+                             default='czb-seqbot')
     other_group.add_argument('--dryrun', action='store_true',
                              help="Don't actually download any files")
     other_group.add_argument('--debug', action='store_true',

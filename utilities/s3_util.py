@@ -29,17 +29,17 @@ def prefix_gen(bucket, prefix, fn=None):
             yield from (fn(r) for r in result['Contents'])
 
 
-def get_files(bucket='czbiohub-seqbot', prefix=None):
+def get_files(bucket='czb-seqbot', prefix=None):
     """Generator of keys for a given S3 prefix"""
     yield from prefix_gen(bucket, prefix, lambda r: r['Key'])
 
 
-def get_size(bucket='czbiohub-seqbot', prefix=None):
+def get_size(bucket='czb-seqbot', prefix=None):
     """Generator of (key,size) for a given S3 prefix"""
     yield from prefix_gen(bucket, prefix, lambda r: (r['Key'], r['Size']))
 
 
-def get_status(file_list, bucket_name='czbiohub-seqbot'):
+def get_status(file_list, bucket_name='czb-seqbot'):
     """Print the storage/restore status for a list of keys"""
     s3res = boto3.resource('s3')
 

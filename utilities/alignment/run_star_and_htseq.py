@@ -58,7 +58,7 @@ def get_parser():
 
     parser.add_argument('--taxon', choices=('homo', 'mus'))
 
-    parser.add_argument('--s3_input_path', default='s3://czbiohub-seqbot/fastqs',
+    parser.add_argument('--s3_input_path', default='s3://czb-seqbot/fastqs',
                         help='Location of input folders')
     parser.add_argument('--s3_output_path', default=None,
                         help='Location for output, default [input_dir]/results')
