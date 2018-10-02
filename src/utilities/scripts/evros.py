@@ -157,6 +157,7 @@ def main():
             "cd utilities",
             "git pull",
             "git checkout {}".format(args.branch),
+            "python setup.py install",
             "python -m utilities.{} {}".format(
                 args.script_name, " ".join(args.script_args)
             ),
