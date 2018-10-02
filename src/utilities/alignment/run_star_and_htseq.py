@@ -127,7 +127,7 @@ def get_parser():
         "--min_size",
         type=int,
         default=50000,
-        help=("Minimum file size (in bytes) for" " a sample to be aligned."),
+        help="Minimum file size (in bytes) for a sample to be aligned.",
     )
 
     return parser

@@ -18,6 +18,7 @@ def launch_tab(port):
     time.sleep(5)
     webbrowser.get("chrome").open_new_tab(f"http://localhost:{port}")
 
+
 def main():
     parser = argparse.ArgumentParser(
         prog="frython",
@@ -43,7 +44,6 @@ def main():
     parser.add_argument("--server", default="fry", choices=("fry", "fry2"))
 
     args = parser.parse_args()
-
 
     gpu_cmd = [
         "ssh",
