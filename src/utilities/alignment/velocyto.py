@@ -92,7 +92,7 @@ def run_sample(
     s3c.upload_file(
         Filename=output_file,
         Bucket=s3_output_bucket,
-        Key=s3_output_prefix,
+        Key=os.path.join(s3_output_prefix, f"{sample_id}.loom"),
         Config=t_config,
     )
 
