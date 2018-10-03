@@ -250,6 +250,8 @@ def main(logger):
             ref_genome_file = 'MicMur3-plus.tgz'
             ref_genome_star_file = 'STAR/MicMur3-PLUS.tgz'
             sjdb_gtf = os.path.join(root_dir, 'genome', 'MicMur3-plus', 'MicMur3-plus.gtf')
+            if args.region != 'west':
+                raise ValueError("you must use --region west for the microcebus genome")
     else:
         raise ValueError('Invalid taxon {}'.format(args.taxon))
 

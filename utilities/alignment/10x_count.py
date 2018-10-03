@@ -70,6 +70,8 @@ def main(logger):
         genome_name = 'MM10-PLUS'
     elif args.taxon == 'microcebus':
         genome_name = 'MicMur3-PLUS'
+        if args.region != 'west':
+            raise ValueError("you must use --region west for the microcebus genome")
     elif args.taxon == 'mus-premrna':
         genome_name = 'mm10-1.2.0-premrna'
         if args.region != 'west':
