@@ -68,7 +68,7 @@ def run_sample(
 
     veloctyo_command = [
         "velocyto",
-        "run_smartseq2",
+        "run-smartseq2",
         "-o",
         run_dir,
         "-m",
