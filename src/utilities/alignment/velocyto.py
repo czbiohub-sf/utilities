@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import datetime
 import os
 import re
 import subprocess
@@ -9,6 +10,9 @@ import utilities.s3_util as s3u
 
 import boto3
 from boto3.s3.transfer import TransferConfig
+
+
+CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
@@ -39,6 +43,11 @@ def get_parser():
     )
     parser.add_argument(
         "--plates", nargs="+", required=True, help="List of plates to run"
+    )
+    parser.add_argument(
+        "--force_redo",
+        action="store_true",
+        help="Process files even when results already exist",
     )
 
     return parser
@@ -84,7 +93,7 @@ def run_sample(
     # except subprocess.CalledProcessError:
     #     output = "Command failed!"
 
-    logger.info('\n'.join(os.listdir(run_dir)))
+    logger.info("\n".join(os.listdir(run_dir)))
 
     output_file = os.path.join(run_dir, f"{sample_id}.loom")
 
@@ -164,6 +173,22 @@ def main(logger):
             )
         )
 
+        # Check the output folder for existing runs
+        if not args.force_redo:
+            output = s3u.prefix_gen(
+                s3_output_bucket,
+                s3_output_prefix,
+                lambda r: (r["LastModified"], r["Key"]),
+            )
+        else:
+            output = []
+
+        output_files = {
+            os.path.basename(fn).split(".")[0]
+            for dt, fn in output
+            if fn.endswith(".loom") and dt > CURR_MIN_VER
+        }
+
         sample_files = [
             fn
             for fn in s3u.get_files(
@@ -176,7 +201,10 @@ def main(logger):
 
         for fn in sample_files:
             matched = sample_re.search(os.path.basename(fn))
-            if matched.group(1).split("_")[1] in plate_set:
+            if (
+                matched.group(1).split("_")[1] in plate_set
+                and matched.group(1) not in output_files
+            ):
                 plate_samples.append(fn)
 
         logger.info(f"number of bam files: {len(plate_samples)}")
