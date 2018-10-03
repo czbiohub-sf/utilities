@@ -84,7 +84,9 @@ def run_sample(
     # except subprocess.CalledProcessError:
     #     output = "Command failed!"
 
-    output_file = os.path.join(run_dir, "velocyto", f"{sample_id}.loom")
+    logger.info('\n'.join(os.listdir(run_dir)))
+
+    output_file = os.path.join(run_dir, f"{sample_id}.loom")
 
     logger.info("Uploading {}".format(output_file))
     s3c.upload_file(
