@@ -174,7 +174,7 @@ def main(logger):
 
         plate_samples = []
 
-        for fn, s in sample_files:
+        for fn in sample_files:
             matched = sample_re.search(os.path.basename(fn))
             if matched.group(1).split("_")[1] in plate_set:
                 plate_samples.append(fn)
