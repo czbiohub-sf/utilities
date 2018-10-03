@@ -88,12 +88,7 @@ def run_sample(
         gtf_path,
     ]
 
-    # try:
-    output = subprocess.check_output(" ".join(veloctyo_command), shell=True)
-    # except subprocess.CalledProcessError:
-    #     output = "Command failed!"
-
-    logger.info("\n".join(os.listdir(run_dir)))
+    subprocess.check_output(" ".join(veloctyo_command), shell=True)
 
     output_file = os.path.join(run_dir, f"{sample_id}.loom")
 
