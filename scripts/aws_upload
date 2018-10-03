@@ -16,15 +16,13 @@ cmd="aws sts get-federation-token --name ro_upload_access --duration-seconds 129
      \"Sid\": \"AllowRootListingOfBCLBucket\",
      \"Action\": [\"s3:ListBucket\"],
      \"Effect\": \"Allow\",
-     \"Resource\": [\"arn:aws:s3:::$s3_bucket\"],
-     \"Condition\":{\"StringEquals\":{\"s3:prefix\":[\"\"],\"s3:delimiter\":[\"/\"]}}
-    },
+     \"Resource\": [\"arn:aws:s3:::$s3_bucket\"]
+   },
    {
      \"Sid\": \"AllowListingOfSpecificFolder\",
      \"Action\": [\"s3:ListBucket\"],
      \"Effect\": \"Allow\",
-     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path\"],
-     \"Condition\":{\"StringLike\":{\"s3:prefix\":[\"$s3_path*\"]}}
+     \"Resource\": [\"arn:aws:s3:::$s3_bucket/$s3_path\"]
    },
    {
      \"Sid\": \"AllowAllS3ActionsInUserFolder\",
