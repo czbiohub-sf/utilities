@@ -142,13 +142,12 @@ def main(logger):
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
-    s3u.download_file(
-        "czbiohub-reference", os.path.join("velocyto", gtf_file), gtf_path
-    )
-
     mask_path = os.path.join(run_dir, "reference", mask_file)
-    s3u.download_file(
-        "czbiohub-reference", os.path.join("velocyto", mask_file), mask_path
+    s3u.download_files(
+        [f"velocyto/{gtf_file}", f"velocyto/{mask_file}"],
+        [gtf_path, mask_path],
+        b="czbiohub-reference",
+        n_proc=2,
     )
 
     sample_re = re.compile(f"([^/]+).{args.taxon}.Aligned.out.sorted.bam$")
