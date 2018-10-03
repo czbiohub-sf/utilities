@@ -67,7 +67,7 @@ def run_sample(
     )
 
     veloctyo_command = [
-        "veloctyo",
+        "velocyto",
         "run_smartseq2",
         "-o",
         run_dir,
@@ -170,14 +170,14 @@ def main(logger):
             if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
         ]
 
-        logger.info(f"number of bam files: {len(sample_files)}")
-
         plate_samples = []
 
         for fn in sample_files:
             matched = sample_re.search(os.path.basename(fn))
             if matched.group(1).split("_")[1] in plate_set:
                 plate_samples.append(fn)
+
+        logger.info(f"number of bam files: {len(plate_samples)}")
 
         for sample_name in sorted(plate_samples)[
             args.partition_id :: args.num_partitions
