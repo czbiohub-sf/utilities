@@ -86,7 +86,7 @@ def run_sample(
 
     output_file = os.path.join(run_dir, "velocyto", f"{sample_id}.loom")
 
-    logger.info("Uploading {}".format(dest_name))
+    logger.info("Uploading {}".format(output_file))
     s3c.upload_file(
         Filename=output_file,
         Bucket=s3_output_bucket,
