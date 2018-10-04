@@ -17,12 +17,12 @@ args = parser.parse_args()
 
 for i in range(args.num_partitions):
     print(' '.join(('evros',
+                    '--branch {}'.format(args.branch),
                     'alignment.run_star_and_htseq',
                     '--taxon {}'.format(args.taxon),
                     '--num_partitions {}'.format(args.num_partitions),
                     '--partition_id {}'.format(i),
                     '--input_dirs {}'.format(' '.join(args.input_dirs)),
-                    '--branch {}'.format(args.branch),
                     ' '.join(args.script_args)))
           )
     print('sleep 10')
