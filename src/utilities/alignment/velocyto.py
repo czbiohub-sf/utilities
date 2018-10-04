@@ -16,7 +16,7 @@ CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=2, memory=8000, storage=500, ecr_image="velocyto")
+    return argparse.Namespace(vcpus=2, memory=32000, storage=500, ecr_image="velocyto")
 
 
 def get_parser():
