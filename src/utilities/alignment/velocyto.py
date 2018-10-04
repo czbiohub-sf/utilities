@@ -88,7 +88,12 @@ def run_sample(
         gtf_path,
     ]
 
-    subprocess.check_output(" ".join(veloctyo_command), shell=True)
+    try:
+        subprocess.check_output(" ".join(veloctyo_command), shell=True)
+    except subprocess.CalledProcessError:
+        logger.info(f"velocyto failed on {sample_id}")
+        os.remove(local_sample)
+        return
 
     output_file = os.path.join(run_dir, f"{sample_id}.loom")
 
