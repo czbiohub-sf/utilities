@@ -4,6 +4,7 @@ import datetime
 import os
 import re
 import subprocess
+import time
 
 import utilities.log_util as ut_log
 import utilities.s3_util as s3u
@@ -222,6 +223,7 @@ def main(logger):
                 run_dir,
                 logger,
             )
+            time.sleep(30)
 
     logger.info("Job completed")
 
