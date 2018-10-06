@@ -30,19 +30,17 @@ setuptools.setup(
     ],
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
-        "aegea >= 2.2.3",
-        "awscli >= 1.15.41",
-        "awscli-cwlogs >= 1.4.4",
-        "boto3 >= 1.7.41",
-    ],
+    install_requires=["boto3 >= 1.7.41"],
+    extras_require={
+        "evros": ["aegea >= 2.2.3", "awscli >= 1.15.41", "awscli-cwlogs >= 1.4.4"]
+    },
     entry_points={
         "console_scripts": [
-            "aws_star = utilities.scripts.aws_star:main",
+            "aws_star = utilities.scripts.aws_star:main [evros]",
             "batch_samplesheet = utilities.scripts.batch_samplesheet:main",
-            "evros = utilities.scripts.evros:main",
+            "evros = utilities.scripts.evros:main [evros]",
             "frython = utilities.scripts.frython:main",
-            "gene_cell_table = utilities.scripts.gene_cell_table:main",
+            "gene_cell_table = utilities.scripts.gene_cell_table:main [evros]",
         ]
     },
     scripts=glob.glob("scripts/*"),
