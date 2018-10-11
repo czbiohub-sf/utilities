@@ -65,7 +65,6 @@ def run_sample(
     logger,
 ):
 
-    s3c = boto3.client("s3")
     t_config = TransferConfig(use_threads=False, num_download_attempts=25)
 
     sample_name = os.path.basename(sample_key)
@@ -99,6 +98,7 @@ def run_sample(
     output_file = os.path.join(run_dir, f"{sample_id}.loom")
 
     logger.info("Uploading {}".format(output_file))
+    time.sleep(10)
     s3c.upload_file(
         Filename=output_file,
         Bucket=s3_output_bucket,
@@ -230,5 +230,5 @@ def main(logger):
 
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = ut_log.get_logger(__name__)
-
+    s3c = boto3.client("s3")
     main(mainlogger)
