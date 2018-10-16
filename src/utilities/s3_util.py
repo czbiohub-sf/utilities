@@ -21,7 +21,7 @@ def get_folders(bucket="czb-seqbot", prefix=None):
     client = boto3.client("s3")
     paginator = client.get_paginator("list_objects_v2")
 
-    response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix, delimiter="/")
+    response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/")
 
     for response_data in response_iterator:
         if "CommonPrefixes" in response_data:
