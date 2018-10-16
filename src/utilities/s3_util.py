@@ -15,10 +15,23 @@ def s3_bucket_and_key(s3_uri):
     return s3_uri[len(prefix) :].split("/", 1)
 
 
+def get_folders(bucket="czb-seqbot", prefix=None):
+    """List the folders under a specific path in a bucket. Prefix should end with a /
+    """
+    client = boto3.client("s3")
+    paginator = client.get_paginator("list_objects_v2")
+
+    response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix, delimiter="/")
+
+    for response_data in response_iterator:
+        if "CommonPrefixes" in response_data:
+            yield from (c["Prefix"] for c in response_data["CommonPrefixes"])
+
+
 def prefix_gen(bucket, prefix, fn=None):
     """Generic generator of fn(result) from an S3 paginator"""
     client = boto3.client("s3")
-    paginator = client.get_paginator("list_objects")
+    paginator = client.get_paginator("list_objects_v2")
 
     response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix)
 
