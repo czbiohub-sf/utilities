@@ -70,8 +70,11 @@ def get_logger(name, debug=False, dryrun=False):
     return logger, log_file, file_handler
 
 
-def get_thread_logger(logger):
-    log_queue = mp.Queue()
+def get_thread_logger(logger, queue=None):
+    if queue is None:
+        log_queue = mp.Queue()
+    else:
+        log_queue = queue
     log_thread = threading.Thread(target=process_logs, args=(log_queue, logger))
     log_thread.start()
 
