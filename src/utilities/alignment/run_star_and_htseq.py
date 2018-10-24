@@ -76,7 +76,7 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument("--taxon", choices=("homo", "mus"))
+    parser.add_argument("--taxon", choices=("homo", "mus"), required=True)
 
     parser.add_argument(
         "--s3_input_path",
