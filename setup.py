@@ -16,7 +16,7 @@ def read(*names, **kwargs):
 
 setuptools.setup(
     name="czb-util",
-    version="0.3.0",
+    version="0.4.0",
     license="MIT License",
     description="A collection of scripts for some common Biohub tasks",
     long_description=read("README.md"),
