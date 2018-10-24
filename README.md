@@ -20,17 +20,18 @@ Clone this repo and install it, preferably in a fresh conda environment.
 
 Create a conda environment called `utilities-env` specific to this Python package:
 
-```
+```zsh
 # Create an environment called `utilities-env` with Python and pip
 ➜  conda create --name utilities-env python=3.6 pip
 ➜  source activate utilities-env
 (utilities-env) ➜
 ```
+
 The `(utilities-env)` indicates that the `utilities-env` environment is active.
 
 Now let's clone the environment into a `code` folder:
 
-```
+```zsh
 (utilities-env) ➜ cd code
 (utilities-env) ➜ git clone https://github.com/czbiohub/utilities.git
 
@@ -38,7 +39,7 @@ Now let's clone the environment into a `code` folder:
 
 Now we'll change to that folder with `cd` and install the package by running the `setup.py` script.
 
-```
+```zsh
 (utilities-env) ➜ cd utilities
 (utilities-env) ➜ python setup.py install
 ```
@@ -49,7 +50,7 @@ Now we'll change to that folder with `cd` and install the package by running the
 
 As of the latest version of this repository, you *do not* need to be in the `utilities` folder to run scripts, but you *must* activate the environment:
 
-```
+```zsh
 ➜  source activate utilities-env
 (utilities-env) ➜
 ```
@@ -60,7 +61,7 @@ The `evros` command (and others) will be on your path, and it will be able to fi
 
 The `evros` script wraps aegea (which can be tricky to use). It has sane defaults so you don't need to choose most of them.
 
-```
+```zsh
 (utilities-env) ➜ evros --help
 usage: evros [--ecr-image ECR] [--queue QUEUE] [--vcpus VCPUS]
              [--memory MEMORY] [--storage STORAGE] [--ulimits U [U ...]]
@@ -105,7 +106,7 @@ If the script defines a function named `get_default_requirements` it will call t
 If you write custom scripts that follow these conventions, `evros` will be able to run them. A template script is included as an example. To run custom scripts, use the `--branch` option. First, create a new branch of the repo, then write your script (or modify an existing one). Once you've committed your changes, push them back to this repo. The batch job will run `git checkout [branch]` at runtime.
 
 
-```
+```zsh
 (utilities-env) ➜ git checkout -b my_custom_branch
 Switched to a new branch 'my_custom_branch'
 
@@ -120,26 +121,38 @@ Branch 'my_custom_branch' set up to track remote branch 'my_custom_branch' from 
 (utilities-env) ➜ evros --branch my_custom_branch custom.my_custom_script --arg1 --arg2
 ```
 
-### How to demux a thing using the standard workflow:
+### How to demux something:
+
+*First consider: maybe don't? Demuxing should happen automatically for most runs* 
 
 If your BCLs were uploaded to czb-seqbot/bcl and your sample sheet is in czb-seqbot/sample-sheets, you can do this:
 
-```
+```zsh
 (utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID
 ```
 
 If you want to stick the results somewhere other than czb-seqbot/fastqs, you can change that option:
 
-```
+```zsh
 (utilities-env) ➜ evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID --s3_output_dir s3://my-special-bucket
 ```
 
 ### How to align some stuff:
 
+*Important change: you need to explicitly specify an output path for your alignment results.*
+
+To the run the first of ten partitions:
+
+```zsh
+(utilities-env) ➜ evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --exp_ids YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
 ```
-(utilities-env) ➜ aws_star mus 10 YYMMDD_EXP_ID > my_star_jobs.sh
+
+Or use this helper script to create a bunch of commands:
+
+```zsh
+(utilities-env) ➜ aws_star mus 10 YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results > my_star_jobs.sh
 (utilities-env) ➜ cat my_star_jobs.sh
-evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --exp_ids YYMMDD_EXP_ID
+evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
 sleep 10
 [...lots more...]
 (utilities-env) ➜ source my_star_jobs.sh
@@ -149,11 +162,11 @@ sleep 10
 
 For some reason, a fraction of alignment jobs fail to start because of AWS problems. It happens enough that there's a script to help with the problem:
 
-```
+```zsh
 (utilities-env) ➜ starfails my_star_jobs.sh
 8d920e9f-313a-465a-ae4d-df77bdbe990d
 (utilities-env) ➜ cat my_star_jobs_failed_jobs.sh 
-evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --exp_ids YYMMDD_EXP_ID
+evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --input_dirs YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
 sleep 20
 (utilities-env) ➜ source my_star_jobs_failed_jobs.sh 
 ```
@@ -162,9 +175,9 @@ This new file contains the command to re-try the failed jobs.
 
 ### How to make a gene-cell table from an alignment:
 
-This one runs on your local machine--it'll download alignment results from S3 and make a table out of it.
+This one runs on your local machine&mdash;it'll download alignment results from S3 and make a table out of it.
 
-```
+```zsh
 (utilities-env) ➜ gene_cell_table --help
 usage: gene_cell_table [--s3_bucket S3_BUCKET] [--dryrun] [--debug] [-h]
                        s3_path output_file
@@ -199,6 +212,29 @@ See https://github.com/czbiohub/utilities for more examples
 
 ```
 
+### *New!* How to run Velocyto on some alignments
+
+This script will use the BAM files from a STAR alignment and create loom files using Velocyto. Currently only supports hg38.
+
+To run the first of ten partitions:
+
+```zsh
+(utilities-env) ➜ evros alignment.velocyto --taxon homo --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID
+```
+
+Or use this helper script:
+
+```zsh
+(utilities-env) ➜ aws_velocyto homo 10 YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files > my_velocyto_jobs.sh
+(utilities-env) ➜ cat my_star_jobs.sh
+evros --branch master alignment.velocyto --taxon homo --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files
+sleep 10
+[...lots more...]
+(utilities-env) ➜ source my_star_jobs.sh
+```
+
+This will run Velocyto on every BAM file under the input paths 
+
 ### How to share data with an outside collaborator
 
 They don't need an AWS account but they _do_ need to install the [AWS CLI](aws.amazon.com/cli).
@@ -209,7 +245,7 @@ To use the script, just give it the path to the folder you want to share (not in
 
 By default this will share data in the `czb-seqbot` bucket. If you want to share data from somewhere else, give it the bucket name:
 
-```
+```zsh
 (utilities-env) ➜ aws_access fastqs/YYMMDD_EXP_ID > download_script.sh
 (utilities-env) ➜ aws_access some/data/here my-own-bucket > download_script_for_my_bucket.sh
 ```

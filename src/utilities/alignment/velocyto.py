@@ -17,7 +17,7 @@ CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=2, memory=32000, storage=500, ecr_image="velocyto")
+    return argparse.Namespace(vcpus=2, memory=64000, storage=500, ecr_image="velocyto")
 
 
 def get_parser():
@@ -25,12 +25,10 @@ def get_parser():
         prog="velocyto.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument("--taxon", choices=("homo",), default="homo")
+    parser.add_argument("--taxon", choices=("homo",), required=True)
 
     parser.add_argument(
-        "--s3_input_path",
-        default="s3://czbiohub-seqbot/fastqs",
-        help="Location of input folders",
+        "--s3_input_path", required=True, help="Location of input folders"
     )
     parser.add_argument("--s3_output_path", required=True, help="Location for output")
 
@@ -43,7 +41,7 @@ def get_parser():
         help="List of input folders to process",
     )
     parser.add_argument(
-        "--plates", nargs="+", required=True, help="List of plates to run"
+        "--plates", nargs="*", help="List of plates to run"
     )
     parser.add_argument(
         "--force_redo",
@@ -138,19 +136,12 @@ def main(logger):
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
     logger.info(
-        """Run Info: partition {} out of {}
-                    gtf_file:\t{}
-                   mask_file:\t{}
-               s3_input_path:\t{}
-                  input_dirs:\t{}""".format(
-            args.partition_id,
-            args.num_partitions,
-            gtf_file,
-            mask_file,
-            args.taxon,
-            args.s3_input_path,
-            ", ".join(args.input_dirs),
-        )
+        f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
+                     gtf_file:\t{gtf_file}
+                    mask_file:\t{mask_file}
+                        taxon:\t{args.taxon}
+                s3_input_path:\t{args.s3_input_path}
+                   input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
@@ -202,11 +193,9 @@ def main(logger):
 
         for fn in sample_files:
             matched = sample_re.search(os.path.basename(fn))
-            if (
-                matched.group(1).split("_")[1] in plate_set
-                and matched.group(1) not in output_files
-            ):
-                plate_samples.append(fn)
+            if matched.group(1) not in output_files:
+                if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
+                    plate_samples.append(fn)
 
         logger.info(f"number of bam files: {len(plate_samples)}")
 

@@ -10,16 +10,16 @@ def main():
         "--branch", default="master", help="branch of utilities repo to use"
     )
 
-    parser.add_argument("taxon", choices=("mus", "homo", "microcebus"))
+    parser.add_argument("taxon", choices=("homo",))
     parser.add_argument("num_partitions", type=int)
     parser.add_argument(
-        "input_dirs", nargs="+", help="The folder(s) containing fastq.gz files to align"
+        "input_dirs", nargs="+", help="The folder(s) containing bam files to velocytize"
     )
 
     parser.add_argument(
         "script_args",
         nargs=argparse.REMAINDER,
-        help="Extra arguments are passed to run_star_and_htseq",
+        help="Extra arguments are passed to velocyto",
     )
 
     args = parser.parse_args()
@@ -30,7 +30,7 @@ def main():
                 (
                     "evros",
                     f"--branch {args.branch}",
-                    "alignment.run_star_and_htseq",
+                    "alignment.velocyto",
                     f"--taxon {args.taxon}",
                     f"--num_partitions {args.num_partitions}",
                     f"--partition_id {i}",
