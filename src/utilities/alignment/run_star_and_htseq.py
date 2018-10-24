@@ -84,9 +84,7 @@ def get_parser():
         help="Location of input folders",
     )
     parser.add_argument(
-        "--s3_output_path",
-        default=None,
-        help="Location for output, default [input_dir]/results",
+        "--s3_output_path", required=True, help="Location for output files"
     )
     parser.add_argument(
         "--region",
@@ -234,7 +232,7 @@ def run_sample(
             htseq_queue.put((input_dir, sample_name, dest_dir))
 
 
-def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb_gtf):
+def run_htseq(htseq_queue, log_queue, s3_output_path, taxon, sjdb_gtf):
     s3c = boto3.client("s3")
     t_config = TransferConfig(use_threads=False)
 
@@ -270,9 +268,6 @@ def run_htseq(htseq_queue, log_queue, s3_input_path, s3_output_path, taxon, sjdb
         # compress the results dir and move it to s3
         command = ["tar", "-cvzf", "{}.{}.tgz".format(sample_name, taxon), "results"]
         ut_log.log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
-
-        if s3_output_path is None:
-            s3_output_path = os.path.join(s3_input_path, input_dir, "results")
 
         s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(s3_output_path)
 
@@ -353,28 +348,16 @@ def main(logger):
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
     logger.info(
-        """Run Info: partition {} out of {}
-                   star_proc:\t{}
-                  htseq_proc:\t{}
-                  genome_dir:\t{}
-             ref_genome_file:\t{}
-        ref_genome_star_file:\t{}
-                    sjdb_gtf:\t{}
-                       taxon:\t{}
-               s3_input_path:\t{}
-                  input_dirs:\t{}""".format(
-            args.partition_id,
-            args.num_partitions,
-            args.star_proc,
-            args.htseq_proc,
-            genome_dir,
-            ref_genome_file,
-            ref_genome_star_file,
-            sjdb_gtf,
-            args.taxon,
-            args.s3_input_path,
-            ", ".join(args.input_dirs),
-        )
+        f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
+                    star_proc:\t{args.star_proc}
+                   htseq_proc:\t{args.htseq_proc}
+                   genome_dir:\t{genome_dir}
+              ref_genome_file:\t{ref_genome_file}
+         ref_genome_star_file:\t{ref_genome_star_file}
+                     sjdb_gtf:\t{sjdb_gtf}
+                        taxon:\t{args.taxon}
+                s3_input_path:\t{args.s3_input_path}
+                   input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     s3 = boto3.resource("s3")
@@ -424,14 +407,7 @@ def main(logger):
     for p in star_procs:
         p.start()
 
-    htseq_args = (
-        htseq_queue,
-        log_queue,
-        args.s3_input_path,
-        args.s3_output_path,
-        args.taxon,
-        sjdb_gtf,
-    )
+    htseq_args = (htseq_queue, log_queue, args.s3_output_path, args.taxon, sjdb_gtf)
     htseq_procs = [
         mp.Process(target=run_htseq, args=htseq_args) for i in range(args.htseq_proc)
     ]
@@ -442,12 +418,7 @@ def main(logger):
     sample_re = re.compile("([^/]+)_R\d_\d+.fastq.gz$")
 
     for input_dir in args.input_dirs:
-        if args.s3_output_path is None:
-            s3_output_path = os.path.join(args.s3_input_path, input_dir, "results")
-        else:
-            s3_output_path = args.s3_output_path
-
-        s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(s3_output_path)
+        s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
         # Check the input_dir folder for existing runs
         if not args.force_realign:
