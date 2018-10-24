@@ -20,4 +20,4 @@ build_image:
       - "conda install samtools"
       - "git clone https://github.com/czbiohub/utilities.git"
       - "cd utilities"
-      - "pip install --upgrade -e ."
+      - "python setup.py install"

@@ -36,14 +36,14 @@ Now let's clone the environment into a `code` folder:
 
 ```
 
-Now we'll change to that folder with `cd` and install the program with `pip install -e .`, where the `.` means right here.
+Now we'll change to that folder with `cd` and install the package by running the `setup.py` script.
 
 ```
 (utilities-env) ➜ cd utilities
-(utilities-env) ➜ pip install -e .
+(utilities-env) ➜ python setup.py install
 ```
 
-The `-e` option tells pip to install the repo as an editable package. This means that you can get updates from GitHub with `git pull`, rather than reinstalling.
+**Note** This does not install the repo as an editable package (unlike previous versions). When you update from Github you should reinstall by running the command again. The old way was more trouble than it was worth. 
 
 ## Usage
 

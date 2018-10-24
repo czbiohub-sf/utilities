@@ -9,7 +9,7 @@ from utilities.log_util import get_logger, log_command
 
 
 # an s3 bucket to upload your logs, if you want them
-S3_LOG_DIR = 's3://your-bucket/script_logs/'
+S3_LOG_DIR = "s3://your-bucket/script_logs/"
 
 
 def get_parser():
@@ -18,11 +18,10 @@ def get_parser():
     so that evros can test them before launching a job
     """
     parser = argparse.ArgumentParser(
-            prog='template.py',
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        prog="template.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('--message', default='Hello world!')
+    parser.add_argument("--message", default="Hello world!")
 
     return parser
 
@@ -40,14 +39,14 @@ def main(logger):
     args = parser.parse_args()
 
     # use the logger
-    logger.info('Attempting to echo the message...')
+    logger.info("Attempting to echo the message...")
 
     # run a subprocess and log the attempt
-    log_command(logger, 'echo {}'.format(args.message), shell=True)
+    log_command(logger, "echo {}".format(args.message), shell=True)
 
 
 if __name__ == "__main__":
-    mainlogger,log_file,file_handler = get_logger(__name__)
+    mainlogger, log_file, file_handler = get_logger(__name__)
 
     try:
         main(mainlogger)
@@ -58,7 +57,7 @@ if __name__ == "__main__":
         # upload the log file no matter what. You can remove this if you don't
         # want to accumulate logs
         if log_file:
-            log_cmd = 'aws s3 cp --quiet {} {}'.format(log_file, S3_LOG_DIR)
+            log_cmd = "aws s3 cp --quiet {} {}".format(log_file, S3_LOG_DIR)
             mainlogger.info(log_cmd)
 
             file_handler.close()
