@@ -6,10 +6,13 @@ import argparse
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("taxon", choices=("mus", "homo"))
+    parser.add_argument("taxon", choices=("mus", "homo", "microcebus"))
     parser.add_argument("num_partitions", type=int)
     parser.add_argument(
         "input_dirs", nargs="+", help="The folder(s) containing fastq.gz files to align"
+    )
+    parser.add_argument(
+        "--branch", default="master", help="branch of utilities repo to use"
     )
     parser.add_argument(
         "script_args",
@@ -24,6 +27,7 @@ def main():
             " ".join(
                 (
                     "evros",
+                    "--branch {}".format(args.branch),
                     "alignment.run_star_and_htseq",
                     "--taxon {}".format(args.taxon),
                     "--num_partitions {}".format(args.num_partitions),
