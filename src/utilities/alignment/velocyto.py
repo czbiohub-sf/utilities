@@ -25,7 +25,7 @@ def get_parser():
         prog="velocyto.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument("--taxon", choices=("homo",), required=True)
+    parser.add_argument("--taxon", choices=("homo", "mus"), required=True)
 
     parser.add_argument(
         "--s3_input_path", required=True, help="Location of input folders"
@@ -128,8 +128,8 @@ def main(logger):
         gtf_file = "hg38-plus.gtf"
         mask_file = "hg38_rmsk.gtf"
     elif args.taxon == "mus":
-        gtf_file = os.path.join(root_dir, "mm10-plus.gtf")
-        mask_file = os.path.join(root_dir, "mm10_rmsk.gtf")
+        gtf_file = "mm10-plus.gtf"
+        mask_file = "mm10_rmsk.gtf"
     else:
         raise ValueError("Invalid taxon {}".format(args.taxon))
 
