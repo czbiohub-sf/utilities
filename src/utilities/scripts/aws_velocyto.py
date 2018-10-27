@@ -10,7 +10,7 @@ def main():
         "--branch", default="master", help="branch of utilities repo to use"
     )
 
-    parser.add_argument("taxon", choices=("homo",))
+    parser.add_argument("taxon", choices=("homo", "mus"))
     parser.add_argument("num_partitions", type=int)
     parser.add_argument(
         "input_dirs", nargs="+", help="The folder(s) containing bam files to velocytize"
