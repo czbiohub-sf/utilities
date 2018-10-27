@@ -41,7 +41,7 @@ def get_parser():
         help="List of input folders to process",
     )
     parser.add_argument(
-        "--plates", nargs="*", help="List of plates to run"
+        "--plates", nargs="*", default=(), help="List of plates to run"
     )
     parser.add_argument(
         "--force_redo",
