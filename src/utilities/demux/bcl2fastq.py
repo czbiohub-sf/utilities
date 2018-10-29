@@ -244,7 +244,7 @@ def main(logger):
         "s3",
         "cp",
         "--quiet",
-        reports_path,
+        reports_path.decode(),
         os.path.join(args.s3_report_dir, args.exp_id),
         "--recursive",
     ]
