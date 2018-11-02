@@ -30,7 +30,18 @@ def get_parser():
     parser.add_argument("--s3_input_dir", required=True)
     parser.add_argument("--s3_output_dir", required=True)
     parser.add_argument(
-        "--taxon", required=True, choices=("homo", "mus", "mus-premrna", "microcebus")
+        "--taxon",
+        required=True,
+        choices=(
+            "homo",
+            "hg38-plus",
+            "mus",
+            "mm10-plus",
+            "mm10-1.2.0",
+            "mus-premrna",
+            "mm10-1.2.0-premrna",
+            "microcebus",
+        ),
     )
     parser.add_argument("--cell_count", type=int, default=3000)
 
@@ -68,18 +79,33 @@ def main(logger):
     genome_base_dir = os.path.join(args.root_dir, "genome", "cellranger")
     os.makedirs(genome_base_dir)
 
-    if args.taxon == "homo":
+    if args.taxon in ("homo", "hg38-plus"):
+        if args.taxon == "homo":
+            logger.warn("'homo' will be removed in the future, use 'hg38-plus'")
+
         genome_name = "HG38-PLUS"
-    elif args.taxon == "mus":
+    elif args.taxon in ("mus", "mm10-plus"):
+        if args.taxon == "mus":
+            logger.warn("'mus' will be removed in the future, use 'mm10-plus'")
+
         genome_name = "MM10-PLUS"
     elif args.taxon == "microcebus":
         genome_name = "MicMur3-PLUS"
         if args.region != "west":
-            raise ValueError("you must use --region west for the microcebus genome")
-    elif args.taxon == "mus-premrna":
+            raise ValueError(f"you must use --region west for {genome_name}")
+    elif args.taxon == "mm10-1.2.0":
+        genome_name = "mm10-1.2.0"
+        if args.region != "west":
+            raise ValueError(f"you must use --region west for {genome_name}")
+    elif args.taxon in ("mus-premrna", "mm10-1.2.0-premrna"):
+        if args.taxon == "mus-premrna":
+            logger.warn(
+                "'mus-premrna' will be removed in the future, use 'mm10-1.2.0-premrna'"
+            )
+
         genome_name = "mm10-1.2.0-premrna"
         if args.region != "west":
-            raise ValueError("you must use --region west for the premrna genome")
+            raise ValueError(f"you must use --region west for {genome_name}")
     else:
         raise ValueError("unknown taxon {}".format(args.taxon))
 
