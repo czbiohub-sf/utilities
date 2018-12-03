@@ -219,18 +219,18 @@ This script will use the BAM files from a STAR alignment and create loom files u
 To run the first of ten partitions:
 
 ```zsh
-(utilities-env) ➜ evros alignment.velocyto --taxon homo --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID
+(utilities-env) ➜ evros alignment.velocyto --taxon {homo,mus} --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID
 ```
 
 Or use this helper script:
 
 ```zsh
-(utilities-env) ➜ aws_velocyto homo 10 YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files > my_velocyto_jobs.sh
-(utilities-env) ➜ cat my_star_jobs.sh
+(utilities-env) ➜ aws_velocyto {homo,mus} 10 YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files > my_velocyto_jobs.sh
+(utilities-env) ➜ cat my_velocyto_jobs.sh
 evros --branch master alignment.velocyto --taxon homo --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files
 sleep 10
 [...lots more...]
-(utilities-env) ➜ source my_star_jobs.sh
+(utilities-env) ➜ source my_velocyto_jobs.sh
 ```
 
 This will run Velocyto on every BAM file under the input paths 
