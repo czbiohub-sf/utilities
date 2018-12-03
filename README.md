@@ -214,7 +214,7 @@ See https://github.com/czbiohub/utilities for more examples
 
 ### *New!* How to run Velocyto on some alignments
 
-This script will use the BAM files from a STAR alignment and create loom files using Velocyto. Currently only supports hg38.
+This script will use the BAM files from a STAR alignment and create loom files using Velocyto. Currently supports hg38-plus and mm10-plus.
 
 To run the first of ten partitions:
 
