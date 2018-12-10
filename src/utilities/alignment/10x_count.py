@@ -9,11 +9,14 @@ import tarfile
 
 from utilities.log_util import get_logger, log_command
 
+import boto3
+
 
 CELLRANGER = "cellranger"
 
 S3_RETRY = 5
 S3_LOG_DIR = "s3://jamestwebber-logs/10xcount_logs/"
+S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 
 
 def get_default_requirements():
@@ -40,6 +43,7 @@ def get_parser():
             "mm10-1.2.0",
             "mus-premrna",
             "mm10-1.2.0-premrna",
+            "hg19-mm10-3.0.0",
             "microcebus",
         ),
     )
@@ -91,12 +95,8 @@ def main(logger):
         genome_name = "MM10-PLUS"
     elif args.taxon == "microcebus":
         genome_name = "MicMur3-PLUS"
-        if args.region != "west":
-            raise ValueError(f"you must use --region west for {genome_name}")
     elif args.taxon == "mm10-1.2.0":
         genome_name = "mm10-1.2.0"
-        if args.region != "west":
-            raise ValueError(f"you must use --region west for {genome_name}")
     elif args.taxon in ("mus-premrna", "mm10-1.2.0-premrna"):
         if args.taxon == "mus-premrna":
             logger.warn(
@@ -104,41 +104,47 @@ def main(logger):
             )
 
         genome_name = "mm10-1.2.0-premrna"
-        if args.region != "west":
-            raise ValueError(f"you must use --region west for {genome_name}")
+    elif args.taxon == "hg19-mm10-3.0.0":
+        genome_name = "hg19-mm10-3.0.0"
     else:
-        raise ValueError("unknown taxon {}".format(args.taxon))
+        raise ValueError(f"unknown taxon {args.taxon}")
+
+    if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
+        raise ValueError(f"you must use --region west for {genome_name}")
 
     # files that should be uploaded outside of the massive tgz
     # path should be relative to the run folder
-    files_to_upload = [
-        "outs/raw_gene_bc_matrices_h5.h5",
-        "outs/raw_gene_bc_matrices/{}/genes.tsv".format(genome_name),
-        "outs/raw_gene_bc_matrices/{}/barcodes.tsv".format(genome_name),
-        "outs/raw_gene_bc_matrices/{}/matrix.mtx".format(genome_name),
-        "outs/web_summary.html",
-        "outs/metrics_summary.csv",
-    ]
+    files_to_upload = {
+        "outs/raw_gene_bc_matrices_h5.h5": "raw_gene_bc_matrices_h5.h5",
+        "outs/web_summary.html": "web_summary.html",
+        "outs/metrics_summary.csv": "metrics_summary.csv",
+    }
 
-    if args.region == "east":
-        genome_tar_source = os.path.join(
-            "s3://czi-hca/ref-genome/cellranger/", genome_name + ".tgz"
-        )
+    if args.taxon == "hg19-mm10-3.0.0":
+        genome_list = ("hg19", "mm10")
     else:
-        genome_tar_source = os.path.join(
-            "s3://czbiohub-reference/cellranger/", genome_name + ".tgz"
+        genome_list = (genome_name,)
+
+    for gn in genome_list:
+        files_to_upload.update(
+            {
+                f"outs/raw_gene_bc_matrices/{gn}/genes.tsv": f"genes.{gn}.tsv",
+                f"outs/raw_gene_bc_matrices/{gn}/barcodes.tsv": f"barcodes.{gn}.tsv",
+                f"outs/raw_gene_bc_matrices/{gn}/matrix.mtx": f"matrix.{gn}.mtx",
+            }
         )
 
-    genome_dir = os.path.join(genome_base_dir, genome_name)
+    s3 = boto3.resource("s3")
 
     # download the ref genome data
-    command = ["aws", "s3", "cp", "--quiet", genome_tar_source, genome_base_dir]
-    log_command(logger, command, shell=True)
+    logger.info(f"Downloading and extracting genome data {genome_name}")
 
-    genome_tar_file = os.path.basename(genome_tar_source)
-    logger.debug("Extracting {}".format(genome_tar_file))
-    with tarfile.open(os.path.join(genome_base_dir, genome_tar_file)) as tf:
+    s3_object = s3.Object(S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz")
+
+    with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
         tf.extractall(path=genome_base_dir)
+
+    genome_dir = os.path.join(genome_base_dir, genome_name)
 
     sys.stdout.flush()
 
@@ -163,58 +169,48 @@ def main(logger):
         "--localmem=240",
         "--nosecondary",
         "--disable-ui",
-        "--expect-cells={}".format(args.cell_count),
-        "--id={}".format(sample_id),
-        "--fastqs={}".format(fastq_path),
-        "--transcriptome={}".format(genome_dir),
+        f"--expect-cells={args.cell_count}",
+        f"--id={sample_id}",
+        f"--fastqs={fastq_path}",
+        f"--transcriptome={genome_dir}",
     ]
     log_command(
         logger, command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
     )
 
     # Move results(websummary, cell-gene table, tarball) data back to S3
-    for file_name in files_to_upload:
+    for file_name, dest_name in files_to_upload.items():
         command = [
             "aws",
             "s3",
             "cp",
             "--quiet",
             os.path.join(result_path, sample_id, file_name),
-            "{}/".format(args.s3_output_dir),
+            os.path.join(args.s3_output_dir, dest_name),
         ]
         for i in range(S3_RETRY):
             try:
                 log_command(logger, command, shell=True)
                 break
             except subprocess.CalledProcessError:
-                logger.info("retrying cp {}".format(file_name))
+                logger.info(f"retrying cp {file_name}")
         else:
-            raise RuntimeError("couldn't sync {}".format(file_name))
+            raise RuntimeError(f"couldn't sync {file_name}")
 
-    command = [
-        "tar",
-        "cvzf",
-        "{}.tgz".format(os.path.join(result_path, sample_id)),
-        sample_id,
-    ]
+    tarball_file = f"{os.path.join(result_path, sample_id)}.tgz"
+
+    command = ["tar", "czf", tarball_file, sample_id]
     log_command(logger, command, shell=True)
 
-    command = [
-        "aws",
-        "s3",
-        "cp",
-        "--quiet",
-        "{}.tgz".format(os.path.join(result_path, sample_id)),
-        "{}/".format(args.s3_output_dir),
-    ]
+    command = ["aws", "s3", "cp", "--quiet", tarball_file, f"{args.s3_output_dir}/"]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
             break
         except subprocess.CalledProcessError:
-            logger.info("retrying cp {}.tgz".format(sample_id))
+            logger.info(f"retrying cp {sample_id}.tgz")
     else:
-        raise RuntimeError("couldn't sync {}.tgz".format(sample_id))
+        raise RuntimeError(f"couldn't sync {sample_id}.tgz")
 
 
 if __name__ == "__main__":
@@ -227,7 +223,7 @@ if __name__ == "__main__":
         raise
     finally:
         if log_file:
-            log_cmd = "aws s3 cp --quiet {} {}".format(log_file, S3_LOG_DIR)
+            log_cmd = f"aws s3 cp --quiet {log_file} {S3_LOG_DIR}"
             mainlogger.info(log_cmd)
 
             file_handler.close()
