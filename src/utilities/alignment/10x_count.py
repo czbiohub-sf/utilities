@@ -18,6 +18,25 @@ S3_RETRY = 5
 S3_LOG_DIR = "s3://jamestwebber-logs/10xcount_logs/"
 S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 
+reference_genomes = {
+    "homo": "HG38-PLUS",
+    "hg38-plus": "HG38-PLUS",
+    "mus": "MM10-PLUS",
+    "mm10-plus": "MM10-PLUS",
+    "mm10-1.2.0": "mm10-1.2.0",
+    "mus-premrna": "mm10-1.2.0-premrna",
+    "mm10-1.2.0-premrna": "mm10-1.2.0-premrna",
+    "hg19-mm10-3.0.0": "hg19-mm10-3.0.0",
+    "microcebus": "MicMur3-PLUS",
+    "gencode.vM19": "gencode.vM19",
+}
+
+deprecated = {
+    "homo": "hg38-plus",
+    "mus": "mm10-plus",
+    "mus-premrna": "mm10-1.2.0-premrna",
+}
+
 
 def get_default_requirements():
     return argparse.Namespace(
@@ -35,17 +54,7 @@ def get_parser():
     parser.add_argument(
         "--taxon",
         required=True,
-        choices=(
-            "homo",
-            "hg38-plus",
-            "mus",
-            "mm10-plus",
-            "mm10-1.2.0",
-            "mus-premrna",
-            "mm10-1.2.0-premrna",
-            "hg19-mm10-3.0.0",
-            "microcebus",
-        ),
+        choices=list(reference_genomes.keys()),
     )
     parser.add_argument("--cell_count", type=int, default=3000)
 
@@ -83,29 +92,14 @@ def main(logger):
     genome_base_dir = os.path.join(args.root_dir, "genome", "cellranger")
     os.makedirs(genome_base_dir)
 
-    if args.taxon in ("homo", "hg38-plus"):
-        if args.taxon == "homo":
-            logger.warn("'homo' will be removed in the future, use 'hg38-plus'")
-
-        genome_name = "HG38-PLUS"
-    elif args.taxon in ("mus", "mm10-plus"):
-        if args.taxon == "mus":
-            logger.warn("'mus' will be removed in the future, use 'mm10-plus'")
-
-        genome_name = "MM10-PLUS"
-    elif args.taxon == "microcebus":
-        genome_name = "MicMur3-PLUS"
-    elif args.taxon == "mm10-1.2.0":
-        genome_name = "mm10-1.2.0"
-    elif args.taxon in ("mus-premrna", "mm10-1.2.0-premrna"):
-        if args.taxon == "mus-premrna":
+    if args.taxon in reference_genomes:
+        if args.taxon in deprecated:
             logger.warn(
-                "'mus-premrna' will be removed in the future, use 'mm10-1.2.0-premrna'"
+                f"'{args.taxon}' will be removed in the future,"
+                f" use '{reference_genomes[args.taxon]}'"
             )
 
-        genome_name = "mm10-1.2.0-premrna"
-    elif args.taxon == "hg19-mm10-3.0.0":
-        genome_name = "hg19-mm10-3.0.0"
+        genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
