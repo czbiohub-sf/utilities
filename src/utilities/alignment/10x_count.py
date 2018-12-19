@@ -31,11 +31,7 @@ reference_genomes = {
     "gencode.vM19": "gencode.vM19",
 }
 
-deprecated = {
-    "homo": "HG38-PLUS",
-    "mus": "MM10-PLUS",
-    "mus-premrna": "mm10-1.2.0-premrna",
-}
+deprecated = {"homo", "mus", "mus-premrna"}
 
 
 def get_default_requirements():
@@ -60,7 +56,7 @@ def get_parser():
 
     parser.add_argument(
         "--region",
-        default="east",
+        default="west",
         choices=("east", "west"),
         help=(
             "Region you're running jobs in."
@@ -133,7 +129,10 @@ def main(logger):
     # download the ref genome data
     logger.info(f"Downloading and extracting genome data {genome_name}")
 
-    s3_object = s3.Object(S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz")
+    if args.region == "east":
+        s3_object = s3.Object(S3_REFERENCE[args.region], f"ref-genome/cellranger/{genome_name}.tgz")
+    else:
+        s3_object = s3.Object(S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz")
 
     with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
         tf.extractall(path=genome_base_dir)
