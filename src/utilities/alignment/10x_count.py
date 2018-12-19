@@ -32,8 +32,8 @@ reference_genomes = {
 }
 
 deprecated = {
-    "homo": "hg38-plus",
-    "mus": "mm10-plus",
+    "homo": "HG38-PLUS",
+    "mus": "MM10-PLUS",
     "mus-premrna": "mm10-1.2.0-premrna",
 }
 
