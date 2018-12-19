@@ -48,9 +48,7 @@ def get_parser():
     parser.add_argument("--s3_input_dir", required=True)
     parser.add_argument("--s3_output_dir", required=True)
     parser.add_argument(
-        "--taxon",
-        required=True,
-        choices=list(reference_genomes.keys()),
+        "--taxon", required=True, choices=list(reference_genomes.keys())
     )
     parser.add_argument("--cell_count", type=int, default=3000)
 
@@ -130,9 +128,13 @@ def main(logger):
     logger.info(f"Downloading and extracting genome data {genome_name}")
 
     if args.region == "east":
-        s3_object = s3.Object(S3_REFERENCE[args.region], f"ref-genome/cellranger/{genome_name}.tgz")
+        s3_object = s3.Object(
+            S3_REFERENCE[args.region], f"ref-genome/cellranger/{genome_name}.tgz"
+        )
     else:
-        s3_object = s3.Object(S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz")
+        s3_object = s3.Object(
+            S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz"
+        )
 
     with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
         tf.extractall(path=genome_base_dir)
