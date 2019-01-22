@@ -31,15 +31,19 @@ def batch_samplesheet(
     """
 
     with open(samplesheet_file) as f:
-        rdr = csv.reader(f)
-        rows = list(rdr)
-        hdr = "\n".join(",".join(r) for r in rows[:2])
-        if reverse_comp_i7:
-            i7_c = list(map(str.lower, rows[1])).index("index")
-        if reverse_comp_i5:
-            i5_c = list(map(str.lower, rows[1])).index("index2")
+        rows = list(csv.reader(f))
 
-        rows = rows[2:]
+        # find the [Data] section to check format
+        h_i = [i for i, r in enumerate(rows) if r[0] == "[Data]"][0]
+        h_row = list(map(str.lower, rows[h_i + 1]))
+
+        hdr = "\n".join(",".join(r) for r in rows[:h_i + 2])
+        if reverse_comp_i7:
+            i7_c = list(map(str.lower, h_row)).index("index")
+        if reverse_comp_i5:
+            i5_c = list(map(str.lower, h_row)).index("index2")
+
+        rows = rows[h_i + 2:]
 
     print(len(rows), "rows")
 
