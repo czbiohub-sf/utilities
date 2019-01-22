@@ -222,16 +222,6 @@ def main(logger):
     else:
         raise RuntimeError("couldn't sync fastqs")
 
-    # check fastq upload
-    command = [
-        "aws",
-        "s3",
-        "ls",
-        "--recursive",
-        os.path.join(args.s3_output_dir, args.exp_id, "rawdata"),
-    ]
-    log_command(logger, command, shell=True)
-
     # Move reports data back to S3
     reports_path = subprocess.check_output(
         "ls -d {}".format(
