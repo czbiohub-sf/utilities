@@ -415,7 +415,7 @@ def main(logger):
     for p in htseq_procs:
         p.start()
 
-    sample_re = re.compile("([^/]+)_R\d_\d+.fastq.gz$")
+    sample_re = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
 
     for input_dir in args.input_dirs:
         s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
