@@ -37,13 +37,13 @@ def batch_samplesheet(
         h_i = [i for i, r in enumerate(rows) if r[0] == "[Data]"][0]
         h_row = list(map(str.lower, rows[h_i + 1]))
 
-        hdr = "\n".join(",".join(r) for r in rows[:h_i + 2])
+        hdr = "\n".join(",".join(r) for r in rows[: h_i + 2])
         if reverse_comp_i7:
             i7_c = list(map(str.lower, h_row)).index("index")
         if reverse_comp_i5:
             i5_c = list(map(str.lower, h_row)).index("index2")
 
-        rows = rows[h_i + 2:]
+        rows = rows[h_i + 2 :]
 
     print(len(rows), "rows")
 

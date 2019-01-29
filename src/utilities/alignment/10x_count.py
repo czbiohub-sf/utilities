@@ -100,28 +100,6 @@ def main(logger):
     if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
         raise ValueError(f"you must use --region west for {genome_name}")
 
-    # files that should be uploaded outside of the massive tgz
-    # path should be relative to the run folder
-    files_to_upload = {
-        "outs/raw_gene_bc_matrices_h5.h5": "raw_gene_bc_matrices_h5.h5",
-        "outs/web_summary.html": "web_summary.html",
-        "outs/metrics_summary.csv": "metrics_summary.csv",
-    }
-
-    if args.taxon == "hg19-mm10-3.0.0":
-        genome_list = ("hg19", "mm10")
-    else:
-        genome_list = (genome_name,)
-
-    for gn in genome_list:
-        files_to_upload.update(
-            {
-                f"outs/raw_gene_bc_matrices/{gn}/genes.tsv": f"genes.{gn}.tsv",
-                f"outs/raw_gene_bc_matrices/{gn}/barcodes.tsv": f"barcodes.{gn}.tsv",
-                f"outs/raw_gene_bc_matrices/{gn}/matrix.mtx": f"matrix.{gn}.mtx",
-            }
-        )
-
     s3 = boto3.resource("s3")
 
     # download the ref genome data
@@ -173,39 +151,23 @@ def main(logger):
         logger, command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
     )
 
-    # Move results(websummary, cell-gene table, tarball) data back to S3
-    for file_name, dest_name in files_to_upload.items():
-        command = [
-            "aws",
-            "s3",
-            "cp",
-            "--quiet",
-            os.path.join(result_path, sample_id, file_name),
-            os.path.join(args.s3_output_dir, dest_name),
-        ]
-        for i in range(S3_RETRY):
-            try:
-                log_command(logger, command, shell=True)
-                break
-            except subprocess.CalledProcessError:
-                logger.info(f"retrying cp {file_name}")
-        else:
-            raise RuntimeError(f"couldn't sync {file_name}")
-
-    tarball_file = f"{os.path.join(result_path, sample_id)}.tgz"
-
-    command = ["tar", "czf", tarball_file, sample_id]
-    log_command(logger, command, shell=True)
-
-    command = ["aws", "s3", "cp", "--quiet", tarball_file, f"{args.s3_output_dir}/"]
+    # Move outs folder to S3
+    command = [
+        "aws",
+        "s3",
+        "sync",
+        "--no-progress",
+        os.path.join(result_path, sample_id, "outs"),
+        args.s3_output_dir,
+    ]
     for i in range(S3_RETRY):
         try:
             log_command(logger, command, shell=True)
             break
         except subprocess.CalledProcessError:
-            logger.info(f"retrying cp {sample_id}.tgz")
+            logger.info(f"retrying sync")
     else:
-        raise RuntimeError(f"couldn't sync {sample_id}.tgz")
+        raise RuntimeError(f"couldn't sync output")
 
 
 if __name__ == "__main__":
