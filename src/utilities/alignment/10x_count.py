@@ -78,6 +78,9 @@ def main(logger):
         args.root_dir = os.path.join(args.root_dir, os.environ["AWS_BATCH_JOB_ID"])
 
     # local directories
+    if args.s3_input_dir.endswith('/'):
+        args.s3_input_dir = args.s3_input_dir[:-1]
+
     sample_id = os.path.basename(args.s3_input_dir)
     result_path = os.path.join(args.root_dir, "data", "hca", sample_id)
     fastq_path = os.path.join(result_path, "fastqs")
@@ -173,15 +176,4 @@ def main(logger):
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = get_logger(__name__)
 
-    try:
-        main(mainlogger)
-    except:
-        mainlogger.info("An exception occurred", exc_info=True)
-        raise
-    finally:
-        if log_file:
-            log_cmd = f"aws s3 cp --quiet {log_file} {S3_LOG_DIR}"
-            mainlogger.info(log_cmd)
-
-            file_handler.close()
-            subprocess.check_output(log_cmd, shell=True)
+    main(mainlogger)
