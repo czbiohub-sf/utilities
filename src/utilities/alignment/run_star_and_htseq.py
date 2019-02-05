@@ -3,6 +3,7 @@ import argparse
 import datetime
 import os
 import re
+import subprocess
 import tarfile
 import time
 
@@ -15,7 +16,6 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 
 
-S3_LOG_DIR = "s3://jamestwebber-logs/star_logs/"
 S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 
 reference_genomes = {
@@ -190,7 +190,11 @@ def run_sample(
         )
     )
     failed = ut_log.log_command(
-        logger, command, shell=True, cwd=os.path.join(dest_dir, "results", "Pass1")
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results", "Pass1"),
     )
 
     # running sam tools
@@ -204,13 +208,21 @@ def run_sample(
         "./Pass1/Aligned.out.bam",
     ]
     failed = failed or ut_log.log_command(
-        logger, command, shell=True, cwd=os.path.join(dest_dir, "results")
+        logger,
+        command,
+        shell=True,
+        stderr=subprocess.STDOUT,
+        cwd=os.path.join(dest_dir, "results"),
     )
 
     # running samtools index -b
     command = [SAMTOOLS, "index", "-b", "Aligned.out.sorted.bam"]
     failed = failed or ut_log.log_command(
-        logger, command, shell=True, cwd=os.path.join(dest_dir, "results", "Pass1")
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results", "Pass1"),
     )
 
     # generating files for htseq-count
@@ -225,7 +237,11 @@ def run_sample(
         "./Pass1/Aligned.out.sorted.bam",
     ]
     failed = failed or ut_log.log_command(
-        logger, command, shell=True, cwd=os.path.join(dest_dir, "results")
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results"),
     )
 
     return failed, dest_dir
@@ -248,7 +264,11 @@ def run_htseq(dest_dir, sjdb_gtf, logger):
         "htseq-count.txt",
     ]
     failed = ut_log.log_command(
-        logger, command, shell=True, cwd=os.path.join(dest_dir, "results")
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results"),
     )
 
     return failed
@@ -371,7 +391,9 @@ def main(logger):
 
     # Load Genome Into Memory
     command = [STAR, "--genomeDir", genome_dir, "--genomeLoad", "LoadAndExit"]
-    ut_log.log_command(logger, command, shell=True)
+    if ut_log.log_command(logger, command, stderr=subprocess.STDOUT, shell=True):
+        logger.error("Failed to load genome into memory")
+        return
 
     sample_re = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)

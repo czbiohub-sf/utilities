@@ -3,6 +3,7 @@ import argparse
 import datetime
 import os
 import re
+import subprocess
 import time
 
 import utilities.log_util as ut_log
@@ -83,7 +84,9 @@ def run_sample(
         gtf_path,
     ]
 
-    if not ut_log.log_command(logger, veloctyo_command, shell=True):
+    if ut_log.log_command(
+        logger, veloctyo_command, stderr=subprocess.STDOUT, shell=True
+    ):
         logger.info(f"velocyto failed on {sample_id}")
         os.remove(local_sample)
         return

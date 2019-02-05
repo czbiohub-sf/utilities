@@ -15,7 +15,7 @@ import boto3
 CELLRANGER = "cellranger"
 
 S3_RETRY = 5
-S3_LOG_DIR = "s3://jamestwebber-logs/10xcount_logs/"
+
 S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 
 reference_genomes = {
@@ -150,9 +150,12 @@ def main(logger):
         f"--fastqs={fastq_path}",
         f"--transcriptome={genome_dir}",
     ]
-    log_command(
+    failed = log_command(
         logger, command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
     )
+
+    if failed:
+        return
 
     # Move outs folder to S3
     command = [
@@ -164,11 +167,9 @@ def main(logger):
         args.s3_output_dir,
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info(f"retrying sync")
+        logger.info(f"retrying sync")
     else:
         raise RuntimeError(f"couldn't sync output")
 
