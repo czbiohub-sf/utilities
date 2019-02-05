@@ -10,8 +10,15 @@ from logging.handlers import TimedRotatingFileHandler
 
 def log_command(logger, command, **kwargs):
     logger.info(" ".join(command))
-    output = subprocess.check_output(" ".join(command), **kwargs)
+    try:
+        output = subprocess.check_output(" ".join(command), **kwargs)
+        failed = False
+    except subprocess.CalledProcessError:
+        output = "Command failed!"
+        failed = True
+
     logger.debug(output)
+    return failed
 
 
 def log_command_to_queue(log_queue, command, **kwargs):

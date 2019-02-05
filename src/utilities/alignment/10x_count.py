@@ -78,7 +78,7 @@ def main(logger):
         args.root_dir = os.path.join(args.root_dir, os.environ["AWS_BATCH_JOB_ID"])
 
     # local directories
-    if args.s3_input_dir.endswith('/'):
+    if args.s3_input_dir.endswith("/"):
         args.s3_input_dir = args.s3_input_dir[:-1]
 
     sample_id = os.path.basename(args.s3_input_dir)

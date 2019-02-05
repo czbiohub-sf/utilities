@@ -3,7 +3,6 @@ import argparse
 import datetime
 import os
 import re
-import subprocess
 import time
 
 import utilities.log_util as ut_log
@@ -61,7 +60,7 @@ def run_sample(
     logger,
 ):
 
-    t_config = TransferConfig(use_threads=False, num_download_attempts=25)
+    t_config = TransferConfig(num_download_attempts=25)
 
     sample_name = os.path.basename(sample_key)
     sample_id = sample_name.split(".")[0]  # this is brittle!
@@ -84,9 +83,7 @@ def run_sample(
         gtf_path,
     ]
 
-    try:
-        subprocess.check_output(" ".join(veloctyo_command), shell=True)
-    except subprocess.CalledProcessError:
+    if not ut_log.log_command(logger, veloctyo_command, shell=True):
         logger.info(f"velocyto failed on {sample_id}")
         os.remove(local_sample)
         return
