@@ -96,6 +96,10 @@ def gene_cell_table(args, logger, dryrun):
             for i, g in enumerate(gene_list):
                 wtr.writerow((g,) + tuple(gc[i] for gc in gene_counts))
 
+    if args.reflow:
+        logger.info("Done!")
+        return
+
     log_metrics = set()
     log_values = list()
 
@@ -150,6 +154,9 @@ def main():
     other_group = parser.add_argument_group("other options")
     other_group.add_argument(
         "--s3_bucket", help="S3 bucket. e.g. czb-seqbot", default="czb-seqbot"
+    )
+    other_group.add_argument(
+        "--reflow", action="store_true", help="Output is from reflow, don't download logs"
     )
     other_group.add_argument(
         "--dryrun", action="store_true", help="Don't actually download any files"
