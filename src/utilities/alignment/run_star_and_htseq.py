@@ -23,10 +23,6 @@ reference_genomes = {
     "hg38-plus": "HG38-PLUS",
     "mus": "MM10-PLUS",
     "mm10-plus": "MM10-PLUS",
-    "mm10-1.2.0": "mm10-1.2.0",
-    "mus-premrna": "mm10-1.2.0-premrna",
-    "mm10-1.2.0-premrna": "mm10-1.2.0-premrna",
-    "hg19-mm10-3.0.0": "hg19-mm10-3.0.0",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
 }
@@ -79,7 +75,7 @@ CURR_MIN_VER = datetime.datetime(2017, 3, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=8, memory=64000, storage=500, ecr_image="aligner")
+    return argparse.Namespace(vcpus=16, memory=64000, storage=500, ecr_image="aligner")
 
 
 def get_parser():
@@ -122,7 +118,7 @@ def get_parser():
     parser.add_argument(
         "--star_proc",
         type=int,
-        default=8,
+        default=16,
         help="Number of processes to give to each STAR run",
     )
 
