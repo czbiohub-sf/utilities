@@ -317,8 +317,8 @@ def main(logger):
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
             logger.warn(
-                f"'{args.taxon}' will be removed in the future,"
-                f" use '{reference_genomes[args.taxon]}'"
+                f"The name '{args.taxon}' will be removed in the future,"
+                f" start using '{reference_genomes[args.taxon]}'"
             )
 
         genome_name = reference_genomes[args.taxon]
