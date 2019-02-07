@@ -330,7 +330,7 @@ def main(logger):
 
     genome_dir = os.path.join(root_dir, "genome", "STAR", genome_name)
     ref_genome_star_file = f"STAR/{genome_name}.tgz"
-    sjdb_gtf = os.path.join(genome_dir, "genes", "genes.gtf")
+    sjdb_gtf = os.path.join(root_dir, f"{genome_name}.gtf")
 
     if args.region == "east":
         ref_genome_star_file = os.path.join("ref-genome", ref_genome_star_file)
@@ -341,12 +341,23 @@ def main(logger):
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
                    genome_dir:\t{genome_dir}
          ref_genome_star_file:\t{ref_genome_star_file}
+                     sjdb_gtf:\t{sjdb_gtf}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}
                    input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     s3 = boto3.resource("s3")
+
+    # download the gtf file
+    os.mkdir(os.path.join(root_dir, "genome"))
+    logger.info("Downloading and extracting gtf data {}".format(sjdb_gtf))
+
+    s3c.download_file(
+        Bucket=S3_REFERENCE["west"], # just always download this from us-west-2...
+        Key=f"velocyto/{genome_name}.gtf",
+        Filename=sjdb_gtf,
+    )
 
     # download STAR stuff
     os.mkdir(os.path.join(root_dir, "genome", "STAR"))

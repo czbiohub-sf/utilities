@@ -123,10 +123,10 @@ def main(logger):
     os.mkdir(os.path.join(run_dir, "input"))
 
     if args.taxon == "homo":
-        gtf_file = "hg38-plus.gtf"
+        gtf_file = "HG38-PLUS.gtf"
         mask_file = "hg38_rmsk.gtf"
     elif args.taxon == "mus":
-        gtf_file = "mm10-plus.gtf"
+        gtf_file = "MM10-PLUS.gtf"
         mask_file = "mm10_rmsk.gtf"
     else:
         raise ValueError("Invalid taxon {}".format(args.taxon))
