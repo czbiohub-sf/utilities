@@ -328,28 +328,11 @@ def main(logger):
     if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
         raise ValueError(f"you must use --region west for {genome_name}")
 
-    if args.taxon == "homo":
-        genome_dir = os.path.join(root_dir, "genome/STAR/HG38-PLUS/")
-        ref_genome_file = "hg38-plus.tgz"
-        ref_genome_star_file = "STAR/HG38-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "hg38-plus", "hg38-plus.gtf")
-    elif args.taxon == "mus":
-        genome_dir = os.path.join(root_dir, "genome/STAR/MM10-PLUS/")
-        ref_genome_file = "mm10-plus.tgz"
-        ref_genome_star_file = "STAR/MM10-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "mm10-plus", "mm10-plus.gtf")
-    elif args.taxon == "microcebus":
-        genome_dir = os.path.join(root_dir, "genome/STAR/MicMur3-PLUS/")
-        ref_genome_file = "MicMur3-plus.tgz"
-        ref_genome_star_file = "STAR/MicMur3-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "MicMur3-plus", "MicMur3-plus.gtf")
-        if args.region != "west":
-            raise ValueError("you must use --region west for the microcebus genome")
-    else:
-        raise ValueError("Invalid taxon {}".format(args.taxon))
+    genome_dir = os.path.join(root_dir, "genome", "STAR", genome_name)
+    ref_genome_star_file = f"STAR/{genome_name}.tgz"
+    sjdb_gtf = os.path.join(genome_dir, "genes", "genes.gtf")
 
     if args.region == "east":
-        ref_genome_file = os.path.join("ref-genome", ref_genome_file)
         ref_genome_star_file = os.path.join("ref-genome", ref_genome_star_file)
 
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
@@ -357,24 +340,13 @@ def main(logger):
     logger.info(
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
                    genome_dir:\t{genome_dir}
-              ref_genome_file:\t{ref_genome_file}
          ref_genome_star_file:\t{ref_genome_star_file}
-                     sjdb_gtf:\t{sjdb_gtf}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}
                    input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     s3 = boto3.resource("s3")
-
-    # download the genome data
-    os.mkdir(os.path.join(root_dir, "genome"))
-    logger.info("Downloading and extracting genome data {}".format(ref_genome_file))
-
-    s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_file)
-
-    with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
-        tf.extractall(path=os.path.join(root_dir, "genome"))
 
     # download STAR stuff
     os.mkdir(os.path.join(root_dir, "genome", "STAR"))
