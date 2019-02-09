@@ -357,7 +357,7 @@ def main(logger):
     logger.info("Downloading and extracting gtf data {}".format(sjdb_gtf))
 
     s3c.download_file(
-        Bucket=S3_REFERENCE["west"], # just always download this from us-west-2...
+        Bucket=S3_REFERENCE["west"],  # just always download this from us-west-2...
         Key=f"velocyto/{genome_name}.gtf",
         Filename=sjdb_gtf,
     )
