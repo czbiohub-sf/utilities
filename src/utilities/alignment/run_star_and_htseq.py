@@ -243,7 +243,7 @@ def run_sample(
     return failed, dest_dir
 
 
-def run_htseq(dest_dir, sjdb_gtf, logger):
+def run_htseq(dest_dir, sjdb_gtf, use_gene_name, logger):
     command = [
         HTSEQ,
         "-r",
@@ -253,6 +253,7 @@ def run_htseq(dest_dir, sjdb_gtf, logger):
         "-f",
         "bam",
         "-m",
+        "--idattr gene_name" if use_gene_name else "",
         "intersection-nonempty",
         os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted-byname.bam"),
         sjdb_gtf,
@@ -324,6 +325,8 @@ def main(logger):
         genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
+
+    use_gene_name = args.taxon == "gencode.vM19"
 
     if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
         raise ValueError(f"you must use --region west for {genome_name}")
@@ -443,7 +446,7 @@ def main(logger):
                 logger,
             )
 
-            failed = failed or run_htseq(dest_dir, sjdb_gtf, logger)
+            failed = failed or run_htseq(dest_dir, sjdb_gtf, use_gene_name, logger)
 
             if not failed:
                 upload_results(
