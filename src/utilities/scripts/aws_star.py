@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import warnings
 
 reference_genomes = {
     "homo": "HG38-PLUS",
@@ -37,7 +38,7 @@ def main():
 
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
-            print(
+            warnings.warn(
                 f"The name '{args.taxon}' will be removed in the future,"
                 f" start using '{reference_genomes[args.taxon]}'"
             )
