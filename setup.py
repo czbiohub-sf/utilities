@@ -42,6 +42,7 @@ setuptools.setup(
             "evros = utilities.scripts.evros:main [evros]",
             "frython = utilities.scripts.frython:main",
             "gene_cell_table = utilities.scripts.gene_cell_table:main [evros]",
+            "starfails = utilities.scripts.starfails:main [evros]",
         ]
     },
     scripts=glob.glob("scripts/*"),

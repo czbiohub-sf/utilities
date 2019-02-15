@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import datetime
-import logging
 import os
 import re
 import subprocess
 import tarfile
-
-import multiprocessing as mp
+import time
 
 from collections import defaultdict
 
@@ -18,8 +16,18 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 
 
-S3_LOG_DIR = "s3://jamestwebber-logs/star_logs/"
 S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
+
+reference_genomes = {
+    "homo": "HG38-PLUS",
+    "hg38-plus": "HG38-PLUS",
+    "mus": "MM10-PLUS",
+    "mm10-plus": "MM10-PLUS",
+    "microcebus": "MicMur3-PLUS",
+    "gencode.vM19": "gencode.vM19",
+}
+
+deprecated = {"homo", "mus", "mus-premrna"}
 
 STAR = "STAR"
 HTSEQ = "htseq-count"
@@ -76,19 +84,20 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument("--taxon", choices=("homo", "mus", "microcebus"), required=True)
+    parser.add_argument(
+        "--taxon", required=True, choices=list(reference_genomes.keys())
+    )
 
     parser.add_argument(
-        "--s3_input_path",
-        default="s3://czb-seqbot/fastqs",
-        help="Location of input folders",
+        "--s3_input_path", required=True, help="Location of input folders"
     )
     parser.add_argument(
         "--s3_output_path", required=True, help="Location for output files"
     )
+
     parser.add_argument(
         "--region",
-        default="east",
+        default="west",
         choices=("east", "west"),
         help=(
             "Region you're running jobs in."
@@ -109,11 +118,8 @@ def get_parser():
     parser.add_argument(
         "--star_proc",
         type=int,
-        default=8,
+        default=16,
         help="Number of processes to give to each STAR run",
-    )
-    parser.add_argument(
-        "--htseq_proc", type=int, default=4, help="Number of htseq processes to run"
     )
 
     parser.add_argument(
@@ -132,175 +138,168 @@ def get_parser():
 
 
 def run_sample(
-    star_queue, htseq_queue, log_queue, s3_input_bucket, genome_dir, run_dir, n_proc
+    s3_input_bucket,
+    input_dir,
+    sample_name,
+    sample_fns,
+    genome_dir,
+    run_dir,
+    star_proc,
+    logger,
 ):
-
-    s3c = boto3.client("s3")
     t_config = TransferConfig(use_threads=False, num_download_attempts=25)
 
-    for input_dir, sample_name, sample_fns in iter(star_queue.get, "STOP"):
-        log_queue.put(("{} - {}".format(input_dir, sample_name), logging.INFO))
-        dest_dir = os.path.join(run_dir, input_dir, sample_name)
-        if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
-            os.mkdir(os.path.join(dest_dir, "rawdata"))
-            os.mkdir(os.path.join(dest_dir, "results"))
-            os.mkdir(os.path.join(dest_dir, "results", "Pass1"))
+    # for input_dir, sample_name, sample_fns in iter(star_queue.get, "STOP"):
+    logger.info(f"{input_dir} - {sample_name}")
+    dest_dir = os.path.join(run_dir, input_dir, sample_name)
 
-        for sample_fn in sample_fns:
-            s3c.download_file(
-                Bucket=s3_input_bucket,
-                Key=sample_fn,
-                Filename=os.path.join(dest_dir, os.path.basename(sample_fn)),
-                Config=t_config,
-            )
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+        os.mkdir(os.path.join(dest_dir, "rawdata"))
+        os.mkdir(os.path.join(dest_dir, "results"))
+        os.mkdir(os.path.join(dest_dir, "results", "Pass1"))
 
-        # start running STAR
-        # getting input files first
-
-        reads = sorted(
-            os.path.join(dest_dir, os.path.basename(sample_fn))
-            for sample_fn in sample_fns
+    for sample_fn in sample_fns:
+        s3c.download_file(
+            Bucket=s3_input_bucket,
+            Key=sample_fn,
+            Filename=os.path.join(dest_dir, os.path.basename(sample_fn)),
+            Config=t_config,
         )
 
-        command = COMMON_PARS[:]
-        command.extend(
-            (
-                "--runThreadN",
-                str(n_proc),
-                "--genomeDir",
-                genome_dir,
-                "--readFilesIn",
-                " ".join(reads),
-            )
+    # start running STAR
+    # getting input files first
+
+    reads = sorted(
+        os.path.join(dest_dir, os.path.basename(sample_fn)) for sample_fn in sample_fns
+    )
+
+    command = COMMON_PARS[:]
+    command.extend(
+        (
+            "--runThreadN",
+            str(star_proc),
+            "--genomeDir",
+            genome_dir,
+            "--readFilesIn",
+            " ".join(reads),
         )
-        failed = ut_log.log_command_to_queue(
-            log_queue,
-            command,
-            shell=True,
-            cwd=os.path.join(dest_dir, "results", "Pass1"),
-        )
+    )
+    failed = ut_log.log_command(
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results", "Pass1"),
+    )
 
-        # running sam tools
-        command = [
-            SAMTOOLS,
-            "sort",
-            "-m",
-            "6000000000",
-            "-o",
-            "./Pass1/Aligned.out.sorted.bam",
-            "./Pass1/Aligned.out.bam",
-        ]
-        failed = failed or ut_log.log_command_to_queue(
-            log_queue, command, shell=True, cwd=os.path.join(dest_dir, "results")
-        )
+    # running sam tools
+    command = [
+        SAMTOOLS,
+        "sort",
+        "-m",
+        "6000000000",
+        "-o",
+        "./Pass1/Aligned.out.sorted.bam",
+        "./Pass1/Aligned.out.bam",
+    ]
+    failed = failed or ut_log.log_command(
+        logger,
+        command,
+        shell=True,
+        stderr=subprocess.STDOUT,
+        cwd=os.path.join(dest_dir, "results"),
+    )
 
-        # running samtools index -b
-        command = [SAMTOOLS, "index", "-b", "Aligned.out.sorted.bam"]
-        failed = failed or ut_log.log_command_to_queue(
-            log_queue,
-            command,
-            shell=True,
-            cwd=os.path.join(dest_dir, "results", "Pass1"),
-        )
+    # running samtools index -b
+    command = [SAMTOOLS, "index", "-b", "Aligned.out.sorted.bam"]
+    failed = failed or ut_log.log_command(
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results", "Pass1"),
+    )
 
-        # remove unsorted bam files
-        if not failed:
-            os.remove(os.path.join(dest_dir, "results", "Pass1", "Aligned.out.bam"))
+    # generating files for htseq-count
+    command = [
+        SAMTOOLS,
+        "sort",
+        "-m",
+        "6000000000",
+        "-n",
+        "-o",
+        "./Pass1/Aligned.out.sorted-byname.bam",
+        "./Pass1/Aligned.out.sorted.bam",
+    ]
+    failed = failed or ut_log.log_command(
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results"),
+    )
 
-        # remove fastq files
-        for fastq_file in reads:
-            os.remove(fastq_file)
-
-        # generating files for htseq-count
-        command = [
-            SAMTOOLS,
-            "sort",
-            "-m",
-            "6000000000",
-            "-n",
-            "-o",
-            "./Pass1/Aligned.out.sorted-byname.bam",
-            "./Pass1/Aligned.out.sorted.bam",
-        ]
-        failed = failed or ut_log.log_command_to_queue(
-            log_queue, command, shell=True, cwd=os.path.join(dest_dir, "results")
-        )
-
-        # ready to be htseq-ed and cleaned up
-        if not failed:
-            htseq_queue.put((input_dir, sample_name, dest_dir))
+    return failed, dest_dir
 
 
-def run_htseq(htseq_queue, log_queue, s3_output_path, taxon, sjdb_gtf):
-    s3c = boto3.client("s3")
+def run_htseq(dest_dir, sjdb_gtf, id_attr, logger):
+    command = [
+        HTSEQ,
+        "-r",
+        "name",
+        "-s",
+        "no",
+        "-f",
+        "bam",
+        f"--idattr={id_attr}",
+        "-m",
+        "intersection-nonempty",
+        os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted-byname.bam"),
+        sjdb_gtf,
+        ">",
+        "htseq-count.txt",
+    ]
+    failed = ut_log.log_command(
+        logger,
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        cwd=os.path.join(dest_dir, "results"),
+    )
+
+    return failed
+
+
+def upload_results(sample_name, taxon, dest_dir, s3_output_path, logger):
     t_config = TransferConfig(use_threads=False)
 
-    for input_dir, sample_name, dest_dir in iter(htseq_queue.get, "STOP"):
-        # running htseq
-        command = [
-            HTSEQ,
-            "-r",
-            "name",
-            "-s",
-            "no",
-            "-f",
-            "bam",
-            "-m",
-            "intersection-nonempty",
-            os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted-byname.bam"),
-            sjdb_gtf,
-            ">",
-            "htseq-count.txt",
-        ]
-        failed = ut_log.log_command_to_queue(
-            log_queue, command, shell=True, cwd=os.path.join(dest_dir, "results")
+    s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(s3_output_path)
+
+    src_files = [
+        os.path.join(dest_dir, "results", "htseq-count.txt"),
+        os.path.join(dest_dir, "results", "Pass1", "Log.final.out"),
+        os.path.join(dest_dir, "results", "Pass1", "SJ.out.tab"),
+        os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted.bam"),
+        os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted.bam.bai"),
+    ]
+
+    dest_names = [
+        "{}.{}.htseq-count.txt".format(sample_name, taxon),
+        "{}.{}.log.final.out".format(sample_name, taxon),
+        "{}.{}.SJ.out.tab".format(sample_name, taxon),
+        "{}.{}.Aligned.out.sorted.bam".format(sample_name, taxon),
+        "{}.{}.Aligned.out.sorted.bam.bai".format(sample_name, taxon),
+    ]
+
+    for src_file, dest_name in zip(src_files, dest_names):
+        logger.info("Uploading {}".format(dest_name))
+        s3c.upload_file(
+            Filename=src_file,
+            Bucket=s3_output_bucket,
+            Key=os.path.join(s3_output_prefix, dest_name),
+            Config=t_config,
         )
-        if failed:
-            command = ["rm", "-rf", dest_dir]
-            ut_log.log_command_to_queue(log_queue, command, shell=True)
-            continue
-
-        os.remove(
-            os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted-byname.bam")
-        )
-
-        # compress the results dir and move it to s3
-        command = ["tar", "-cvzf", "{}.{}.tgz".format(sample_name, taxon), "results"]
-        ut_log.log_command_to_queue(log_queue, command, shell=True, cwd=dest_dir)
-
-        s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(s3_output_path)
-
-        src_files = [
-            os.path.join(dest_dir, "{}.{}.tgz".format(sample_name, taxon)),
-            os.path.join(dest_dir, "results", "htseq-count.txt"),
-            os.path.join(dest_dir, "results", "Pass1", "Log.final.out"),
-            os.path.join(dest_dir, "results", "Pass1", "SJ.out.tab"),
-            os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted.bam"),
-            os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted.bam.bai"),
-        ]
-
-        dest_names = [
-            "{}.{}.tgz".format(sample_name, taxon),
-            "{}.{}.htseq-count.txt".format(sample_name, taxon),
-            "{}.{}.log.final.out".format(sample_name, taxon),
-            "{}.{}.SJ.out.tab".format(sample_name, taxon),
-            "{}.{}.Aligned.out.sorted.bam".format(sample_name, taxon),
-            "{}.{}.Aligned.out.sorted.bam.bai".format(sample_name, taxon),
-        ]
-
-        for src_file, dest_name in zip(src_files, dest_names):
-            log_queue.put(("Uploading {}".format(dest_name), logging.INFO))
-            s3c.upload_file(
-                Filename=src_file,
-                Bucket=s3_output_bucket,
-                Key=os.path.join(s3_output_prefix, dest_name),
-                Config=t_config,
-            )
-
-        # rm all the files
-        command = ["rm", "-rf", dest_dir]
-        ut_log.log_command_to_queue(log_queue, command, shell=True)
 
 
 def main(logger):
@@ -313,48 +312,43 @@ def main(logger):
     else:
         root_dir = "/mnt"
 
-    run_dir = os.path.join(root_dir, "data", "hca")
+    run_dir = os.path.join(root_dir, "data")
     os.makedirs(run_dir)
 
-    if args.taxon == "homo":
-        genome_dir = os.path.join(root_dir, "genome/STAR/HG38-PLUS/")
-        ref_genome_file = "hg38-plus.tgz"
-        ref_genome_star_file = "STAR/HG38-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "hg38-plus", "hg38-plus.gtf")
-    elif args.taxon == "mus":
-        genome_dir = os.path.join(root_dir, "genome/STAR/MM10-PLUS/")
-        ref_genome_file = "mm10-plus.tgz"
-        ref_genome_star_file = "STAR/MM10-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "mm10-plus", "mm10-plus.gtf")
-    elif args.taxon == "microcebus":
-        genome_dir = os.path.join(root_dir, "genome/STAR/MicMur3-PLUS/")
-        ref_genome_file = "MicMur3-plus.tgz"
-        ref_genome_star_file = "STAR/MicMur3-PLUS.tgz"
-        sjdb_gtf = os.path.join(root_dir, "genome", "MicMur3-plus", "MicMur3-plus.gtf")
-        if args.region != "west":
-            raise ValueError("you must use --region west for the microcebus genome")
+    if args.taxon in reference_genomes:
+        if args.taxon in deprecated:
+            logger.warn(
+                f"The name '{args.taxon}' will be removed in the future,"
+                f" start using '{reference_genomes[args.taxon]}'"
+            )
+
+        genome_name = reference_genomes[args.taxon]
     else:
-        raise ValueError("Invalid taxon {}".format(args.taxon))
+        raise ValueError(f"unknown taxon {args.taxon}")
+
+    if args.taxon == "gencode.vM19":
+        id_attr = "gene_name"
+    else:
+        id_attr = "gene_id"
+
+    if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
+        raise ValueError(f"you must use --region west for {genome_name}")
+
+    genome_dir = os.path.join(root_dir, "genome", "STAR", genome_name)
+    ref_genome_star_file = f"STAR/{genome_name}.tgz"
+    sjdb_gtf = os.path.join(root_dir, f"{genome_name}.gtf")
 
     if args.region == "east":
-        ref_genome_file = os.path.join("ref-genome", ref_genome_file)
         ref_genome_star_file = os.path.join("ref-genome", ref_genome_star_file)
-
-    if args.star_proc > mp.cpu_count():
-        raise ValueError(
-            "Not enough CPUs to give {} processes to STAR".format(args.star_proc)
-        )
 
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
     logger.info(
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
-                    star_proc:\t{args.star_proc}
-                   htseq_proc:\t{args.htseq_proc}
                    genome_dir:\t{genome_dir}
-              ref_genome_file:\t{ref_genome_file}
          ref_genome_star_file:\t{ref_genome_star_file}
                      sjdb_gtf:\t{sjdb_gtf}
+                      id_attr:\t{id_attr}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}
                    input_dirs:\t{', '.join(args.input_dirs)}"""
@@ -362,14 +356,15 @@ def main(logger):
 
     s3 = boto3.resource("s3")
 
-    # download the genome data
+    # download the gtf file
     os.mkdir(os.path.join(root_dir, "genome"))
-    logger.info("Downloading and extracting genome data {}".format(ref_genome_file))
+    logger.info("Downloading and extracting gtf data {}".format(sjdb_gtf))
 
-    s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_file)
-
-    with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
-        tf.extractall(path=os.path.join(root_dir, "genome"))
+    s3c.download_file(
+        Bucket=S3_REFERENCE["west"],  # just always download this from us-west-2...
+        Key=f"velocyto/{genome_name}.gtf",
+        Filename=sjdb_gtf,
+    )
 
     # download STAR stuff
     os.mkdir(os.path.join(root_dir, "genome", "STAR"))
@@ -382,43 +377,19 @@ def main(logger):
 
     # Load Genome Into Memory
     command = [STAR, "--genomeDir", genome_dir, "--genomeLoad", "LoadAndExit"]
-    ut_log.log_command(logger, command, shell=True)
-
-    log_queue, log_thread = ut_log.get_thread_logger(logger)
-
-    star_queue = mp.Queue()
-    htseq_queue = mp.Queue()
-
-    n_star_procs = mp.cpu_count() // args.star_proc
-
-    star_args = (
-        star_queue,
-        htseq_queue,
-        log_queue,
-        s3_input_bucket,
-        genome_dir,
-        run_dir,
-        args.star_proc,
-    )
-    star_procs = [
-        mp.Process(target=run_sample, args=star_args) for i in range(n_star_procs)
-    ]
-
-    for p in star_procs:
-        p.start()
-
-    htseq_args = (htseq_queue, log_queue, args.s3_output_path, args.taxon, sjdb_gtf)
-    htseq_procs = [
-        mp.Process(target=run_htseq, args=htseq_args) for i in range(args.htseq_proc)
-    ]
-
-    for p in htseq_procs:
-        p.start()
+    if ut_log.log_command(logger, command, stderr=subprocess.STDOUT, shell=True):
+        logger.error("Failed to load genome into memory")
+        return
 
     sample_re = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
+    s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
     for input_dir in args.input_dirs:
-        s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
+        logger.info(
+            "Running partition {} of {} for {}".format(
+                args.partition_id, args.num_partitions, input_dir
+            )
+        )
 
         # Check the input_dir folder for existing runs
         if not args.force_realign:
@@ -438,13 +409,7 @@ def main(logger):
 
         logger.info("Skipping {} existing results".format(len(output_files)))
 
-        logger.info(
-            "Running partition {} of {} for {}".format(
-                args.partition_id, args.num_partitions, input_dir
-            )
-        )
-
-        output = [
+        sample_files = [
             (fn, s)
             for fn, s in s3u.get_size(
                 s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
@@ -452,65 +417,55 @@ def main(logger):
             if fn.endswith("fastq.gz")
         ]
 
-        logger.info(f"number of fastq.gz files: {len(output)}")
-
         sample_lists = defaultdict(list)
         sample_sizes = defaultdict(list)
 
-        for fn, s in output:
+        for fn, s in sample_files:
             matched = sample_re.search(os.path.basename(fn))
             if matched:
                 sample_lists[matched.group(1)].append(fn)
                 sample_sizes[matched.group(1)].append(s)
 
+        logger.info(f"number of samples: {len(sample_lists)}")
+
         for sample_name in sorted(sample_lists)[
             args.partition_id :: args.num_partitions
         ]:
             if (sample_name, args.taxon) in output_files:
-                logger.info(f"{sample_name} already exists, skipping")
+                logger.debug(f"{sample_name} already exists, skipping")
                 continue
 
             if sum(sample_sizes[sample_name]) < args.min_size:
                 logger.info(f"{sample_name} is below min_size, skipping")
                 continue
 
-            logger.info(f"Adding sample {sample_name} to queue")
-            star_queue.put((input_dir, sample_name, sorted(sample_lists[sample_name])))
+            failed, dest_dir = run_sample(
+                s3_input_bucket,
+                input_dir,
+                sample_name,
+                sorted(sample_lists[sample_name]),
+                genome_dir,
+                run_dir,
+                args.star_proc,
+                logger,
+            )
 
-    for i in range(n_star_procs):
-        star_queue.put("STOP")
+            failed = failed or run_htseq(dest_dir, sjdb_gtf, id_attr, logger)
 
-    for p in star_procs:
-        p.join()
+            if not failed:
+                upload_results(
+                    sample_name, args.taxon, dest_dir, args.s3_output_path, logger
+                )
 
-    for i in range(args.htseq_proc):
-        htseq_queue.put("STOP")
+            command = ["rm", "-rf", dest_dir]
+            ut_log.log_command(logger, command, shell=True)
 
-    for p in htseq_procs:
-        p.join()
-
-    log_queue.put("STOP")
-    log_thread.join()
-
-    # Remove Genome from Memory
-    command = [STAR, "--genomeDir", genome_dir, "--genomeLoad", "Remove"]
-    ut_log.log_command(logger, command, shell=True)
+            time.sleep(30)
 
     logger.info("Job completed")
 
 
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = ut_log.get_logger(__name__)
-
-    try:
-        main(mainlogger)
-    except:
-        mainlogger.info("An exception occurred", exc_info=True)
-        raise
-    finally:
-        if log_file:
-            log_cmd = "aws s3 cp --quiet {} {}".format(log_file, S3_LOG_DIR)
-            mainlogger.info(log_cmd)
-
-            file_handler.close()
-            subprocess.check_output(log_cmd, shell=True)
+    s3c = boto3.client("s3")
+    main(mainlogger)

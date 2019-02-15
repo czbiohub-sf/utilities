@@ -42,7 +42,7 @@ def main(logger):
     logger.info("Attempting to echo the message...")
 
     # run a subprocess and log the attempt
-    log_command(logger, "echo {}".format(args.message), shell=True)
+    failed = log_command(logger, "echo {}".format(args.message), shell=True)
 
 
 if __name__ == "__main__":

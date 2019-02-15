@@ -9,7 +9,6 @@ from utilities.log_util import get_logger, log_command
 CELLRANGER = "cellranger"
 
 S3_RETRY = 5
-S3_LOG_DIR = "s3://jamestwebber-logs/mkfastq_logs/"
 
 
 def get_default_requirements():
@@ -74,11 +73,9 @@ def main(logger):
         result_path,
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying s3 copy")
+        logger.info("retrying s3 copy")
     else:
         raise RuntimeError(
             "couldn't download sample sheet {}".format(
@@ -96,11 +93,9 @@ def main(logger):
         bcl_path,
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying s3 sync bcl")
+        logger.info("retrying s3 sync bcl")
     else:
         raise RuntimeError(
             "couldn't sync {}".format(os.path.join(args.s3_input_dir, args.exp_id))
@@ -115,7 +110,10 @@ def main(logger):
         "--run={}".format(os.path.join(bcl_path)),
         "--output-dir={}".format(output_path),
     ]
-    log_command(logger, command, shell=True)
+
+    if log_command(logger, command, stderr=subprocess.STDOUT, shell=True):
+        logger.error("cellranger mkfastq failed")
+        return
 
     # upload fastq files to destination folder
     command = [
@@ -127,27 +125,13 @@ def main(logger):
         os.path.join(args.s3_output_dir, args.exp_id),
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying sync fastq")
+        logger.info("retrying sync fastq")
     else:
         raise RuntimeError("couldn't sync fastqs")
 
 
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = get_logger(__name__)
-
-    try:
-        main(mainlogger)
-    except:
-        mainlogger.info("An exception occurred", exc_info=True)
-        raise
-    finally:
-        if log_file:
-            log_cmd = "aws s3 cp --quiet {} {}".format(log_file, S3_LOG_DIR)
-            mainlogger.info(log_cmd)
-
-            file_handler.close()
-            subprocess.check_output(log_cmd, shell=True)
+    main(mainlogger)
