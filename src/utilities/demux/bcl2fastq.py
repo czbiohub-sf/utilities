@@ -13,7 +13,6 @@ from utilities.log_util import get_logger, log_command
 BCL2FASTQ = "bcl2fastq"
 
 S3_RETRY = 5
-S3_LOG_DIR = "s3://jamestwebber-logs/bcl2fastq_logs/"
 
 
 def get_default_requirements():
@@ -116,11 +115,9 @@ def main(logger):
         result_path,
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying s3 copy")
+        logger.info("retrying s3 copy")
     else:
         raise RuntimeError(
             "couldn't download sample sheet {}".format(
@@ -139,11 +136,9 @@ def main(logger):
         bcl_path,
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying s3 sync bcl")
+        logger.info("retrying s3 sync bcl")
     else:
         raise RuntimeError(
             "couldn't sync {}".format(os.path.join(args.s3_input_dir, args.exp_id))
@@ -153,7 +148,7 @@ def main(logger):
         "while true;"
         ' do echo "memory usage" `cat /sys/fs/cgroup/memory/memory.usage_in_bytes`;'
         ' echo "disk usage" `df -h | grep "/mnt"`;'
-        " sleep 90;"
+        " sleep 300;"
         " done"
     )
     p = subprocess.Popen([command], shell=True)
@@ -169,7 +164,7 @@ def main(logger):
         "-o",
         output_path,
     ]
-    log_command(logger, command, shell=True)
+    log_command(logger, command, stderr=subprocess.STDOUT, shell=True)
 
     # fix directory structure of the files *before* sync!
     fastqgz_files = glob.glob(os.path.join(output_path, "*fastq.gz"))
@@ -214,11 +209,9 @@ def main(logger):
         '"*fastq.gz"',
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying sync fastq")
+        logger.info("retrying sync fastq")
     else:
         raise RuntimeError("couldn't sync fastqs")
 
@@ -239,11 +232,9 @@ def main(logger):
         "--recursive",
     ]
     for i in range(S3_RETRY):
-        try:
-            log_command(logger, command, shell=True)
+        if not log_command(logger, command, shell=True):
             break
-        except subprocess.CalledProcessError:
-            logger.info("retrying cp reports")
+        logger.info("retrying cp reports")
     else:
         raise RuntimeError("couldn't cp reports")
 
@@ -252,16 +243,4 @@ def main(logger):
 
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = get_logger(__name__)
-
-    try:
-        main(mainlogger)
-    except:
-        mainlogger.info("An exception occurred", exc_info=True)
-        raise
-    finally:
-        if log_file:
-            log_cmd = "aws s3 cp --quiet {} {}".format(log_file, S3_LOG_DIR)
-            mainlogger.info(log_cmd)
-
-            file_handler.close()
-            subprocess.check_output(log_cmd, shell=True)
+    main(mainlogger)

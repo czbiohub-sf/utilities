@@ -61,7 +61,7 @@ def run_sample(
     logger,
 ):
 
-    t_config = TransferConfig(use_threads=False, num_download_attempts=25)
+    t_config = TransferConfig(num_download_attempts=25)
 
     sample_name = os.path.basename(sample_key)
     sample_id = sample_name.split(".")[0]  # this is brittle!
@@ -84,9 +84,9 @@ def run_sample(
         gtf_path,
     ]
 
-    try:
-        subprocess.check_output(" ".join(veloctyo_command), shell=True)
-    except subprocess.CalledProcessError:
+    if ut_log.log_command(
+        logger, veloctyo_command, stderr=subprocess.STDOUT, shell=True
+    ):
         logger.info(f"velocyto failed on {sample_id}")
         os.remove(local_sample)
         return
@@ -123,10 +123,10 @@ def main(logger):
     os.mkdir(os.path.join(run_dir, "input"))
 
     if args.taxon == "homo":
-        gtf_file = "hg38-plus.gtf"
+        gtf_file = "HG38-PLUS.gtf"
         mask_file = "hg38_rmsk.gtf"
     elif args.taxon == "mus":
-        gtf_file = "mm10-plus.gtf"
+        gtf_file = "MM10-PLUS.gtf"
         mask_file = "mm10_rmsk.gtf"
     else:
         raise ValueError("Invalid taxon {}".format(args.taxon))
