@@ -40,6 +40,7 @@ def main():
             failed_cmds.append(jobs[job_cmd])
 
     if failed_cmds:
+        print(f"{len(failed_cmds)} jobs failed :(")
         with open("_failed".join(os.path.splitext(args.job_file)), "w") as out:
             for failed_cmd in failed_cmds:
                 print(failed_cmd, file=out)
