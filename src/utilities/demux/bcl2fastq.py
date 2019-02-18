@@ -164,7 +164,10 @@ def main(logger):
         "-o",
         output_path,
     ]
-    log_command(logger, command, stderr=subprocess.STDOUT, shell=True)
+    failed = log_command(logger, command, stderr=subprocess.STDOUT, shell=True)
+    if failed:
+        p.kill()
+        return
 
     # fix directory structure of the files *before* sync!
     fastqgz_files = glob.glob(os.path.join(output_path, "*fastq.gz"))
@@ -242,5 +245,5 @@ def main(logger):
 
 
 if __name__ == "__main__":
-    mainlogger, log_file, file_handler = get_logger(__name__)
+    mainlogger, log_file, file_handler = get_logger(__name__, debug=True)
     main(mainlogger)

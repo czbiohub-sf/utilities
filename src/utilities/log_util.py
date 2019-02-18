@@ -13,8 +13,8 @@ def log_command(logger, command, **kwargs):
     try:
         output = subprocess.check_output(" ".join(command), **kwargs)
         failed = False
-    except subprocess.CalledProcessError:
-        output = "Command failed!"
+    except subprocess.CalledProcessError as exc:
+        output = f"Command failed!\n{exc.stdout}"
         failed = True
 
     logger.debug(output)
