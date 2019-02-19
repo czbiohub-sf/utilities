@@ -167,7 +167,7 @@ def main(logger):
     failed = log_command(logger, command, stderr=subprocess.STDOUT, shell=True)
     if failed:
         p.kill()
-        return
+        raise RuntimeError("bcl2fastq failed, see above for error")
 
     # fix directory structure of the files *before* sync!
     fastqgz_files = glob.glob(os.path.join(output_path, "*fastq.gz"))
