@@ -25,7 +25,7 @@ def main():
     parser.add_argument("taxon", choices=list(reference_genomes.keys()))
     parser.add_argument("num_partitions", type=int)
     parser.add_argument(
-        "s3_input_dir", help="The folder containing fastq.gz files to align"
+        "s3_input_path", help="The folder containing fastq.gz files to align"
     )
 
     parser.add_argument(
@@ -55,7 +55,7 @@ def main():
                     f"--taxon {args.taxon}",
                     f"--num_partitions {args.num_partitions}",
                     f"--partition_id {i}",
-                    f"--s3_input_dir {args.s3_input_dir}",
+                    f"--s3_input_path {args.s3_input_path}",
                     " ".join(args.script_args),
                 )
             )
