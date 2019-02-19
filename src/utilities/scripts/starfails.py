@@ -18,8 +18,9 @@ def main():
 
     with open(args.job_file) as f:
         jobs = {
-            line.strip().split("run_star_and_htseq")[-1]:line.strip()
-            for line in f if line.find("evros") > -1
+            line.strip().split("run_star_and_htseq")[-1]: line.strip()
+            for line in f
+            if line.find("evros") > -1
         }
 
     failed_job_ids = [
