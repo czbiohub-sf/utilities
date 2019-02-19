@@ -8,9 +8,12 @@ from boto3.s3.transfer import TransferConfig
 
 
 # cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
-def s3_bucket_and_key(s3_uri):
+def s3_bucket_and_key(s3_uri, require_prefix=False):
     prefix = "s3://"
-    assert s3_uri.startswith(prefix)
+    if require_prefix:
+        assert s3_uri.startswith(prefix), "The path must start with s3://"
+    elif not s3_uri.startswith(prefix):
+        prefix = ""
 
     return s3_uri[len(prefix) :].split("/", 1)
 

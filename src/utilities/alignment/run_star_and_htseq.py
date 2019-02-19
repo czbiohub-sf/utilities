@@ -89,7 +89,7 @@ def get_parser():
     )
 
     parser.add_argument(
-        "--s3_input_path", required=True, help="Location of input folders"
+        "--s3_input_path", required=True, help="Location of input folder"
     )
     parser.add_argument(
         "--s3_output_path", required=True, help="Location for output files"
@@ -108,12 +108,6 @@ def get_parser():
 
     parser.add_argument("--num_partitions", type=int, required=True)
     parser.add_argument("--partition_id", type=int, required=True)
-    parser.add_argument(
-        "--input_dirs",
-        nargs="+",
-        required=True,
-        help="List of input folders to process",
-    )
 
     parser.add_argument(
         "--star_proc",
@@ -138,20 +132,11 @@ def get_parser():
 
 
 def run_sample(
-    s3_input_bucket,
-    input_dir,
-    sample_name,
-    sample_fns,
-    genome_dir,
-    run_dir,
-    star_proc,
-    logger,
+    s3_input_bucket, sample_name, sample_fns, genome_dir, run_dir, star_proc, logger
 ):
     t_config = TransferConfig(use_threads=False, num_download_attempts=25)
 
-    # for input_dir, sample_name, sample_fns in iter(star_queue.get, "STOP"):
-    logger.info(f"{input_dir} - {sample_name}")
-    dest_dir = os.path.join(run_dir, input_dir, sample_name)
+    dest_dir = os.path.join(run_dir, sample_name)
 
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
@@ -350,8 +335,7 @@ def main(logger):
                      sjdb_gtf:\t{sjdb_gtf}
                       id_attr:\t{id_attr}
                         taxon:\t{args.taxon}
-                s3_input_path:\t{args.s3_input_path}
-                   input_dirs:\t{', '.join(args.input_dirs)}"""
+                s3_input_path:\t{args.s3_input_path}"""
     )
 
     s3 = boto3.resource("s3")
@@ -384,83 +368,73 @@ def main(logger):
     sample_re = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
-    for input_dir in args.input_dirs:
-        logger.info(
-            "Running partition {} of {} for {}".format(
-                args.partition_id, args.num_partitions, input_dir
-            )
+    logger.info(
+        "Running partition {} of {}".format(args.partition_id, args.num_partitions)
+    )
+
+    # Check the input folder for existing runs
+    if not args.force_realign:
+        output = s3u.prefix_gen(
+            s3_output_bucket, s3_output_prefix, lambda r: (r["LastModified"], r["Key"])
+        )
+    else:
+        output = []
+
+    output_files = {
+        tuple(os.path.basename(fn).split(".")[:2])
+        for dt, fn in output
+        if fn.endswith("htseq-count.txt") and dt > CURR_MIN_VER
+    }
+
+    logger.info("Skipping {} existing results".format(len(output_files)))
+
+    sample_files = [
+        (fn, s)
+        for fn, s in s3u.get_size(s3_input_bucket, s3_input_prefix)
+        if fn.endswith("fastq.gz")
+    ]
+
+    sample_lists = defaultdict(list)
+    sample_sizes = defaultdict(list)
+
+    for fn, s in sample_files:
+        matched = sample_re.search(os.path.basename(fn))
+        if matched:
+            sample_lists[matched.group(1)].append(fn)
+            sample_sizes[matched.group(1)].append(s)
+
+    logger.info(f"number of samples: {len(sample_lists)}")
+
+    for sample_name in sorted(sample_lists)[args.partition_id :: args.num_partitions]:
+        if (sample_name, args.taxon) in output_files:
+            logger.debug(f"{sample_name} already exists, skipping")
+            continue
+
+        if sum(sample_sizes[sample_name]) < args.min_size:
+            logger.info(f"{sample_name} is below min_size, skipping")
+            continue
+
+        failed, dest_dir = run_sample(
+            s3_input_bucket,
+            sample_name,
+            sorted(sample_lists[sample_name]),
+            genome_dir,
+            run_dir,
+            args.star_proc,
+            logger,
         )
 
-        # Check the input_dir folder for existing runs
-        if not args.force_realign:
-            output = s3u.prefix_gen(
-                s3_output_bucket,
-                s3_output_prefix,
-                lambda r: (r["LastModified"], r["Key"]),
-            )
-        else:
-            output = []
+        failed = failed or run_htseq(dest_dir, sjdb_gtf, id_attr, logger)
 
-        output_files = {
-            tuple(os.path.basename(fn).split(".")[:2])
-            for dt, fn in output
-            if fn.endswith("htseq-count.txt") and dt > CURR_MIN_VER
-        }
-
-        logger.info("Skipping {} existing results".format(len(output_files)))
-
-        sample_files = [
-            (fn, s)
-            for fn, s in s3u.get_size(
-                s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
-            )
-            if fn.endswith("fastq.gz")
-        ]
-
-        sample_lists = defaultdict(list)
-        sample_sizes = defaultdict(list)
-
-        for fn, s in sample_files:
-            matched = sample_re.search(os.path.basename(fn))
-            if matched:
-                sample_lists[matched.group(1)].append(fn)
-                sample_sizes[matched.group(1)].append(s)
-
-        logger.info(f"number of samples: {len(sample_lists)}")
-
-        for sample_name in sorted(sample_lists)[
-            args.partition_id :: args.num_partitions
-        ]:
-            if (sample_name, args.taxon) in output_files:
-                logger.debug(f"{sample_name} already exists, skipping")
-                continue
-
-            if sum(sample_sizes[sample_name]) < args.min_size:
-                logger.info(f"{sample_name} is below min_size, skipping")
-                continue
-
-            failed, dest_dir = run_sample(
-                s3_input_bucket,
-                input_dir,
-                sample_name,
-                sorted(sample_lists[sample_name]),
-                genome_dir,
-                run_dir,
-                args.star_proc,
-                logger,
+        if not failed:
+            upload_results(
+                sample_name, args.taxon, dest_dir, args.s3_output_path, logger
             )
 
-            failed = failed or run_htseq(dest_dir, sjdb_gtf, id_attr, logger)
+        command = ["rm", "-rf", dest_dir]
+        ut_log.log_command(logger, command, shell=True)
 
-            if not failed:
-                upload_results(
-                    sample_name, args.taxon, dest_dir, args.s3_output_path, logger
-                )
-
-            command = ["rm", "-rf", dest_dir]
-            ut_log.log_command(logger, command, shell=True)
-
-            time.sleep(30)
+        time.sleep(30)
 
     logger.info("Job completed")
 

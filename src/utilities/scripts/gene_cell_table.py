@@ -156,7 +156,9 @@ def main():
         "--s3_bucket", help="S3 bucket. e.g. czb-seqbot", default="czb-seqbot"
     )
     other_group.add_argument(
-        "--reflow", action="store_true", help="Output is from reflow, don't download logs"
+        "--reflow",
+        action="store_true",
+        help="Output is from reflow, don't download logs",
     )
     other_group.add_argument(
         "--dryrun", action="store_true", help="Don't actually download any files"
