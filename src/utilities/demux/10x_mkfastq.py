@@ -111,7 +111,9 @@ def main(logger):
         "--output-dir={}".format(output_path),
     ]
 
-    if log_command(logger, command, stderr=subprocess.STDOUT, shell=True):
+    if log_command(
+        logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+    ):
         logger.error("cellranger mkfastq failed")
         return
 

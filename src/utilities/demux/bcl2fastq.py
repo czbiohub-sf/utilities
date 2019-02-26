@@ -164,7 +164,9 @@ def main(logger):
         "-o",
         output_path,
     ]
-    failed = log_command(logger, command, stderr=subprocess.STDOUT, shell=True)
+    failed = log_command(
+        logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+    )
     if failed:
         p.kill()
         raise RuntimeError("bcl2fastq failed, see above for error")

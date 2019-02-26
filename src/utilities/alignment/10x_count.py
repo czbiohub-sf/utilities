@@ -151,7 +151,12 @@ def main(logger):
         f"--transcriptome={genome_dir}",
     ]
     failed = log_command(
-        logger, command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
+        logger,
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
     )
 
     if failed:

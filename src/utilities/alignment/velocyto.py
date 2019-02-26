@@ -85,7 +85,11 @@ def run_sample(
     ]
 
     if ut_log.log_command(
-        logger, veloctyo_command, stderr=subprocess.STDOUT, shell=True
+        logger,
+        veloctyo_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=True,
     ):
         logger.info(f"velocyto failed on {sample_id}")
         os.remove(local_sample)

@@ -173,6 +173,7 @@ def run_sample(
     failed = ut_log.log_command(
         logger,
         command,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
         cwd=os.path.join(dest_dir, "results", "Pass1"),
@@ -192,6 +193,7 @@ def run_sample(
         logger,
         command,
         shell=True,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=os.path.join(dest_dir, "results"),
     )
@@ -201,6 +203,7 @@ def run_sample(
     failed = failed or ut_log.log_command(
         logger,
         command,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
         cwd=os.path.join(dest_dir, "results", "Pass1"),
@@ -220,6 +223,7 @@ def run_sample(
     failed = failed or ut_log.log_command(
         logger,
         command,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
         cwd=os.path.join(dest_dir, "results"),
@@ -248,6 +252,7 @@ def run_htseq(dest_dir, sjdb_gtf, id_attr, logger):
     failed = ut_log.log_command(
         logger,
         command,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
         cwd=os.path.join(dest_dir, "results"),
@@ -361,7 +366,9 @@ def main(logger):
 
     # Load Genome Into Memory
     command = [STAR, "--genomeDir", genome_dir, "--genomeLoad", "LoadAndExit"]
-    if ut_log.log_command(logger, command, stderr=subprocess.STDOUT, shell=True):
+    if ut_log.log_command(
+        logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+    ):
         logger.error("Failed to load genome into memory")
         return
 
