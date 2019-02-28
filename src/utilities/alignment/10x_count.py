@@ -160,7 +160,7 @@ def main(logger):
     )
 
     if failed:
-        return
+        raise RuntimeError("cellranger count failed")
 
     # Move outs folder to S3
     command = [

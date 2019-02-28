@@ -114,8 +114,7 @@ def main(logger):
     if log_command(
         logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     ):
-        logger.error("cellranger mkfastq failed")
-        return
+        raise RuntimeError("cellranger mkfastq failed")
 
     # upload fastq files to destination folder
     command = [

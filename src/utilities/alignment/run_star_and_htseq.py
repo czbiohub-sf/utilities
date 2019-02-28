@@ -369,8 +369,7 @@ def main(logger):
     if ut_log.log_command(
         logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     ):
-        logger.error("Failed to load genome into memory")
-        return
+        raise RuntimeError("Failed to load genome into memory")
 
     sample_re = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
