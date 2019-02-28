@@ -1,9 +1,6 @@
 import logging
 import os
 import subprocess
-import threading
-
-import multiprocessing as mp
 
 from logging.handlers import TimedRotatingFileHandler
 
@@ -14,34 +11,13 @@ def log_command(logger, command, **kwargs):
     proc = subprocess.run(" ".join(command), **kwargs)
 
     if proc.returncode != 0:
-        logger.error("Command failed:")
-        logger.error(proc.stdout.decode())
+        logger.error("Command failed")
+        if proc.stdout:
+            logger.error(proc.stdout.decode())
 
         return True
     else:
         return False
-
-
-def log_command_to_queue(log_queue, command, **kwargs):
-    log_queue.put((" ".join(command), logging.INFO))
-
-    proc = subprocess.run(" ".join(command), **kwargs)
-
-    if proc.returncode != 0:
-        log_queue.put("Command failed:", logging.ERROR)
-        log_queue.put(proc.stdout.decode(), logging.ERROR)
-
-        return True
-    else:
-        return False
-
-
-def process_logs(q, logger):
-    for msg, level in iter(q.get, "STOP"):
-        if level == logging.INFO:
-            logger.info(msg)
-        else:
-            logger.debug(msg)
 
 
 def get_logger(name, debug=False, dryrun=False):
@@ -77,17 +53,6 @@ def get_logger(name, debug=False, dryrun=False):
         file_handler = None
 
     return logger, log_file, file_handler
-
-
-def get_thread_logger(logger, queue=None):
-    if queue is None:
-        log_queue = mp.Queue()
-    else:
-        log_queue = queue
-    log_thread = threading.Thread(target=process_logs, args=(log_queue, logger))
-    log_thread.start()
-
-    return log_queue, log_thread
 
 
 def get_trfh_logger(name, *args):
