@@ -10,7 +10,7 @@ reference_genomes = {
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
-    "gencode.vm19.ERCC": "gencode.vm19.ERCC.SP1"
+    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1"
 }
 
 deprecated = {"homo", "mus", "mus-premrna"}
