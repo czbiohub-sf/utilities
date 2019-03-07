@@ -25,6 +25,7 @@ reference_genomes = {
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
+    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1"
 }
 
 deprecated = {"homo", "mus", "mus-premrna"}
@@ -316,7 +317,7 @@ def main(logger):
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
-    if args.taxon == "gencode.vM19":
+    if args.taxon == "gencode.vM19" or args.taxon == "gencode.vM19.ERCC" :
         id_attr = "gene_name"
     else:
         id_attr = "gene_id"
