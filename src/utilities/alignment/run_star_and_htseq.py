@@ -388,9 +388,9 @@ def main(logger):
         output = []
 
     output_files = {
-        tuple(os.path.basename(fn).split(".")[:2])
+        tuple(os.path.basename(fn).rsplit(".", 2)[0].split(".", 1)[:2])
         for dt, fn in output
-        if fn.endswith("htseq-count.txt") and dt > CURR_MIN_VER
+        if fn.endswith(".htseq-count.txt") and dt > CURR_MIN_VER
     }
 
     logger.info("Skipping {} existing results".format(len(output_files)))
