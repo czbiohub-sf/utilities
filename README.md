@@ -1,14 +1,15 @@
-# utilities
+# czb-util
 A collection of scripts for common data management and processing tasks
 
 ## Quick Reference
 
 | Task | Command | Description |
 | ----------- | -------- | ----------- |
-| Demux a standard sequencing run | `evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID` | Assumes your sample sheet is uploaded to S3. If planning to run the alignment script, use `--star_structure` |
+| Demux a standard sequencing run | `evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID` | Assumes your sample sheet is uploaded to S3.|
 | Demux a 10X run | `evros demux.10x_mkfastq --exp_id YYMMDD_EXP_ID` | Again, assumes a sample sheet is present on S3 |
-| Align using STAR and htseq | `aws_star [mus or homo or microcebus] [# partitions] YYMMDD_EXP_ID > your_script.sh` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
-| Align a 10X run | `evros alignment.10x_count --taxon [mus or homo or microcebus] --s3_input_dir s3://czb-seqbot/fastqs/YYMMDD_EXP_ID/SAMPLE --s3_output_dir s3://output-bucket/` | Run once for each channel of the run. Very slow! |
+| Align using STAR and htseq | ```aws_star [see --help for taxons] [# partitions] --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
+| Align a 10X run | ```evros alignment.10x_count --taxon [see --help for options] --s3_input_dir s3://input-bucket/path/to/fastqs --s3_output_dir s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
+| Run Velocyto | ```aws_velocyto [see --help for taxon] [# partitions] --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to run velocyto on STAR output |
 | Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czb-seqbot` bucket |
 
 
@@ -34,7 +35,6 @@ Now let's clone the environment into a `code` folder:
 ```zsh
 (utilities-env) ➜ cd code
 (utilities-env) ➜ git clone https://github.com/czbiohub/utilities.git
-
 ```
 
 Now we'll change to that folder with `cd` and install the package by running the `setup.py` script.
@@ -139,20 +139,22 @@ If you want to stick the results somewhere other than czb-seqbot/fastqs, you can
 
 ### How to align some stuff:
 
-*Important change: you need to explicitly specify an output path for your alignment results.*
+*Important change: you need to explicitly specify the input and output paths for your alignment.*
 
 To the run the first of ten partitions:
 
 ```zsh
-(utilities-env) ➜ evros alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --exp_ids YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
+(utilities-env) ➜ evros alignment.run_star_and_htseq --taxon mm10-plus --num_partitions 10 --partition_id 0 --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results
 ```
 
-Or use this helper script to create a bunch of commands:
+This will find all `.fastq.gz` files under the given input path and align them to to the MM10-PLUS genome.
+
+You can use this helper script to create a bunch of commands:
 
 ```zsh
-(utilities-env) ➜ aws_star mus 10 YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results > my_star_jobs.sh
+(utilities-env) ➜ aws_star mm10-plus 10 --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results > my_star_jobs.sh
 (utilities-env) ➜ cat my_star_jobs.sh
-evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
+evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 0 --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results
 sleep 10
 [...lots more...]
 (utilities-env) ➜ source my_star_jobs.sh
@@ -166,12 +168,12 @@ For some reason, a fraction of alignment jobs fail to start because of AWS probl
 (utilities-env) ➜ starfails my_star_jobs.sh
 8d920e9f-313a-465a-ae4d-df77bdbe990d
 (utilities-env) ➜ cat my_star_jobs_failed_jobs.sh 
-evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --input_dirs YYMMDD_EXP_ID --s3_output_path s3://output-bucket/path/for/results
+evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results
 sleep 20
 (utilities-env) ➜ source my_star_jobs_failed_jobs.sh 
 ```
 
-This new file contains the command to re-try the failed jobs.
+This new file contains the commands to re-try the failed jobs.
 
 ### How to make a gene-cell table from an alignment:
 
@@ -179,23 +181,21 @@ This one runs on your local machine&mdash;it'll download alignment results from 
 
 ```zsh
 (utilities-env) ➜ gene_cell_table --help
-usage: gene_cell_table [--s3_bucket S3_BUCKET] [--dryrun] [--debug] [-h]
-                       s3_path output_file
+usage: gene_cell_table [--no_log] [--dryrun] [--debug] [-h]
+                       s3_input_path output_file
 
 Construct the gene-cell table for an experiment e.g. gene_cell_table
---s3_bucket czbiohub-maca data/YYMMDD_EXP_ID path/to/output.csv
+s3://bucket-name/path/to/results path/to/output.csv
 
 basic arguments:
-  s3_path               Path to experiment. e.g.
-                        fastqs/YYMMDD_EXP_ID
-  output_file           File to save the output, e.g. my_gc_table.csv
+  s3_input_path  Location of data on S3
+  output_file    File to save the output, e.g. my_gc_table[.csv,.h5ad]
 
 other options:
-  --s3_bucket S3_BUCKET
-                        S3 bucket. e.g. czb-seqbot (default: czb-seqbot)
-  --dryrun              Don't actually download any files (default: False)
-  --debug               Set logging to debug level (default: False)
-  -h, --help            Show this help message and exit
+  --no_log       Don't try to download log files (default: False)
+  --dryrun       Don't actually download any files (default: False)
+  --debug        Set logging to debug level (default: False)
+  -h, --help     Show this help message and exit
 
 See https://github.com/czbiohub/utilities for more examples
 
@@ -209,7 +209,6 @@ See https://github.com/czbiohub/utilities for more examples
 2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Downloaded 19 files
 2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Writing to YYMMDD_EXP_ID.log.csv
 2017-11-08 18:19:23,177 - __main__ - INFO - (DRYRUN) - Done!
-
 ```
 
 ### *New!* How to run Velocyto on some alignments
@@ -219,15 +218,15 @@ This script will use the BAM files from a STAR alignment and create loom files u
 To run the first of ten partitions:
 
 ```zsh
-(utilities-env) ➜ evros alignment.velocyto --taxon {homo,mus} --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID
+(utilities-env) ➜ evros alignment.velocyto --taxon mm10-plus --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID
 ```
 
 Or use this helper script:
 
 ```zsh
-(utilities-env) ➜ aws_velocyto {homo,mus} 10 YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files > my_velocyto_jobs.sh
+(utilities-env) ➜ aws_velocyto mm10-plus 10 --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files > my_velocyto_jobs.sh
 (utilities-env) ➜ cat my_velocyto_jobs.sh
-evros --branch master alignment.velocyto --taxon homo --num_partitions 10 --partition_id 0 --input_dirs YYMMDD_EXP_ID --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files
+evros --branch master alignment.velocyto --taxon mm10-plus --num_partitions 10 --partition_id 0 --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/to/velocyto_loom_files
 sleep 10
 [...lots more...]
 (utilities-env) ➜ source my_velocyto_jobs.sh
