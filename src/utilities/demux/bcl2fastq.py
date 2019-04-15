@@ -35,7 +35,7 @@ def get_parser():
 
     parser.add_argument(
         "--s3_input_dir",
-        default="s3://czbiohub-seqbot/bcl",
+        default="s3://czb-seqs/SEQS/NovaSeq-01",
         help="S3 path for [exp_id] folder of BCL files",
     )
     parser.add_argument(

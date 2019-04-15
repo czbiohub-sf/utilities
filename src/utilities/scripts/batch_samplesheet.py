@@ -126,7 +126,9 @@ def main():
     )
 
     bcl2fastq_options = parser.add_argument_group("bcl2fastq options")
-    bcl2fastq_options.add_argument("--s3_input_dir", default="s3://czbiohub-seqbot/bcl")
+    bcl2fastq_options.add_argument(
+        "--s3_input_dir", default="s3://czb-seqs/SEQS/NovaSeq-01"
+    )
     bcl2fastq_options.add_argument("--s3_output_dir", default="s3://czb-seqbot/fastqs")
     bcl2fastq_options.add_argument("--s3_report_dir", default="s3://czb-seqbot/reports")
     bcl2fastq_options.add_argument(
