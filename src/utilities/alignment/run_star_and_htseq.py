@@ -20,6 +20,7 @@ S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 
 reference_genomes = {
     "homo": "HG38-PLUS",
+    "car-t": "HG38-PLUS-CART",
     "hg38-plus": "HG38-PLUS",
     "mus": "MM10-PLUS",
     "mm10-plus": "MM10-PLUS",
