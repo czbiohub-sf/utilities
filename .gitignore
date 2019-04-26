@@ -99,3 +99,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Rene
+HG38-PLUS.gtf
+hg38-plus.tar
+mlaca_scripts_and_files/
+utilities/
+zoe.txt
