@@ -25,10 +25,10 @@ reference_genomes = {
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
-    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1"
+    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
 }
 
-deprecated = {"homo", "mus", "mus-premrna"}
+deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
 
 STAR = "STAR"
 HTSEQ = "htseq-count"
@@ -310,14 +310,14 @@ def main(logger):
         if args.taxon in deprecated:
             logger.warn(
                 f"The name '{args.taxon}' will be removed in the future,"
-                f" start using '{reference_genomes[args.taxon]}'"
+                f" start using '{deprecated[args.taxon]}'"
             )
 
         genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
-    if args.taxon == "gencode.vM19" or args.taxon == "gencode.vM19.ERCC" :
+    if args.taxon == "gencode.vM19" or args.taxon == "gencode.vM19.ERCC":
         id_attr = "gene_name"
     else:
         id_attr = "gene_id"

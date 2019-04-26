@@ -3,17 +3,7 @@
 import argparse
 import warnings
 
-reference_genomes = {
-    "homo": "HG38-PLUS",
-    "hg38-plus": "HG38-PLUS",
-    "mus": "MM10-PLUS",
-    "mm10-plus": "MM10-PLUS",
-    "microcebus": "MicMur3-PLUS",
-    "gencode.vM19": "gencode.vM19",
-    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1"
-}
-
-deprecated = {"homo", "mus", "mus-premrna"}
+from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
 
 
 def main():
@@ -41,7 +31,7 @@ def main():
         if args.taxon in deprecated:
             warnings.warn(
                 f"The name '{args.taxon}' will be removed in the future,"
-                f" start using '{reference_genomes[args.taxon]}'"
+                f" start using '{deprecated[args.taxon]}'"
             )
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
