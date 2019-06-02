@@ -207,7 +207,7 @@ def main(logger):
         "sync",
         "--quiet",
         output_path,
-        os.path.join(args.s3_output_dir, args.exp_id, "rawdata"),
+        os.path.join(args.s3_output_dir, args.exp_id),
         "--exclude",
         '"*"',
         "--include",
