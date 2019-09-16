@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import json
+import re
 import subprocess
 
 import utilities.log_util as ut_log
@@ -16,10 +17,10 @@ def resource_range(name, min_val, max_val):
     def range_validator(s):
         value = int(s)
         if value < min_val:
-            msg = "{} must be at least".format(name, min_val)
+            msg = f"{name} must be at least"
             raise argparse.ArgumentTypeError(msg)
         if value > max_val:
-            msg = "{} can be at most".format(name, max_val)
+            msg = f"{name} can be at most"
             raise argparse.ArgumentTypeError(msg)
         return value
 
@@ -115,7 +116,7 @@ def main():
 
     logger.debug("Importing script as a module")
     if not args.script_name.startswith("."):
-        args.script_name = ".{}".format(args.script_name)
+        args.script_name = f".{args.script_name}"
     script_module = importlib.import_module(args.script_name, "utilities")
 
     logger.debug("Checking for script default requirements")
@@ -123,12 +124,12 @@ def main():
     if hasattr(script_module, "get_default_requirements"):
         script_reqs = script_module.get_default_requirements()
         logger.debug(
-            "{} defines default requirements: {}".format(args.script_name, script_reqs)
+            f"{args.script_name} defines default requirements: {script_reqs}"
         )
         args = parser.parse_args(namespace=script_reqs)
     else:
         logger.warning(
-            "{} does not define default requirements".format(args.script_name)
+            f"{args.script_name} does not define default requirements"
         )
 
     logger.debug("Testing script args")
@@ -139,14 +140,12 @@ def main():
             script_parser.parse_args(args.script_args)
         except:
             logger.error(
-                "{} failed with the given arg string\n\t{}".format(
-                    args.script_name, args.script_args
-                )
+                f"{args.script_name} failed with the given arg string\n\t{args.script_args}"
             )
             raise
     else:
         raise NotImplementedError(
-            "{} must have a 'get_parser' method to test args".format(args.script_name)
+            f"{args.script_name} must have a 'get_parser' method to test args"
         )
 
     logger.debug("Script parsed args successfully")
@@ -156,11 +155,9 @@ def main():
             "PATH=$HOME/anaconda/bin:$PATH",
             "cd utilities",
             "git pull",
-            "git checkout {}".format(args.branch),
+            f"git checkout {args.branch}",
             "python setup.py install",
-            "python -m utilities.{} {}".format(
-                args.script_name, " ".join(args.script_args)
-            ),
+            f"python -m utilities.{args.script_name} {' '.join(args.script_args)}",
         )
     )
 
@@ -179,7 +176,7 @@ def main():
     ]
 
     if args.storage:
-        aegea_command.extend(["--storage", "/mnt={}".format(args.storage)])
+        aegea_command.extend(["--storage", f"/mnt={args.storage}"])
 
     if args.ulimits:
         aegea_command.extend(["--ulimits", " ".join(args.ulimits)])
@@ -187,13 +184,17 @@ def main():
     if args.environment:
         aegea_command.extend(["--environment", " ".join(args.environment)])
 
-    aegea_command.extend(["--command", "'{}'".format(job_command)])
+    aegea_command.extend(["--command", f"'{job_command}'"])
 
-    logger.info("executing command:\n\t{}".format(" ".join(aegea_command)))
+    logger.info(f"executing command:\n\t{' '.join(aegea_command)}")
     if not args.dryrun:
         output = subprocess.check_output(" ".join(aegea_command), shell=True)
         try:
             output = json.loads(output)["jobId"]
-            logger.info("Launched job with jobId: {}".format(output))
+            logger.info(f"Launched job with jobId: {output}")
         except json.decoder.JSONDecodeError:
-            logger.info(output)
+            job_id_m = re.search(r'"jobId": "([\w\-]{36})"', output.decode())
+            if job_id_m:
+                logger.info(f"Launched job with jobId: {job_id_m.group(1)}")
+            else:
+                logger.info(output)
