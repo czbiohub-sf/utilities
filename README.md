@@ -41,10 +41,19 @@ Now we'll change to that folder with `cd` and install the package by running the
 
 ```zsh
 (utilities-env) ➜ cd utilities
-(utilities-env) ➜ python setup.py install
+(utilities-env) ➜ pip install .
 ```
 
 **Note** This does not install the repo as an editable package (unlike previous versions). When you update from Github you should reinstall by running the command again. The old way was more trouble than it was worth. 
+
+If you are planning to use `evros` to launch AWS batch jobs, you will need additional dependencies:
+
+```zsh
+(utilities-env) ➜ cd utilities
+(utilities-env) ➜ pip install .'[evros]'
+```
+
+The quotes are necessary if you are using `zsh` as it uses square brackets for pattern matching.
 
 ## Usage
 
