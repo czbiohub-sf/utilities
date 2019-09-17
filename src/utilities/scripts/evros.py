@@ -123,14 +123,10 @@ def main():
 
     if hasattr(script_module, "get_default_requirements"):
         script_reqs = script_module.get_default_requirements()
-        logger.debug(
-            f"{args.script_name} defines default requirements: {script_reqs}"
-        )
+        logger.debug(f"{args.script_name} defines default requirements: {script_reqs}")
         args = parser.parse_args(namespace=script_reqs)
     else:
-        logger.warning(
-            f"{args.script_name} does not define default requirements"
-        )
+        logger.warning(f"{args.script_name} does not define default requirements")
 
     logger.debug("Testing script args")
 
