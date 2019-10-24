@@ -26,6 +26,7 @@ reference_genomes = {
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
     "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
+    "zebrafish-plus": "danio_rerio_plus"
 }
 
 deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
