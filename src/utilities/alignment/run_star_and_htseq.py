@@ -318,7 +318,7 @@ def main(logger):
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
-    if args.taxon == "gencode.vM19" or args.taxon == "gencode.vM19.ERCC":
+    if args.taxon == "gencode.vM19" or args.taxon == "gencode.vM19.ERCC" or args.taxon == "zebrafish-plus":
         id_attr = "gene_name"
     else:
         id_attr = "gene_id"
