@@ -12,7 +12,9 @@ def log_command(logger, command, **kwargs):
 
     if proc.returncode != 0:
         logger.error("Command failed")
-        if proc.stdout:
+        if proc.stdout and isinstance(proc.stdout, str):
+            logger.error(proc.stdout)
+        elif isinstance(proc.stdout, bytes):
             logger.error(proc.stdout.decode())
 
         return True
