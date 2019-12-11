@@ -150,7 +150,7 @@ def main(logger):
     sample_name = {
         os.path.basename(fn).rsplit("_", 3)[0] for fn in fastq_path.glob("*fastq.gz")
     }
-    assert len(sample_name) == 1
+    assert len(sample_name) == 1, "Should only have one sample name to process"
     sample_name = sample_name.pop()
 
     # Run cellranger
@@ -162,13 +162,12 @@ def main(logger):
         "--nosecondary",
         "--disable-ui",
         f"--expect-cells={args.cell_count}",
+        f"--id={sample_id}",
         f"--fastqs={fastq_path}",
         f"--transcriptome={genome_dir}",
     ]
     if args.dobby:
         command.append(f"--sample={sample_name}")
-    else:
-        command.append(f"--id={sample_id}")
 
     failed = log_command(
         logger,
