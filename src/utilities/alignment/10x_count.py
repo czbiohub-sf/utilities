@@ -97,7 +97,7 @@ def main(logger):
     fastq_path.mkdir(parents=True)
 
     genome_base_dir = args.root_dir / "genome" / "cellranger"
-    genome_base_dir.mkdir()
+    genome_base_dir.mkdir(parents=True)
 
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
