@@ -3,6 +3,7 @@
 # Example: TAXON=homo CELL_COUNT=3000 S3_DIR=s3://biohub-spyros/data/10X_data/CK_Healthy/ ./10x_count.py
 import argparse
 import os
+import pathlib
 import sys
 import subprocess
 import tarfile
@@ -53,6 +54,9 @@ def get_parser():
     )
     parser.add_argument("--cell_count", type=int, default=3000)
 
+    parser.add_argument("--dobby", action="store_true",
+                        help="Use if 10x run was demuxed locally (post November 2019)")
+
     parser.add_argument(
         "--region",
         default="west",
@@ -75,20 +79,25 @@ def main(logger):
 
     args = parser.parse_args()
 
+    args.root_dir = pathlib.Path(args.root_dir)
+
     if os.environ.get("AWS_BATCH_JOB_ID"):
-        args.root_dir = os.path.join(args.root_dir, os.environ["AWS_BATCH_JOB_ID"])
+        args.root_dir = args.root_dir / os.environ["AWS_BATCH_JOB_ID"]
 
     # local directories
     if args.s3_input_dir.endswith("/"):
         args.s3_input_dir = args.s3_input_dir[:-1]
 
     sample_id = os.path.basename(args.s3_input_dir)
-    result_path = os.path.join(args.root_dir, "data", "hca", sample_id)
-    fastq_path = os.path.join(result_path, "fastqs")
-    os.makedirs(fastq_path)
+    result_path = args.root_dir / "data" / sample_id
+    if args.dobby:
+        fastq_path = result_path
+    else:
+        fastq_path = result_path / "fastqs"
+    fastq_path.mkdir(parents=True)
 
-    genome_base_dir = os.path.join(args.root_dir, "genome", "cellranger")
-    os.makedirs(genome_base_dir)
+    genome_base_dir = args.root_dir / "genome" / "cellranger"
+    genome_base_dir.mkdir()
 
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
@@ -121,7 +130,7 @@ def main(logger):
     with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
         tf.extractall(path=genome_base_dir)
 
-    genome_dir = os.path.join(genome_base_dir, genome_name)
+    genome_dir = genome_base_dir / genome_name
 
     sys.stdout.flush()
 
@@ -138,6 +147,12 @@ def main(logger):
     ]
     log_command(logger, command, shell=True)
 
+    sample_name = {
+        os.path.basename(fn).rsplit("_", 3)[0] for fn in fastq_path.glob("*fastq.gz")
+    }
+    assert len(sample_name) == 1
+    sample_name = sample_name.pop()
+
     # Run cellranger
     os.chdir(result_path)
     command = [
@@ -147,10 +162,14 @@ def main(logger):
         "--nosecondary",
         "--disable-ui",
         f"--expect-cells={args.cell_count}",
-        f"--id={sample_id}",
         f"--fastqs={fastq_path}",
         f"--transcriptome={genome_dir}",
     ]
+    if args.dobby:
+        command.append(f"--sample={sample_name}")
+    else:
+        command.append(f"--id={sample_id}")
+
     failed = log_command(
         logger,
         command,
