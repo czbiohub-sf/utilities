@@ -148,7 +148,7 @@ def main(logger):
     log_command(logger, command, shell=True)
 
     sample_name = {
-        os.path.basename(fn).rsplit("_", 3)[0] for fn in fastq_path.glob("*fastq.gz")
+        os.path.basename(fn).rsplit("_", 4)[0] for fn in fastq_path.glob("*fastq.gz")
     }
     assert len(sample_name) == 1, "Should only have one sample name to process"
     sample_name = sample_name.pop()
