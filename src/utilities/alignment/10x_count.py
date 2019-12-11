@@ -143,7 +143,7 @@ def main(logger):
         "--recursive",
         "--force-glacier-transfer" if args.glacier else "",
         args.s3_input_dir,
-        fastq_path,
+        f"{fastq_path}",
     ]
     log_command(logger, command, shell=True)
 
