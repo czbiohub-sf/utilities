@@ -21,12 +21,14 @@ S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
+    "homo.gencode.v30": "homo.gencode.v30.annotation.ERCC92"
     "mus": "MM10-PLUS",
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
     "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
-    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d"
+    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
+    "homo.gencode.v30-plus-HAV18": "gencode.v30.annotation.ERCC92.HAV_18f_KP879216"
 }
 
 deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
