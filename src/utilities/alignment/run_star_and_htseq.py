@@ -21,8 +21,7 @@ S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
 reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
-    "homo.gencode.v30": "homo.gencode.v30.annotation.ERCC92",
-    #"mus": "MM10-PLUS",
+    "mus": "MM10-PLUS",
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
