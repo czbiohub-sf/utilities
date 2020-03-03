@@ -31,6 +31,7 @@ reference_genomes = {
     "hg19-mm10-3.0.0": "hg19-mm10-3.0.0",
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
+    "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d"
 }
 
