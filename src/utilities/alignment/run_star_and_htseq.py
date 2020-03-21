@@ -22,6 +22,7 @@ reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
     "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
+    "homo.covid19": "homo.gencode.v30.annotation.ERCC92.virus",# this reference contains homo.gencode.v30.ERCC.chrM + viral sequences relevant to covid-19
     "mus": "MM10-PLUS",
     "mm10-plus": "MM10-PLUS",
     "microcebus": "MicMur3-PLUS",
@@ -63,17 +64,33 @@ COMMON_PARS = [
     "BAM",
     "Unsorted",
     "--outSAMattributes",
-    "NH",
-    "HI",
-    "NM",
-    "MD",
+    "All",
+    #"NH",
+    #"HI",
+    #"NM",
+    #"MD",
     "--genomeLoad",
     "LoadAndKeep",
     "--outReadsUnmapped",
     "Fastx",
     "--readFilesCommand",
     "zcat",
+    # new flags for Salzman lab
+    "--twopassMode",
+    "Basic",
+    "--chimSegmentMin",
+    "12",
+    "--chimOutType",
+    "WithinBAM",
+    "SoftClip",
+    "Junctions",
+    "--chimJunctionOverhangMin",
+    "12",
+    "--chimSegmentReadGapMax",
+    "3"
 ]
+
+
 
 CURR_MIN_VER = datetime.datetime(2017, 3, 1, tzinfo=datetime.timezone.utc)
 
