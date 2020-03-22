@@ -76,8 +76,8 @@ COMMON_PARS = [
     "--readFilesCommand",
     "zcat",
     # new flags for Salzman lab
-    "--twopassMode",
-    "Basic",
+    #"--twopassMode",# not compatible with genomeLoad option
+    #"Basic",
     "--chimSegmentMin",
     "12",
     "--chimOutType",
