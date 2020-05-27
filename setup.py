@@ -38,6 +38,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "aws_star = utilities.scripts.aws_star:main [evros]",
+            "aws_10x = utilities.scripts.aws_10x:main [evros]",
             "aws_velocyto = utilities.scripts.aws_velocyto:main [evros]",
             "batch_samplesheet = utilities.scripts.batch_samplesheet:main",
             "evros = utilities.scripts.evros:main [evros]",
