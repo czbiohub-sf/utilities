@@ -85,20 +85,32 @@ def get_default_requirements():
 def get_parser():
     parser = argparse.ArgumentParser(
         prog="run_star_and_htseq.py",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    # required arguments
+    parser.add_argument(
+        "--taxon", required=True, choices=list(reference_genomes.keys()),
+        help="(required) Reference genome for the alignment run"
     )
 
     parser.add_argument(
-        "--taxon", required=True, choices=list(reference_genomes.keys())
-    )
-
-    parser.add_argument(
-        "--s3_input_path", required=True, help="Location of input folder"
+        "--s3_input_path", required=True,
+        help="(required) The folder with fastq.gz files to align"
     )
     parser.add_argument(
-        "--s3_output_path", required=True, help="Location for output files"
+        "--s3_output_path", required=True,
+        help="(required) The folder to store the alignment results"
     )
+    parser.add_argument("--num_partitions", type=int, required=True,
+                        help="(required) Number of groups to divide samples " +
+                        "into for the alignment run. Enter 10 as the default " +
+                        "value here since we don't divide a single sample")
+    parser.add_argument("--partition_id", type=int, required=True,
+                        help="(required) Index of sample group. Enter 0 as " +
+                        "the default value here since we only have one sample")
 
+    # optional arguments
     parser.add_argument(
         "--region",
         default="west",
@@ -109,9 +121,6 @@ def get_parser():
             " the fastq.gz files"
         ),
     )
-
-    parser.add_argument("--num_partitions", type=int, required=True)
-    parser.add_argument("--partition_id", type=int, required=True)
 
     parser.add_argument(
         "--star_proc",
@@ -306,9 +315,14 @@ def main(logger):
     else:
         root_dir = "/mnt"
 
+    # local directories
+    if args.s3_input_path.endswith("/"):
+        args.s3_input_path = args.s3_input_path[:-1]
+    
     run_dir = os.path.join(root_dir, "data")
     os.makedirs(run_dir)
 
+    # check if the input genome and region are valid
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
             logger.warn(
@@ -325,12 +339,12 @@ def main(logger):
     else:
         id_attr = "gene_id"
 
-    if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
-        raise ValueError(f"you must use --region west for {genome_name}")
-
     genome_dir = os.path.join(root_dir, "genome", "STAR", genome_name)
     ref_genome_star_file = f"STAR/{genome_name}.tgz"
     sjdb_gtf = os.path.join(root_dir, f"{genome_name}.gtf")
+
+    if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
+        raise ValueError(f"you must use --region west for {genome_name}")
 
     if args.region == "east":
         ref_genome_star_file = os.path.join("ref-genome", ref_genome_star_file)
@@ -349,7 +363,7 @@ def main(logger):
 
     s3 = boto3.resource("s3")
 
-    # download the gtf file
+    # download the reference genome data (.gtf files)
     os.mkdir(os.path.join(root_dir, "genome"))
     logger.info("Downloading and extracting gtf data {}".format(sjdb_gtf))
 

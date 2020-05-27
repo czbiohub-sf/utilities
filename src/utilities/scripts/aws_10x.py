@@ -3,12 +3,12 @@
 import argparse
 import warnings
 
-from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
+from utilities.alignment.run_10x_count import reference_genomes, deprecated
 
 
 def main():
     parser = argparse.ArgumentParser(description="Create a shell to run alignment jobs" + 
-                                     " with STAR and htseq for multiple samples all together")
+                                     " with 10x for multiple samples all together")
 
     parser.add_argument(
         "--branch", default="master",
@@ -19,7 +19,7 @@ def main():
         "--taxon", choices=list(reference_genomes.keys()), required=True,
         help="(required) Reference genome for the alignment run, " +
         "selected from the reference_genomes dictionary keys from " +
-        "alignment.run_star_and_htseq.py"
+        "alignment.run_10x_count.py"
     )
     parser.add_argument(
         "--num_partitions", type=int, required=True, 
@@ -38,7 +38,7 @@ def main():
 
     parser.add_argument(
         "script_args", nargs=argparse.REMAINDER,
-        help="Extra arguments are passed to run_star_and_htseq"
+        help="Extra arguments are passed to run_10x_count"
     )
 
     args = parser.parse_args()
@@ -53,14 +53,14 @@ def main():
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
-    # Print input arguments for running alignment.run_star_and_htseq for each group of sample
+    # Print input arguments for running alignment.run_10x_count for each group of sample
     for i in range(args.num_partitions):
         print(
             " ".join(
                 (
                     "evros",
                     f"--branch {args.branch}",
-                    "alignment.run_star_and_htseq",
+                    "alignment.run_10x_count",
                     f"--taxon {args.taxon}",
                     f"--num_partitions {args.num_partitions}",
                     f"--partition_id {i}",
