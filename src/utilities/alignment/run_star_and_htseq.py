@@ -16,8 +16,10 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 
 
-S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
+# reference genome bucket name for different regions
+S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 
+# valid and deprecated reference genomes
 reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
@@ -28,11 +30,11 @@ reference_genomes = {
     "gencode.vM19": "gencode.vM19",
     "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
-    "homo.gencode.v30-plus-HAV18": "gencode.v30.annotation.ERCC92.HAV_18f_KP879216"
+    "homo.gencode.v30-plus-HAV18": "gencode.v30.annotation.ERCC92.HAV_18f_KP879216",
 }
-
 deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
 
+# other helpful constants
 STAR = "STAR"
 HTSEQ = "htseq-count"
 SAMTOOLS = "samtools"
@@ -83,32 +85,50 @@ def get_default_requirements():
 
 
 def get_parser():
+    """ Construct and return the ArgumentParser object that parses input command.
+    """
+
     parser = argparse.ArgumentParser(
         prog="run_star_and_htseq.py",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Run alignment jobs using STAR and htseq",
     )
 
     # required arguments
-    parser.add_argument(
-        "--taxon", required=True, choices=list(reference_genomes.keys()),
-        help="(required) Reference genome for the alignment run"
+    requiredNamed = parser.add_argument_group("required arguments")
+
+    requiredNamed.add_argument(
+        "--taxon",
+        required=True,
+        choices=list(reference_genomes.keys()),
+        help="Reference genome for the alignment run",
     )
 
-    parser.add_argument(
-        "--s3_input_path", required=True,
-        help="(required) The folder with fastq.gz files to align"
+    requiredNamed.add_argument(
+        "--s3_input_path", required=True, help="The folder with fastq.gz files to align"
     )
-    parser.add_argument(
-        "--s3_output_path", required=True,
-        help="(required) The folder to store the alignment results"
+
+    requiredNamed.add_argument(
+        "--s3_output_path",
+        required=True,
+        help="The folder to store the alignment results",
     )
-    parser.add_argument("--num_partitions", type=int, required=True,
-                        help="(required) Number of groups to divide samples " +
-                        "into for the alignment run. Enter 10 as the default " +
-                        "value here since we don't divide a single sample")
-    parser.add_argument("--partition_id", type=int, required=True,
-                        help="(required) Index of sample group. Enter 0 as " +
-                        "the default value here since we only have one sample")
+
+    requiredNamed.add_argument(
+        "--num_partitions",
+        type=int,
+        required=True,
+        help="Number of groups to divide samples "
+        "into for the alignment run. Enter 10 as the default "
+        "value here since we don't divide a single sample",
+    )
+    requiredNamed.add_argument(
+        "--partition_id",
+        type=int,
+        required=True,
+        help="Index of sample group. Enter 0 as "
+        "the default value here since we only have one sample",
+    )
 
     # optional arguments
     parser.add_argument(
@@ -147,6 +167,24 @@ def get_parser():
 def run_sample(
     s3_input_bucket, sample_name, sample_fns, genome_dir, run_dir, star_proc, logger
 ):
+    """ Run alignment jobs with STAR.
+
+        s3_input_bucket - Name of the bucket with input fastq files to align
+        sample_name - Sequenced sample name (joined by "_")
+        sample_fns - Sample file names. Each file name is concatenated by sample_name,
+                     "_R1_" or"_R2_", a number, and ".fastq.gz"
+        genome_dir - Path to reference genome
+        run_dir - Path local to the machine on EC2 under which alignment results
+                  are stored before uploaded to S3
+        star_proc - Number of processes to give to each STAR run
+        logger - Logger object that exposes the interface the code directly uses
+
+        Return two values. FAILED is a boolean value of whether the alignment run
+        fails. DEST_DIR is the path under which STAR alignment results are stored.
+        This path is local to the machine on EC2 running the alignment, and that's
+        where we copy the alignment results to upload to S3 later.
+    """
+
     t_config = TransferConfig(use_threads=False, num_download_attempts=25)
 
     dest_dir = os.path.join(run_dir, sample_name)
@@ -172,8 +210,8 @@ def run_sample(
         os.path.join(dest_dir, os.path.basename(sample_fn)) for sample_fn in sample_fns
     )
 
-    command = COMMON_PARS[:]
-    command.extend(
+    input_command = COMMON_PARS[:]
+    input_command.extend(
         (
             "--runThreadN",
             str(star_proc),
@@ -185,7 +223,7 @@ def run_sample(
     )
     failed = ut_log.log_command(
         logger,
-        command,
+        input_command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
@@ -193,7 +231,7 @@ def run_sample(
     )
 
     # running sam tools
-    command = [
+    sample_command = [
         SAMTOOLS,
         "sort",
         "-m",
@@ -204,7 +242,7 @@ def run_sample(
     ]
     failed = failed or ut_log.log_command(
         logger,
-        command,
+        sample_command,
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -212,10 +250,10 @@ def run_sample(
     )
 
     # running samtools index -b
-    command = [SAMTOOLS, "index", "-b", "Aligned.out.sorted.bam"]
+    sample_index_command = [SAMTOOLS, "index", "-b", "Aligned.out.sorted.bam"]
     failed = failed or ut_log.log_command(
         logger,
-        command,
+        sample_index_command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
@@ -223,7 +261,7 @@ def run_sample(
     )
 
     # generating files for htseq-count
-    command = [
+    output_command = [
         SAMTOOLS,
         "sort",
         "-m",
@@ -235,7 +273,7 @@ def run_sample(
     ]
     failed = failed or ut_log.log_command(
         logger,
-        command,
+        output_command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
@@ -246,7 +284,18 @@ def run_sample(
 
 
 def run_htseq(dest_dir, sjdb_gtf, id_attr, logger):
-    command = [
+    """ Run alignment job with htseq.
+
+        dest_dir - Path local to the machine on EC2 under which alignment results
+                   are stored before uploaded to S3. Child path of run_dir/sample_name
+        sjdb_gtf - Path of reference genome .gtf files used to detect splice junctions
+        id_attr - Determine naming format in the count file for different genomes
+        logger - Logger object that exposes the interface the code directly uses
+
+        Return FAILED, a boolean value of whether the alignment run fails
+    """
+
+    htseq_command = [
         HTSEQ,
         "-r",
         "name",
@@ -264,7 +313,7 @@ def run_htseq(dest_dir, sjdb_gtf, id_attr, logger):
     ]
     failed = ut_log.log_command(
         logger,
-        command,
+        htseq_command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         shell=True,
@@ -275,6 +324,16 @@ def run_htseq(dest_dir, sjdb_gtf, id_attr, logger):
 
 
 def upload_results(sample_name, taxon, dest_dir, s3_output_path, logger):
+    """ Upload alignment results copied from EC2 machine directory onto S3.
+
+        sample_name - Sequenced sample name (joined by "_")
+        taxon - Reference genome name
+        dest_dir - Path local to the machine on EC2 under which alignment results
+                   are stored before uploaded to S3. Child path of run_dir/sample_name
+        s3_output_path - S3 path of where the alignment results are stored
+        logger - Logger object that exposes the interface the code directly uses
+    """
+
     t_config = TransferConfig(use_threads=False)
 
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(s3_output_path)
@@ -306,6 +365,11 @@ def upload_results(sample_name, taxon, dest_dir, s3_output_path, logger):
 
 
 def main(logger):
+    """ Download reference genome, run alignment jobs, and upload results to S3.
+
+        logger - Logger object that exposes the interface the code directly uses
+    """
+
     parser = get_parser()
 
     args = parser.parse_args()
@@ -318,7 +382,7 @@ def main(logger):
     # local directories
     if args.s3_input_path.endswith("/"):
         args.s3_input_path = args.s3_input_path[:-1]
-    
+
     run_dir = os.path.join(root_dir, "data")
     os.makedirs(run_dir)
 
@@ -363,7 +427,7 @@ def main(logger):
 
     s3 = boto3.resource("s3")
 
-    # download the reference genome data (.gtf files)
+    # download the reference genome data
     os.mkdir(os.path.join(root_dir, "genome"))
     logger.info("Downloading and extracting gtf data {}".format(sjdb_gtf))
 
@@ -373,7 +437,6 @@ def main(logger):
         Filename=sjdb_gtf,
     )
 
-    # download STAR stuff
     os.mkdir(os.path.join(root_dir, "genome", "STAR"))
     logger.info("Downloading and extracting STAR data {}".format(ref_genome_star_file))
 

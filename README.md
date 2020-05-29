@@ -7,10 +7,9 @@ A collection of scripts for common data management and processing tasks
 | ----------- | -------- | ----------- |
 | Demux a standard sequencing run | `evros demux.bcl2fastq --exp_id YYMMDD_EXP_ID` | Assumes your sample sheet is uploaded to S3.|
 | Demux a 10X run | `evros demux.10x_mkfastq --exp_id YYMMDD_EXP_ID` | Again, assumes a sample sheet is present on S3 |
-| Align one sample using 10X | ```evros alignment.run_10x_count [see --help for input format] --taxon [see --help for options] --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Suitable for aligning only one sample. Very slow for multiple samples! |
-| Align multiple samples using 10X | ```aws_10x [see --help for input format] --taxon TAXON --num_partitions NUM_PARTITIONS --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
-| Align one sample using STAR and htseq | ```evros alignment.run_star_and_htseq [see --help for input format] --taxon [see --help for options] --num_partitions NUM_PARTITIONS --partition_id PARTITION_ID --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Suitable for aligning only one sample. Very slow for multiple samples! |
-| Align multiple samples using STAR and htseq | ```aws_star [see --help for input format] --taxon TAXON --num_partitions NUM_PARTITIONS --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
+| Align using 10X (slow) | ```evros alignment.run_10x_count [see --help for input format] --taxon [see --help for options] --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
+| Align using STAR and htseq (slow) | ```evros alignment.run_star_and_htseq [see --help for input format] --taxon [see --help for options] --num_partitions NUM_PARTITIONS --partition_id PARTITION_ID --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
+| Align using STAR and htseq (fast) | ```aws_star [see --help for input format] --taxon TAXON --num_partitions NUM_PARTITIONS --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
 | Run Velocyto | ```aws_velocyto [see --help for taxon] [# partitions] --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to run velocyto on STAR output |
 | Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czb-seqbot` bucket |
 
@@ -59,7 +58,6 @@ The quotes are necessary if you are using `zsh` as it uses square brackets for p
 
 ```zsh
 (utilities-env) ➜ cd utilities
-(utilities-env) ➜ pip install -e .
 (utilities-env) ➜ pip install -e .'[evros]'
 ```
 
@@ -214,11 +212,11 @@ Now we have two genomes left. "danio_rerio_plus_STAR2.6.1d" is the danio rerio (
 
 After selecting a proper genome, you can go ahead running the alignment job.
 
-#### How to launch alignment job for one sample:
+#### How to launch alignment job for one sample folder:
 
 *Important change: you need to explicitly specify the input and output paths for your alignment.*
 
-The following shows an example to align a sample using STAR and htseq. Don't forget to include "--taxon", "--num_partitions", "--partition_id", "--s3_input_path", and "--s3_output_path" in the command since the arguments are not positional, and their sequence doesn't matter. These arguments are required though they're displayed under "optional arguments" after calling `evros alignment.run_star_and_htseq -h`. This is also true for the other alignment commands. When running only one sample, just enter 10 for --num_partitions and 0 for --partition_id as default values, since these two arguments are only of interest in running multiple samples all together, and they don't matter for a single sample. See documentation in "How to launch alignment job for multiple samples" below for more details:
+The following shows an example to align a sample using STAR and htseq. Don't forget to include "--taxon", "--num_partitions", "--partition_id", "--s3_input_path", and "--s3_output_path" in the command since the arguments are not positional, and their sequence doesn't matter. When running only one sample folder, just enter 10 for --num_partitions and 0 for --partition_id as default values, since these two arguments are only of interest in running multiple sample folders all together. See documentation in "How to launch alignment job for multiple sample folders" below for more details:
 
 ```zsh
 (utilities-env) ➜ evros alignment.run_star_and_htseq --taxon homo.gencode.v30.ERCC.chrM --num_partitions 10 --partition_id 0 --s3_input_path s3://tabula-sapiens/Pilot1/fastqs/smartseq2/pilot/B107809_A10_S130 --s3_output_path s3://output-bucket/path/for/results
@@ -234,9 +232,9 @@ Likewise, to align a 10x run, take the following code as an example:
 
 Running either `run_star_and_htseq` or `run_10x_count` launches an alignment job on AWS Batch, and you'll get the jobID from the terminal. Copy and paste that jobID into the search box on AWS Batch Job page, and the job you just launched will pop out. You don't need to do anything else there - the job status will turn from runnable to starting and then running automatically. Usually alignment using `run_star_and_htseq` takes around half an hour, and alignment using `run_10x_count` takes hours.
 
-#### How to launch alignment job for multiple samples:
+#### How to launch alignment job for multiple sample folders:
 
-You can use the helper script below, replacing inputs with your values, to create a bunch of commands to efficiently align using STAR and htseq, instead of running one sample at a time. Argument `num_partitions` is the number of jobs you want to launch to align all the sample reads under the input folder, and `partition_id` tags each job with integers from 0 to `num_partitions - 1`. For example, if there're 200 sample folders under the input folder, and we enter 10 for `num_partitions`, then each job runs 20 samples. The job with `partition_id` 0 runs 1st, 11th, 21st, ..., 191th samples, and likewise for jobs with other `partition_id`.
+You can use the helper script below, replacing inputs with your values, to create a bunch of commands to efficiently align using STAR and htseq, instead of running one sample folder at a time. Argument `num_partitions` is the number of jobs you want to launch to align all the sample reads under the input folder, and `partition_id` tags each job with integers from 0 to `num_partitions - 1`. For example, if there're 200 sample folders under the input folder, and we enter 10 for `num_partitions`, then each job runs 20 sample folders. The job with `partition_id` 0 runs 1st, 11th, 21st, ..., 191th sample folders, and likewise for jobs with other `partition_id`.
 
 ```zsh
 (utilities-env) ➜ aws_star --taxon homo.gencode.v30.ERCC.chrM --num_partitions 10 --s3_input_path s3://tabula-sapiens/Pilot1/fastqs/smartseq2/pilot --s3_output_path s3://output-bucket/path/for/results > my_star_jobs.sh
@@ -247,18 +245,7 @@ sleep 10
 (utilities-env) ➜ source my_star_jobs.sh
 ```
 
-Likewise, to align multiple 10x runs, take the following code as an example:
-
-```zsh
-(utilities-env) ➜ aws_10x --taxon homo.gencode.v30.ERCC.chrM --num_partitions 10 --s3_input_path s3://tabula-sapiens/Pilot2/fastqs/10X/NovaSeq_ReRun_Folders --s3_output_path s3://output-bucket/path/for/results > my_10x_jobs.sh
-(utilities-env) ➜ cat my_10x_jobs.sh
-evros --branch master alignment.run_10x_count --taxon homo.gencode.v30.ERCC.chrM --num_partitions 10 --partition_id 0 --s3_input_path s3://tabula-sapiens/Pilot2/fastqs/10X/NovaSeq_ReRun_Folders --s3_output_path s3://output-bucket/path/for/results
-sleep 10
-[...lots more, with increasing partition_id totaling num_partitions...]
-(utilities-env) ➜ source my_10x_jobs.sh
-```
-
-Running either `aws_star` or `aws_10x` will launch multiple jobs all at once for all the samples under the input folder, which saves much time. Again, copy the jobIDs printed in the terminal and paste them on AWS Batch Job page will give you information about the status of all those jobs.
+Running this will launch multiple jobs all at once for all the sample folders under the input folder, which saves much time. Again, copy the jobIDs printed in the terminal and paste them on AWS Batch Job page will give you information about the status of all those jobs.
 
 #### How to check for failed alignment jobs:
 

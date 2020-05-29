@@ -102,6 +102,3 @@ ENV/
 
 # DS_Store
 .DS_Store
-
-# shell for running multiple alignment jobs
-*.sh

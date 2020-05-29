@@ -6,6 +6,9 @@ from logging.handlers import TimedRotatingFileHandler
 
 
 def log_command(logger, command, **kwargs):
+    """ Return true if running the command is failed
+        Return false if the command is successfully ran
+    """
     logger.info(" ".join(command))
 
     proc = subprocess.run(" ".join(command), **kwargs)
