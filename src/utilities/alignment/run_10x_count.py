@@ -142,14 +142,14 @@ def main(logger):
         args.s3_input_path = args.s3_input_path[:-1]
 
     sample_id = os.path.basename(args.s3_input_path)
-    result_path = os.path.join(args.root_dir, "data", sample_id)
+    result_path = args.root_dir / "data" / sample_id
     if args.dobby:
         fastq_path = result_path
     else:
-        fastq_path = os.path.join(result_path, "fastqs")
+        fastq_path = result_path / "fastqs"
     fastq_path.mkdir(parents=True)
 
-    genome_base_dir = os.path.join(args.root_dir, "genome", "cellranger")
+    genome_base_dir = args.root_dir / "genome" / "cellranger"
     genome_base_dir.mkdir(parents=True)
 
     # check if the input genome and region are valid
@@ -164,7 +164,7 @@ def main(logger):
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
-    genome_dir = os.path.join(genome_base_dir, genome_name)
+    genome_dir = genome_base_dir / genome_name
     ref_genome_10x_file = f"cellranger/{genome_name}.tgz"
 
     if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
