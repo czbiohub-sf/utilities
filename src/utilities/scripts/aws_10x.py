@@ -2,7 +2,7 @@
 
 import argparse
 import warnings
-import re
+import posixpath
 
 from utilities.alignment.run_10x_count import reference_genomes, deprecated
 import utilities.s3_util as s3u
@@ -64,13 +64,8 @@ def main():
     # get the list of sample folder paths under the input folder
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
     s3_input_prefix += "/"
-    sample_folder_pattern = re.compile(
-        s3_input_prefix + "([a-zA-Z0-9]+_)+10X_\d+_\d+.*/$"
-    )
     sample_folder_paths = [
-        folder_path
-        for folder_path in s3u.get_folders(s3_input_bucket, s3_input_prefix)
-        if sample_folder_pattern.match(folder_path)
+        folder_path for folder_path in s3u.get_folders(s3_input_bucket, s3_input_prefix)
     ]
     complete_input_paths = [
         "s3://" + s3_input_bucket + "/" + path for path in sample_folder_paths
@@ -80,13 +75,9 @@ def main():
     num_partitions = len(complete_input_paths)
     for i in range(num_partitions):
         s3_input_path = complete_input_paths[i]
-        s3_output_path = ""
-        if args.s3_output_path[-1] == "/":
-            s3_output_path = args.s3_output_path + s3_input_path.rsplit("/", 2)[1]
-        else:
-            s3_output_path += (
-                args.s3_output_path + "/" + s3_input_path.rsplit("/", 2)[1]
-            )
+        s3_output_path = posixpath.join(
+            args.s3_output_path, s3_input_path.rsplit("/", 2)[1]
+        )
         print(
             " ".join(
                 (
