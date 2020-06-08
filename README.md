@@ -217,7 +217,7 @@ After selecting a proper genome, you can go ahead running the alignment job.
 
 *Important change: you need to explicitly specify the input and output paths for your alignment.*
 
-The following shows an example to align a sample using STAR and htseq. Don't forget to include "--taxon", "--num_partitions", "--partition_id", "--s3_input_path", and "--s3_output_path" in the command since the arguments are not positional, and their sequence doesn't matter. When running only one sample folder, just enter 10 for --num_partitions and 0 for --partition_id as default values, since these two arguments are only of interest in running multiple sample folders all together. See documentation in "How to launch alignment job for multiple sample folders" below for more details:
+The following shows an example to align a sample folder using STAR and htseq. Don't forget to include `--taxon`, `--num_partitions`, `--partition_id`, `--s3_input_path`, and `--s3_output_path` in the command since the arguments are not positional, and their sequence doesn't matter. When running only one sample folder, just enter 10 for `--num_partitions` and 0 for `--partition_id` as default values, since these two arguments are only of interest in running multiple sample folders all together. See documentation in "How to launch alignment jobs for multiple sample folders" below for more details:
 
 ```zsh
 (utilities-env) ➜ evros alignment.run_star_and_htseq --taxon homo.gencode.v30.ERCC.chrM --num_partitions 10 --partition_id 0 --s3_input_path s3://tabula-sapiens/Pilot1/fastqs/smartseq2/pilot/B107809_A10_S130 --s3_output_path s3://output-bucket/path/for/results
