@@ -7,8 +7,17 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 
 
+s3c = boto3.client("s3")
+s3r = boto3.resource("s3")
+bucket_resource = s3r.Bucket("czbiohub-seqbot")
+
+
 # cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
 def s3_bucket_and_key(s3_uri, require_prefix=False):
+    """
+    Return the bucket and key name as a two-element list, key here could be
+    file or folder under the bucket
+    """
     prefix = "s3://"
     if require_prefix:
         assert s3_uri.startswith(prefix), "The path must start with s3://"
@@ -21,8 +30,7 @@ def s3_bucket_and_key(s3_uri, require_prefix=False):
 def get_folders(bucket="czb-seqbot", prefix=None):
     """List the folders under a specific path in a bucket. Prefix should end with a /
     """
-    client = boto3.client("s3")
-    paginator = client.get_paginator("list_objects_v2")
+    paginator = s3c.get_paginator("list_objects_v2")
 
     response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/")
 
@@ -33,8 +41,8 @@ def get_folders(bucket="czb-seqbot", prefix=None):
 
 def prefix_gen(bucket, prefix, fn=None):
     """Generic generator of fn(result) from an S3 paginator"""
-    client = boto3.client("s3")
-    paginator = client.get_paginator("list_objects_v2")
+
+    paginator = s3c.get_paginator("list_objects_v2")
 
     response_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix)
 
@@ -55,10 +63,9 @@ def get_size(bucket="czb-seqbot", prefix=None):
 
 def get_status(file_list, bucket_name="czb-seqbot"):
     """Print the storage/restore status for a list of keys"""
-    s3res = boto3.resource("s3")
 
     for fn in file_list:
-        obj = s3res.Object(bucket_name, fn)
+        obj = s3r.Object(bucket_name, fn)
         print(obj.key, obj.storage_class, obj.restore)
 
 
@@ -92,11 +99,6 @@ def download_file(bucket, key, dest):
 def restore_files(file_list, *, n_proc=16):
     """Restore a list of files from czbiohub-seqbot in parallel"""
 
-    global s3r
-    s3r = boto3.resource("s3")
-    global bucket_resource
-    bucket_resource = s3r.Bucket("czbiohub-seqbot")
-
     print(f"restoring {len(file_list)} files")
     with ProcessPoolExecutor(max_workers=n_proc) as executor:
         list(executor.map(restore_file, file_list, chunksize=64))
@@ -108,9 +110,6 @@ def copy_files(src_list, dest_list, *, b, nb, force_copy=False, n_proc=16):
     b - original bucket
     nb - destination bucket
     """
-
-    global s3c
-    s3c = boto3.client("s3")
 
     if not force_copy:
         existing_files = set(
@@ -143,9 +142,6 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
 
     assert really
 
-    global s3c
-    s3c = boto3.client("s3")
-
     print(f"Removing {len(file_list)} files!")
     with ProcessPoolExecutor(max_workers=n_proc) as executor:
         list(executor.map(remove_file, itertools.repeat(b), file_list, chunksize=64))
@@ -153,9 +149,6 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
 
 def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
     """Download a list of file to local storage"""
-
-    global s3c
-    s3c = boto3.client("s3")
 
     if not force_download:
         src_list, dest_list = zip(

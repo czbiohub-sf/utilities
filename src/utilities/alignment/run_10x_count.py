@@ -13,12 +13,10 @@ from utilities.log_util import get_logger, log_command
 import boto3
 
 
-CELLRANGER = "cellranger"
+# reference genome bucket name for different regions
+S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 
-S3_RETRY = 5
-
-S3_REFERENCE = {"east": "czi-hca", "west": "czbiohub-reference"}
-
+# valid and deprecated reference genomes
 reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
@@ -32,10 +30,17 @@ reference_genomes = {
     "microcebus": "MicMur3-PLUS",
     "gencode.vM19": "gencode.vM19",
     "GRCh38_premrna": "GRCh38_premrna",
-    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d"
+    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
+}
+deprecated = {
+    "homo": "hg38-plus",
+    "mus": "mm10-plus",
+    "mus-premrna": "mm10-1.2.0-premrna",
 }
 
-deprecated = {"homo", "mus", "mus-premrna"}
+# other helpful constants
+CELLRANGER = "cellranger"
+S3_RETRY = 5
 
 
 def get_default_requirements():
@@ -45,19 +50,60 @@ def get_default_requirements():
 
 
 def get_parser():
+    """ Construct and return the ArgumentParser object that parses input command.
+    """
+
     parser = argparse.ArgumentParser(
-        prog="10x_count.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        prog="run_10x_count.py",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Run alignment jobs using 10x",
     )
 
-    parser.add_argument("--s3_input_dir", required=True)
-    parser.add_argument("--s3_output_dir", required=True)
-    parser.add_argument(
-        "--taxon", required=True, choices=list(reference_genomes.keys())
+    # required arguments
+    requiredNamed = parser.add_argument_group("required arguments")
+
+    requiredNamed.add_argument(
+        "--taxon",
+        required=True,
+        choices=list(reference_genomes.keys()),
+        help="Reference genome for the alignment run",
     )
+
+    requiredNamed.add_argument(
+        "--s3_input_path", required=True, help="The folder with fastq.gz files to align"
+    )
+
+    requiredNamed.add_argument(
+        "--s3_output_path",
+        required=True,
+        help="The folder to store the alignment results",
+    )
+
+    requiredNamed.add_argument(
+        "--num_partitions",
+        type=int,
+        required=True,
+        help="Number of groups to divide samples "
+        "into for the alignment run. Enter 10 as the default "
+        "value here since we don't divide a single sample",
+    )
+
+    requiredNamed.add_argument(
+        "--partition_id",
+        type=int,
+        required=True,
+        help="Index of sample group. Enter 0 as "
+        "the default value here since we only have one sample",
+    )
+
+    # optional arguments
     parser.add_argument("--cell_count", type=int, default=3000)
 
-    parser.add_argument("--dobby", action="store_true",
-                        help="Use if 10x run was demuxed locally (post November 2019)")
+    parser.add_argument(
+        "--dobby",
+        action="store_true",
+        help="Use if 10x run was demuxed locally (post November 2019)",
+    )
 
     parser.add_argument(
         "--region",
@@ -77,6 +123,11 @@ def get_parser():
 
 
 def main(logger):
+    """ Download reference genome, run alignment jobs, and upload results to S3.
+
+        logger - Logger object that exposes the interface the code directly uses
+    """
+
     parser = get_parser()
 
     args = parser.parse_args()
@@ -87,10 +138,10 @@ def main(logger):
         args.root_dir = args.root_dir / os.environ["AWS_BATCH_JOB_ID"]
 
     # local directories
-    if args.s3_input_dir.endswith("/"):
-        args.s3_input_dir = args.s3_input_dir[:-1]
+    if args.s3_input_path.endswith("/"):
+        args.s3_input_path = args.s3_input_path[:-1]
 
-    sample_id = os.path.basename(args.s3_input_dir)
+    sample_id = os.path.basename(args.s3_input_path)
     result_path = args.root_dir / "data" / sample_id
     if args.dobby:
         fastq_path = result_path
@@ -101,38 +152,44 @@ def main(logger):
     genome_base_dir = args.root_dir / "genome" / "cellranger"
     genome_base_dir.mkdir(parents=True)
 
+    # check if the input genome and region are valid
     if args.taxon in reference_genomes:
         if args.taxon in deprecated:
             logger.warn(
-                f"'{args.taxon}' will be removed in the future,"
-                f" use '{reference_genomes[args.taxon]}'"
+                f"The name '{args.taxon}' will be removed in the future,"
+                f" start using '{deprecated[args.taxon]}'"
             )
 
         genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
 
+    genome_dir = genome_base_dir / genome_name
+    ref_genome_10x_file = f"cellranger/{genome_name}.tgz"
+
     if args.region != "west" and genome_name not in ("HG38-PLUS", "MM10-PLUS"):
         raise ValueError(f"you must use --region west for {genome_name}")
 
+    if args.region == "east":
+        ref_genome_10x_file = f"ref-genome/{ref_genome_10x_file}"
+
+    logger.info(
+        f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
+                   genome_dir:\t{genome_dir}
+         ref_genome_10x_file:\t{ref_genome_10x_file}
+                        taxon:\t{args.taxon}
+                s3_input_path:\t{args.s3_input_path}"""
+    )
+
     s3 = boto3.resource("s3")
 
-    # download the ref genome data
+    # download the reference genome data
     logger.info(f"Downloading and extracting genome data {genome_name}")
 
-    if args.region == "east":
-        s3_object = s3.Object(
-            S3_REFERENCE[args.region], f"ref-genome/cellranger/{genome_name}.tgz"
-        )
-    else:
-        s3_object = s3.Object(
-            S3_REFERENCE[args.region], f"cellranger/{genome_name}.tgz"
-        )
+    s3_object = s3.Object(S3_REFERENCE[args.region], ref_genome_10x_file)
 
     with tarfile.open(fileobj=s3_object.get()["Body"], mode="r|gz") as tf:
         tf.extractall(path=genome_base_dir)
-
-    genome_dir = genome_base_dir / genome_name
 
     sys.stdout.flush()
 
@@ -144,11 +201,14 @@ def main(logger):
         "--no-progress",
         "--recursive",
         "--force-glacier-transfer" if args.glacier else "",
-        args.s3_input_dir,
+        args.s3_input_path,
         f"{fastq_path}",
     ]
     log_command(logger, command, shell=True)
 
+    logger.info(f"Running partition {args.partition_id} of {args.num_partitions}")
+
+    # check the input folder for existing runs
     sample_name = {
         os.path.basename(fn).rsplit("_", 4)[0] for fn in fastq_path.glob("*fastq.gz")
     }
@@ -190,7 +250,7 @@ def main(logger):
         "sync",
         "--no-progress",
         os.path.join(result_path, sample_id, "outs"),
-        args.s3_output_dir,
+        args.s3_output_path,
     ]
     for i in range(S3_RETRY):
         if not log_command(logger, command, shell=True):
