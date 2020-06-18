@@ -21,26 +21,64 @@ def get_default_requirements():
 
 
 def get_parser():
+    """ Construct and return the ArgumentParser object that parses input command.
+    """
+    
     parser = argparse.ArgumentParser(
-        prog="velocyto.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        prog="velocyto.py",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Run expression dynamics (RNA velocity) analysis on smartseq2 data aligned with STAR",
     )
 
-    parser.add_argument("--taxon", choices=("homo", "mus"), required=True)
+    # required arguments
+    requiredNamed = parser.add_argument_group("required arguments")
 
-    parser.add_argument(
-        "--s3_input_path", required=True, help="Location of input folders"
-    )
-    parser.add_argument("--s3_output_path", required=True, help="Location for output")
-
-    parser.add_argument("--num_partitions", type=int, required=True)
-    parser.add_argument("--partition_id", type=int, required=True)
-    parser.add_argument(
-        "--input_dirs",
-        nargs="+",
+    requiredNamed.add_argument(
+        "--taxon",
         required=True,
-        help="List of input folders to process",
+        choices=("homo", "mus"),
+        help="Reference genome for the velocyto run on smartseq2 data aligned with STAR",
     )
-    parser.add_argument("--plates", nargs="*", default=(), help="List of plates to run")
+
+    requiredNamed.add_argument(
+        "--s3_input_path",
+        required=True,
+        help="Location of input folder where STAR alignment results are stored in sample sub-folders",
+    )
+    
+    requiredNamed.add_argument(
+        "--s3_output_path",
+        required=True,
+        help="Location for output",
+    )
+
+    requiredNamed.add_argument(
+        "--num_partitions",
+        type=int,
+        required=True,
+        default=10,
+        help="Number of groups to divide samples "
+        "into for the velocyto run. Enter 10 as the default "
+        "value here since we don't divide a single sample",
+    )
+    
+    requiredNamed.add_argument(
+        "--partition_id",
+        type=int,
+        required=True,
+        default=0,
+        help="Index of sample group. Enter 0 as "
+        "the default value here since we only have one sample",
+    )
+    
+    # optional arguments
+    parser.add_argument(
+        "--plates",
+        nargs="*",
+        default=(),
+        help="List of plates to run",
+    )
+    
     parser.add_argument(
         "--force_redo",
         action="store_true",
@@ -60,6 +98,18 @@ def run_sample(
     run_dir,
     logger,
 ):
+    """ Run RNA velocity analysis with Velocyto on smartseq2 data aligned with STAR.
+
+        sample_key - Sample alignment result file name that ends with ".bam"
+        mask_path - .gtf file containing intervals to mask (i.e. genes not considered for RNA velocity analysis)
+        gtf_path - Path to the .gtf file used for velocyto run
+        s3_input_bucket - Name of the bucket with smartseq2 alignment results
+        s3_output_bucket - Name of the bucket to store smartseq2 velocyto results
+        s3_output_prefix - Pathname under the output bucket to store smartseq2 velocyto results
+        run_dir - Path local to the machine on EC2 under which alignment results
+                  are stored before uploaded to S3
+        logger - Logger object that exposes the interface the code directly uses
+    """
 
     t_config = TransferConfig(num_download_attempts=25)
 
@@ -111,6 +161,11 @@ def run_sample(
 
 
 def main(logger):
+    """ Download reference genome, run velocyto jobs, and upload results to S3.
+
+        logger - Logger object that exposes the interface the code directly uses
+    """
+    
     parser = get_parser()
 
     args = parser.parse_args()
@@ -136,6 +191,11 @@ def main(logger):
         raise ValueError("Invalid taxon {}".format(args.taxon))
 
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
+    
+    s3_input_prefix_full += "/"
+    input_dirs = [
+        folder_path for folder_path in s3u.get_folders(s3_input_bucket, s3_input_prefix_full)
+    ]
 
     logger.info(
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
@@ -143,7 +203,7 @@ def main(logger):
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}
-                   input_dirs:\t{', '.join(args.input_dirs)}"""
+                   input_dirs:\t{', '.join(input_dirs)}"""
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
@@ -160,7 +220,7 @@ def main(logger):
 
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
-    for input_dir in args.input_dirs:
+    for input_dir in input_dirs:
         logger.info(
             "Running partition {} of {} for {}".format(
                 args.partition_id, args.num_partitions, input_dir

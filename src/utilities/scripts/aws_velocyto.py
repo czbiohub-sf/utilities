@@ -4,7 +4,8 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Create a shell script locally to run velocyto on STAR output)
 
     parser.add_argument(
         "--branch", default="master", help="branch of utilities repo to use"
@@ -34,7 +35,7 @@ def main():
                     f"--taxon {args.taxon}",
                     f"--num_partitions {args.num_partitions}",
                     f"--partition_id {i}",
-                    f"--input_dirs {' '.join(args.input_dirs)}",
+                    f"--input_path {' '.join(args.input_dirs)}",
                     " ".join(args.script_args),
                 )
             )
