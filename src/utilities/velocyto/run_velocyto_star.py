@@ -208,6 +208,8 @@ def main(logger):
         for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
         if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
     ]
+    for fn in sample_file:
+        print(fn)
     assert (
         len(sample_file) == 1
     ), "There should be only one .bam file for the input sample folder"
