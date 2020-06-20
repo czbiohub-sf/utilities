@@ -5,7 +5,8 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create a shell script locally to run velocyto on STAR output)
+        description="Create a shell script locally to run velocyto on STAR output"
+    )
 
     parser.add_argument(
         "--branch", default="master", help="branch of utilities repo to use"

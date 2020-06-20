@@ -23,11 +23,11 @@ def get_default_requirements():
 def get_parser():
     """ Construct and return the ArgumentParser object that parses input command.
     """
-    
+
     parser = argparse.ArgumentParser(
         prog="velocyto.py",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description="Run expression dynamics (RNA velocity) analysis on smartseq2 data aligned with STAR",
+        description="Run expression dynamics (RNA velocity) analysis on smartseq2 data aligned with STAR for a sample folder",
     )
 
     # required arguments
@@ -43,42 +43,18 @@ def get_parser():
     requiredNamed.add_argument(
         "--s3_input_path",
         required=True,
-        help="Location of input folder where STAR alignment results are stored in sample sub-folders",
-    )
-    
-    requiredNamed.add_argument(
-        "--s3_output_path",
-        required=True,
-        help="Location for output",
+        help="Location of input sample folder with STAR alignment results",
     )
 
     requiredNamed.add_argument(
-        "--num_partitions",
-        type=int,
-        required=True,
-        default=10,
-        help="Number of groups to divide samples "
-        "into for the velocyto run. Enter 10 as the default "
-        "value here since we don't divide a single sample",
+        "--s3_output_path", required=True, help="Location for output",
     )
-    
-    requiredNamed.add_argument(
-        "--partition_id",
-        type=int,
-        required=True,
-        default=0,
-        help="Index of sample group. Enter 0 as "
-        "the default value here since we only have one sample",
-    )
-    
+
     # optional arguments
     parser.add_argument(
-        "--plates",
-        nargs="*",
-        default=(),
-        help="List of plates to run",
+        "--plates", nargs="*", default=(), help="List of plates to run",
     )
-    
+
     parser.add_argument(
         "--force_redo",
         action="store_true",
@@ -165,7 +141,7 @@ def main(logger):
 
         logger - Logger object that exposes the interface the code directly uses
     """
-    
+
     parser = get_parser()
 
     args = parser.parse_args()
@@ -191,19 +167,13 @@ def main(logger):
         raise ValueError("Invalid taxon {}".format(args.taxon))
 
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
-    
-    s3_input_prefix_full += "/"
-    input_dirs = [
-        folder_path for folder_path in s3u.get_folders(s3_input_bucket, s3_input_prefix_full)
-    ]
 
     logger.info(
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
                      gtf_file:\t{gtf_file}
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
-                s3_input_path:\t{args.s3_input_path}
-                   input_dirs:\t{', '.join(input_dirs)}"""
+                s3_input_path:\t{args.s3_input_path}"""
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
@@ -220,61 +190,47 @@ def main(logger):
 
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
-    for input_dir in input_dirs:
-        logger.info(
-            "Running partition {} of {} for {}".format(
-                args.partition_id, args.num_partitions, input_dir
-            )
+    # Check the output folder for existing runs
+    if not args.force_redo:
+        output = s3u.prefix_gen(
+            s3_output_bucket, s3_output_prefix, lambda r: (r["LastModified"], r["Key"]),
         )
+    else:
+        output = []
 
-        # Check the output folder for existing runs
-        if not args.force_redo:
-            output = s3u.prefix_gen(
-                s3_output_bucket,
-                s3_output_prefix,
-                lambda r: (r["LastModified"], r["Key"]),
-            )
-        else:
-            output = []
+    output_files = {
+        os.path.basename(fn).split(".")[0]
+        for dt, fn in output
+        if fn.endswith(".loom") and dt > CURR_MIN_VER
+    }
 
-        output_files = {
-            os.path.basename(fn).split(".")[0]
-            for dt, fn in output
-            if fn.endswith(".loom") and dt > CURR_MIN_VER
-        }
+    sample_file = [
+        fn
+        for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
+        if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+    ]
+    assert (
+        len(sample_file) == 1
+    ), "There should be only one .bam file for the input sample folder"
 
-        sample_files = [
-            fn
-            for fn in s3u.get_files(
-                s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
-            )
-            if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
-        ]
+    plate_sample = ""
 
-        plate_samples = []
+    matched = sample_re.search(os.path.basename(sample_file[0]))
+    if matched.group(1) not in output_files:
+        if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
+            plate_sample = sample_file[0]
 
-        for fn in sample_files:
-            matched = sample_re.search(os.path.basename(fn))
-            if matched.group(1) not in output_files:
-                if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
-                    plate_samples.append(fn)
-
-        logger.info(f"number of bam files: {len(plate_samples)}")
-
-        for sample_name in sorted(plate_samples)[
-            args.partition_id :: args.num_partitions
-        ]:
-            run_sample(
-                sample_name,
-                mask_path,
-                gtf_path,
-                s3_input_bucket,
-                s3_output_bucket,
-                os.path.join(s3_output_prefix, input_dir),
-                run_dir,
-                logger,
-            )
-            time.sleep(30)
+    run_sample(
+        plate_sample,
+        mask_path,
+        gtf_path,
+        s3_input_bucket,
+        s3_output_bucket,
+        s3_output_prefix,
+        run_dir,
+        logger,
+    )
+    time.sleep(30)
 
     logger.info("Job completed")
 
