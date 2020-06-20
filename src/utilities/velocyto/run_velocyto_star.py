@@ -169,8 +169,7 @@ def main(logger):
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
     logger.info(
-        f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
-                     gtf_file:\t{gtf_file}
+        f"""Run Info: gtf_file:\t{gtf_file}
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}"""
