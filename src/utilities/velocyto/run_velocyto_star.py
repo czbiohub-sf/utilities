@@ -15,6 +15,8 @@ from boto3.s3.transfer import TransferConfig
 
 CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
+# valid reference genomes
+reference_genomes = ("homo", "mus")
 
 def get_default_requirements():
     return argparse.Namespace(vcpus=2, memory=64000, storage=500, ecr_image="velocyto")
@@ -36,18 +38,34 @@ def get_parser():
     requiredNamed.add_argument(
         "--taxon",
         required=True,
-        choices=("homo", "mus"),
+        choices=reference_genomes,
         help="Reference genome for the velocyto run on smartseq2 data aligned with STAR",
     )
 
     requiredNamed.add_argument(
         "--s3_input_path",
-        required=True,
-        help="Location of input sample folder with STAR alignment results",
+        #required=True,
+        help="Location of input files (STAR alignment results of multiple samples)",
     )
 
     requiredNamed.add_argument(
         "--s3_output_path", required=True, help="Location for output",
+    )
+
+    requiredNamed.add_argument(
+        "--num_partitions",
+        type=int,
+        required=True,
+        default=10,
+        help="Number of velocyto jobs to launch on the STAR "
+        "alignment outputs"
+    )
+    
+    requiredNamed.add_argument(
+        "--partition_id",
+        type=int,
+        required=True,
+        help="Index of velocyto job group",
     )
 
     # optional arguments
@@ -169,7 +187,8 @@ def main(logger):
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
     logger.info(
-        f"""Run Info: gtf_file:\t{gtf_file}
+        f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
+                    gtf_file:\t{gtf_file}
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}"""
@@ -190,10 +209,13 @@ def main(logger):
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
     # Check the output folder for existing runs
+    logger.info(
+    "Running partition {} of {} for {}".format(
+        args.partition_id, args.num_partitions, args.s3_input_path
+    ))
+    
     if not args.force_redo:
-        output = s3u.prefix_gen(
-            s3_output_bucket, s3_output_prefix, lambda r: (r["LastModified"], r["Key"]),
-        )
+        output = s3u.prefix_gen(s3_output_bucket, s3_output_prefix, lambda r: (r["LastModified"], r["Key"]))
     else:
         output = []
 
@@ -203,35 +225,36 @@ def main(logger):
         if fn.endswith(".loom") and dt > CURR_MIN_VER
     }
 
-    sample_file = [
+    sample_files = [
         fn
         for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
         if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
     ]
-    for fn in sample_file:
-        print(fn)
-    assert (
-        len(sample_file) == 1
-    ), "There should be only one .bam file for the input sample folder"
 
-    plate_sample = ""
+    plate_samples = []
 
-    matched = sample_re.search(os.path.basename(sample_file[0]))
-    if matched.group(1) not in output_files:
-        if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
-            plate_sample = sample_file[0]
+    for fn in sample_files:
+        matched = sample_re.search(os.path.basename(fn))
+        if matched.group(1) not in output_files:
+            if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
+                plate_samples.append(fn)
 
-    run_sample(
-        plate_sample,
-        mask_path,
-        gtf_path,
-        s3_input_bucket,
-        s3_output_bucket,
-        s3_output_prefix,
-        run_dir,
-        logger,
-    )
-    time.sleep(30)
+    logger.info(f"number of bam files: {len(plate_samples)}")
+
+    for sample_name in sorted(plate_samples)[
+            args.partition_id :: args.num_partitions
+        ]:
+        run_sample(
+            sample_name,
+            mask_path,
+            gtf_path,
+            s3_input_bucket,
+            s3_output_bucket,
+            s3_output_prefix,
+            run_dir,
+            logger,
+        )
+        time.sleep(30)
 
     logger.info("Job completed")
 
