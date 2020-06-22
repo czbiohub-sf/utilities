@@ -8,6 +8,7 @@ import time
 
 import utilities.log_util as ut_log
 import utilities.s3_util as s3u
+from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
 
 import boto3
 from boto3.s3.transfer import TransferConfig
@@ -15,8 +16,6 @@ from boto3.s3.transfer import TransferConfig
 
 CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
-# valid reference genomes
-reference_genomes = ("homo", "mus")
 
 def get_default_requirements():
     return argparse.Namespace(vcpus=2, memory=64000, storage=500, ecr_image="velocyto")
@@ -175,11 +174,11 @@ def main(logger):
     os.mkdir(os.path.join(run_dir, "reference"))
     os.mkdir(os.path.join(run_dir, "input"))
 
-    if args.taxon == "homo":
-        gtf_file = "HG38-PLUS.gtf"
+    if args.taxon == "hg38-plus":
+        gtf_file = f"{reference_genomes[args.taxon]}.gtf"
         mask_file = "hg38_rmsk.gtf"
-    elif args.taxon == "mus":
-        gtf_file = "MM10-PLUS.gtf"
+    elif args.taxon == "mm10-plus":
+        gtf_file = f"{reference_genomes[args.taxon]}.gtf"
         mask_file = "mm10_rmsk.gtf"
     else:
         raise ValueError("Invalid taxon {}".format(args.taxon))
