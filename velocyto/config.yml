@@ -18,6 +18,8 @@ build_image:
       - "conda info -a"
       - "conda install numpy scipy cython numba matplotlib scikit-learn h5py click"
       - "pip install velocyto"
+      - "conda install kallisto"
+      - "pip install -U loompy"
       - "git clone https://github.com/czbiohub/utilities.git"
       - "cd utilities"
       - "python setup.py install"
