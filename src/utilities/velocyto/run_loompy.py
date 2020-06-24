@@ -120,7 +120,7 @@ def main(logger):
     # extract sample name(s) and technology from the metadata tsv file
     metadata_name = os.path.basename(args.metadata)
     metadata_dir = run_dir / "metadata" / metadata_name
-    metadata_dir.mkdir()
+    metadata_dir.mkdir(parents=True)
     s3_metadata_bucket, s3_metadata_prefix = s3u.s3_bucket_and_key(args.metadata)
     s3c.download_file(
         Bucket=s3_metadata_bucket,  # just always download this from us-west-2...
