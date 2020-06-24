@@ -89,13 +89,6 @@ def get_parser():
 
     # optional arguments
     parser.add_argument("--cell_count", type=int, default=3000)
-    
-    parser.add_argument(
-        "--dobby",
-        action="store_true",
-        help="Use if 10x run was demuxed locally (post November 2019)",
-    )
-    
     parser.add_argument("--glacier", action="store_true")
     parser.add_argument("--root_dir", default="/mnt")
 
@@ -131,7 +124,7 @@ def main(logger):
     s3c.download_file(
         Bucket=s3_metadata_bucket,  # just always download this from us-west-2...
         Key=s3_metadata_prefix,
-        Filename=metadata_dir,
+        Filename=str(metadata_dir),
     )
     
     technology, sample_name = '', ''
