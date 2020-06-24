@@ -125,16 +125,13 @@ def main(logger):
     run_dir.mkdir(parents=True)
 
     # extract sample name(s) and technology from the metadata tsv file
-    t_config = TransferConfig(use_threads=False)
-    
     metadata_name = os.path.basename(args.metadata)
     metadata_dir = run_dir / "metadata" / metadata_name
     s3_metadata_bucket, s3_metadata_prefix = s3u.s3_bucket_and_key(args.metadata)
-    s3u.download_file(
+    s3c.download_file(
         Bucket=s3_metadata_bucket,  # just always download this from us-west-2...
         Key=s3_metadata_prefix,
         Filename=metadata_dir,
-        Config=t_config
     )
     
     technology, sample_name = '', ''
@@ -249,6 +246,7 @@ def main(logger):
             universal_newlines=True,
         )
 
+        t_config = TransferConfig(use_threads=False)
         if failed:
             raise RuntimeError("loompy failed")
         else:
