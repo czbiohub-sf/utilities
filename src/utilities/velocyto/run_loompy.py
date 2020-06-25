@@ -221,13 +221,16 @@ def main(logger):
             ]
             sample_files += files
 
+    print(sample_files) # testing
     sample_lists = defaultdict(list)
     sample_sizes = defaultdict(list)
 
     for fn, s in sample_files:
         matched = False
         if technology == "10x":
+            print("technology is 10x") # testing
             matched = sample_re_10x.search(os.path.basename(fn))
+            print(matched) # testing
         elif technology == "smartseq2":
             matched = sample_re_smartseq2.search(os.path.basename(fn))
         if matched:
