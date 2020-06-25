@@ -221,40 +221,36 @@ def main(logger):
             ]
             fastq_key_and_size += files
 
-    sample_name_to_fastq_key_and_size = defaultdict(list)
+    sample_name_to_fastq_keys = defaultdict(list)
     fastq_sizes = defaultdict(list)
-    fastq_names = list()
+    fastqs_key_to_name = dict()
 
     for fn, s in fastq_key_and_size:
-        fastq_names.append(os.path.basename(fn))
         matched = False
         if "10x" in technology:
             matched = sample_re_10x.search(os.path.basename(fn))
         elif "smartseq2" in technology:
             matched = sample_re_smartseq2.search(os.path.basename(fn))
         if matched:
-            sample_name_to_fastq_key_and_size[matched.group(1)].append(fn)
+            sample_name_to_fastq_keys[matched.group(1)].append(fn)
             fastq_sizes[matched.group(1)].append(s)
+            fastqs_key_to_name[fn] = os.path.basename(fn)
 
-    logger.info(f"number of samples: {len(sample_name_to_fastq_key_and_size)}")
+    logger.info(f"number of samples: {len(sample_name_to_fastq_keys)}")
 
     # download input fastqs from S3 to an EC2 instance
     fastq_dir = run_dir / "fastqs"
     fastq_dir.mkdir(parents=True)
-    assert len(fastq_names) == len(
-        fastq_key_and_size
-    ), "fastq_names and fastq_key_and_size should have same length"
-    fastqs_key_and_size_to_name = dict(zip(fastq_key_and_size, fastq_names))
 
-    for key_size in fastq_key_and_size:
+    for key in fastqs_key_to_name.keys():
         s3c.download_file(
             Bucket=s3_input_bucket,
-            Key=key_size[0],
-            Filename=str(fastq_dir / fastqs_key_and_size_to_name[key_size]),
+            Key=key,
+            Filename=str(fastq_dir / fastqs_key_to_name[key]),
         )
 
     # run kallisto alignment and RNA velocity analysis on the valid fastq files
-    for sample in sorted(sample_name_to_fastq_key_and_size)[
+    for sample in sorted(sample_name_to_fastq_keys)[
         args.partition_id :: args.num_partitions
     ]:
         result_path = run_dir / "results"
@@ -271,8 +267,8 @@ def main(logger):
         ]
         fastqs = [
             str(fastq_dir / fastq)
-            for fastq in fastqs_key_and_size_to_name[
-                tuple(sample_name_to_fastq_key_and_size[sample])
+            for fastq in fastqs_key_to_name[
+                sample_name_to_fastq_keys[sample]
             ]
         ]
         command += fastqs
