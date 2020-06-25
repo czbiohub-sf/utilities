@@ -247,8 +247,8 @@ def main(logger):
             "fromfq",
             f"{sample_name}.loom",
             sample_name,
-            genome_dir,
-            metadata_dir,
+            str(genome_dir),
+            str(metadata_dir),
         ]
         fastqs = [file for file in sample_lists[sample]]
         command += fastqs
