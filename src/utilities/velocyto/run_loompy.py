@@ -265,11 +265,10 @@ def main(logger):
             str(genome_dir),
             str(metadata_dir),
         ]
-        fastqs = [
+        fastq_names = [fastqs_key_to_name[key] for key in sample_name_to_fastq_keys[sample]]
+        fastq_dirs = [
             str(fastq_dir / fastq)
-            for fastq in fastqs_key_to_name[
-                sample_name_to_fastq_keys[sample]
-            ]
+            for fastq in fastq_names
         ]
         command += fastqs
 
