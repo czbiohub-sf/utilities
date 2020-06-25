@@ -242,10 +242,6 @@ def main(logger):
         result_path.mkdir(parents=True)
         os.chdir(result_path)
 
-        if sum(sample_sizes[sample]) < args.min_size:
-            logger.info(f"{sample} is below min_size, skipping")
-            continue
-
         command = [
             "loompy",
             "fromfq",
