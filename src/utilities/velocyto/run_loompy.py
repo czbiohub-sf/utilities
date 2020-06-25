@@ -123,6 +123,7 @@ def main(logger):
     metadata_dir.mkdir(parents=True)
     metadata_dir = metadata_dir / metadata_name
     s3_metadata_bucket, s3_metadata_prefix = s3u.s3_bucket_and_key(args.metadata)
+    
     s3c.download_file(
         Bucket=s3_metadata_bucket,  # just always download this from us-west-2...
         Key=s3_metadata_prefix,
@@ -150,6 +151,7 @@ def main(logger):
     elif 'smartseq2' in technology:  # may need to update these after confirming what technology name looks like for smartseq2 data 
         genome_dir = root_dir / "genome" / "smartseq2" / genome_name  # necessary to separate the reference genome location path for 10x and smartseq2? 
     genome_dir.mkdir(parents=True)
+    
 
     s3_input_bucket, s3_input_prefix = s3u.s3_bucket_and_key(args.s3_input_path)
 
@@ -166,10 +168,13 @@ def main(logger):
     logger.info("Downloading reference genome index files of {}".format(genome_name))
 
     if '10x' in technology:
-        s3_genome_index = f"{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
+        s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
     elif 'smartseq2' in technology:
-        s3_genome_index = f"{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
-    s3u.download_files(s3_genome_index, genome_dir)
+        s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
+    s3_genome_index_bucket, s3_genome_index_prefix = s3u.s3_bucket_and_key(s3_genome_index)
+    genome_files = list(s3u.get_files(s3_genome_index_bucket, s3_genome_index_prefix))
+    for file in genome_files:
+        s3u.download_file(s3_genome_index_bucket, s3_genome_index_prefix, str(genome_dir / file))
 
     # extract valid fastq files
     sample_re_smartseq2 = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")

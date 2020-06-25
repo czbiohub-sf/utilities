@@ -147,7 +147,7 @@ def remove_files(file_list, *, b, really=False, n_proc=16):
         list(executor.map(remove_file, itertools.repeat(b), file_list, chunksize=64))
 
 
-def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
+def download_files(src_list, dest_list, *, bucket, force_download=False, n_proc=16):
     """Download a list of file to local storage"""
 
     if not force_download:
@@ -162,6 +162,6 @@ def download_files(src_list, dest_list, *, b, force_download=False, n_proc=16):
     with ProcessPoolExecutor(max_workers=n_proc) as executor:
         list(
             executor.map(
-                download_file, itertools.repeat(b), src_list, dest_list, chunksize=64
+                download_file, itertools.repeat(bucket), src_list, dest_list, chunksize=64
             )
         )
