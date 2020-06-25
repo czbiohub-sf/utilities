@@ -270,7 +270,7 @@ def main(logger):
             str(fastq_dir / fastq)
             for fastq in fastq_names
         ]
-        command += fastqs
+        command += fastq_dirs
 
         failed = ut_log.log_command(
             logger,
