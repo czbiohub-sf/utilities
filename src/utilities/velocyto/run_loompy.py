@@ -255,12 +255,11 @@ def main(logger):
     ]:
         result_path = run_dir / "results"
         result_path.mkdir(parents=True)
-        os.chdir(result_path)
 
         command = [
             "loompy",
             "fromfq",
-            f"{sample_name}.loom",
+            str(result_path / f"{sample_name}.loom"),
             sample_name,
             str(genome_dir),
             str(metadata_dir),
