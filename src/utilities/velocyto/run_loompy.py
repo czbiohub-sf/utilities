@@ -167,7 +167,7 @@ def main(logger):
 
     s3 = boto3.resource("s3")
 
-    # download the reference genome index data
+    # download the reference genome index data from s3 bucket to an EC2 instance
     logger.info("Downloading reference genome index files of {}".format(genome_name))
 
     if "10x" in technology:
@@ -186,7 +186,7 @@ def main(logger):
         os.path.basename(file_path) for file_path in s3_genome_files_prefix
     )
     genome_name_to_prefix = dict(zip(file_names, s3_genome_files_prefix))
-    
+
     for file in genome_name_to_prefix.keys():
         s3c.download_file(
             Bucket=s3_genome_index_bucket,
@@ -237,22 +237,26 @@ def main(logger):
             fastq_sizes[matched.group(1)].append(s)
 
     logger.info(f"number of samples: {len(sample_name_to_fastq_key_and_size)}")
-    
+
     # download input fastqs from S3 to an EC2 instance
     fastq_dir = run_dir / "fastqs"
     fastq_dir.mkdir(parents=True)
-    assert len(fastq_names) == len(fastq_key_and_size), 'fastq_names and fastq_key_and_size should have same length'
-    fastqs_key_to_name = dict(zip(fastq_key_and_size, fastq_names))
-    
+    assert len(fastq_names) == len(
+        fastq_key_and_size
+    ), "fastq_names and fastq_key_and_size should have same length"
+    fastqs_key_and_size_to_name = dict(zip(fastq_key_and_size, fastq_names))
+
     for key_size in fastq_key_and_size:
         s3c.download_file(
             Bucket=s3_input_bucket,
             Key=key_size[0],
-            Filename=str(fastq_dir / fastqs_key_to_name[key_size]),
+            Filename=str(fastq_dir / fastqs_key_and_size_to_name[key_size]),
         )
 
     # run kallisto alignment and RNA velocity analysis on the valid fastq files
-    for sample in sorted(sample_name_to_fastq_key_and_size)[args.partition_id :: args.num_partitions]:
+    for sample in sorted(sample_name_to_fastq_key_and_size)[
+        args.partition_id :: args.num_partitions
+    ]:
         result_path = run_dir / "results"
         result_path.mkdir(parents=True)
         os.chdir(result_path)
@@ -265,7 +269,12 @@ def main(logger):
             str(genome_dir),
             str(metadata_dir),
         ]
-        fastqs = [str(fastq_dir / fastq) for fastq in fastqs_key_to_name[sample_name_to_fastq_key_and_size[sample][0]]]
+        fastqs = [
+            str(fastq_dir / fastq)
+            for fastq in fastqs_key_and_size_to_name[
+                sample_name_to_fastq_key_and_size[sample]
+            ]
+        ]
         command += fastqs
 
         failed = ut_log.log_command(
