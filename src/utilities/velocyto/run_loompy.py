@@ -253,7 +253,7 @@ def main(logger):
         fastqs = [file for file in sample_lists[sample]]
         command += fastqs
 
-        failed = log_command(
+        failed = ut_log.log_command(
             logger,
             command,
             shell=True,
