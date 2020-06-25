@@ -139,7 +139,6 @@ def main(logger):
         technology = file_content[0][
             1
         ]  # need to fix this later to fit tsv file with multiple samples
-    print(technology, sample_name) # testing
 
     # check if the input genome is valid
     if args.taxon in reference_genomes_indexes:
@@ -227,11 +226,9 @@ def main(logger):
 
     for fn, s in sample_files:
         matched = False
-        if technology == "10x":
-            print("technology is 10x") # testing
+        if "10x" in technology:
             matched = sample_re_10x.search(os.path.basename(fn))
-            print(matched) # testing
-        elif technology == "smartseq2":
+        elif "smartseq2" in technology:
             matched = sample_re_smartseq2.search(os.path.basename(fn))
         if matched:
             sample_lists[matched.group(1)].append(fn)
