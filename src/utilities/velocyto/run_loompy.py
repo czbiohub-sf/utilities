@@ -174,7 +174,7 @@ def main(logger):
     s3_genome_index_bucket, s3_genome_index_prefix = s3u.s3_bucket_and_key(s3_genome_index)
     genome_files = list(s3u.get_files(s3_genome_index_bucket, s3_genome_index_prefix))
     for file in genome_files:
-        s3u.download_file(s3_genome_index_bucket, s3_genome_index_prefix, str(genome_dir / file))
+        s3c.download_file(s3_genome_index_bucket, s3_genome_index_prefix, str(genome_dir / file))
 
     # extract valid fastq files
     sample_re_smartseq2 = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
