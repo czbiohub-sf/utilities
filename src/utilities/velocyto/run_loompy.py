@@ -139,6 +139,7 @@ def main(logger):
         technology = file_content[0][
             1
         ]  # need to fix this later to fit tsv file with multiple samples
+    print(technology, sample_name) # testing
 
     # check if the input genome is valid
     if args.taxon in reference_genomes_indexes:
@@ -221,7 +222,6 @@ def main(logger):
             ]
             sample_files += files
 
-    print(sample_files) # testing
     sample_lists = defaultdict(list)
     sample_sizes = defaultdict(list)
 
