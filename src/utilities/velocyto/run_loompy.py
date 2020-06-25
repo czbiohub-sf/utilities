@@ -170,11 +170,13 @@ def main(logger):
     if '10x' in technology:
         s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
     elif 'smartseq2' in technology:
-        s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
+        s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/smartseq2/{genome_name}"
     s3_genome_index_bucket, s3_genome_index_prefix = s3u.s3_bucket_and_key(s3_genome_index)
-    genome_files = list(s3u.get_files(s3_genome_index_bucket, s3_genome_index_prefix))
-    for file in genome_files:
-        s3c.download_file(s3_genome_index_bucket, s3_genome_index_prefix, str(genome_dir / file))
+    s3_genome_files_prefix = list(s3u.get_files(s3_genome_index_bucket, s3_genome_index_prefix))
+    file_names = list(os.path.basename(file_path) for file_path in s3_genome_files_prefix)
+    genome_name_to_prefix = dict(zip(file_names, s3_genome_files_prefix))
+    for file in genome_name_to_prefix.keys():
+        s3c.download_file(Bucket=s3_genome_index_bucket, Key=genome_name_to_prefix[file], Filename=str(genome_dir / file))
 
     # extract valid fastq files
     sample_re_smartseq2 = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
