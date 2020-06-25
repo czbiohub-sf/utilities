@@ -272,7 +272,7 @@ def main(logger):
         fastqs = [
             str(fastq_dir / fastq)
             for fastq in fastqs_key_and_size_to_name[
-                sample_name_to_fastq_key_and_size[sample]
+                tuple(sample_name_to_fastq_key_and_size[sample])
             ]
         ]
         command += fastqs
@@ -298,7 +298,7 @@ def main(logger):
                 Config=t_config,
             )
 
-        command = ["rm", "-rf", result_path]
+        command = ["rm", "-rf", str(result_path)]
         ut_log.log_command(logger, command, shell=True)
 
         time.sleep(30)
