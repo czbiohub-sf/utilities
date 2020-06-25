@@ -164,15 +164,17 @@ def main(logger):
 
     s3 = boto3.resource("s3")
 
-    # download the reference genome data
+    # download the reference genome index data
     logger.info("Downloading reference genome index files of {}".format(genome_name))
 
     if '10x' in technology:
         s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/10X/{genome_name}"
     elif 'smartseq2' in technology:
         s3_genome_index = f"s3://{S3_REFERENCE['west']}/loompy/smartseq2/{genome_name}"
+        
     s3_genome_index_bucket, s3_genome_index_prefix = s3u.s3_bucket_and_key(s3_genome_index)
     s3_genome_files_prefix = list(s3u.get_files(s3_genome_index_bucket, s3_genome_index_prefix))
+    s3_genome_files_prefix = s3_genome_files_prefix[1:]
     file_names = list(os.path.basename(file_path) for file_path in s3_genome_files_prefix)
     genome_name_to_prefix = dict(zip(file_names, s3_genome_files_prefix))
     for file in genome_name_to_prefix.keys():
