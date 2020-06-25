@@ -241,8 +241,7 @@ def main(logger):
     # download input fastqs from S3 to an EC2 instance
     fastq_dir = run_dir / "fastqs"
     fastq_dir.mkdir(parents=True)
-    fastq_keys = fastq_keys[1:]
-    assert len(fastq_names) == len(fastq_keys), 'first element of fastq_keys from get_size is empty'
+    assert len(fastq_names) == len(fastq_keys), 'fastq_names and fastq_keys should have same length'
     fastqs_key_to_name = dict(zip(fastq_keys, fastq_names))
     
     for key in fastq_keys:
