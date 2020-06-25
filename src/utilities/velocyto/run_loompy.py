@@ -203,41 +203,57 @@ def main(logger):
         "Running partition {} of {}".format(args.partition_id, args.num_partitions)
     )
 
-    # fastq files are stored all under the input folder, or in sample sub-folders
+    # fastq files are stored all under the s3 input folder, or in sample sub-folders
     if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
-        sample_files = [
+        fastq_keys = [
             (fn, s)
             for fn, s in s3u.get_size(s3_input_bucket, s3_input_prefix)
             if fn.endswith("fastq.gz")
         ]
     else:
         sample_folder_paths = s3u.get_folders(s3_input_bucket, s3_input_prefix + "/")
-        sample_files = []
+        fastq_keys = []
         for sample in sample_folder_paths:
             files = [
                 (fn, s)
                 for fn, s in s3u.get_size(s3_input_bucket, s3_input_prefix)
                 if fn.endswith("fastq.gz")
             ]
-            sample_files += files
+            fastq_keys += files
 
-    sample_lists = defaultdict(list)
-    sample_sizes = defaultdict(list)
+    sample_name_to_fastq_keys = defaultdict(list)
+    fastq_sizes = defaultdict(list)
+    fastq_names = list()
 
-    for fn, s in sample_files:
+    for fn, s in fastq_keys:
+        fastq_names.append(os.path.basename(fn))
         matched = False
         if "10x" in technology:
             matched = sample_re_10x.search(os.path.basename(fn))
         elif "smartseq2" in technology:
             matched = sample_re_smartseq2.search(os.path.basename(fn))
         if matched:
-            sample_lists[matched.group(1)].append(fn)
-            sample_sizes[matched.group(1)].append(s)
+            sample_name_to_fastq_keys[matched.group(1)].append(fn)
+            fastq_sizes[matched.group(1)].append(s)
 
-    logger.info(f"number of samples: {len(sample_lists)}")
+    logger.info(f"number of samples: {len(sample_name_to_fastq_keys)}")
+    
+    # download input fastqs from S3 to an EC2 instance
+    fastq_dir = run_dir / "fastqs"
+    fastq_dir.mkdir(parents=True)
+    fastq_keys = fastq_keys[1:]
+    assert len(fastq_names) == len(fastq_keys), 'first element of fastq_keys from get_size is empty'
+    fastqs_key_to_name = dict(zip(fastq_keys, fastq_names))
+    
+    for key in fastq_keys:
+        s3c.download_file(
+            Bucket=s3_input_bucket,
+            Key=key,
+            Filename=str(fastq_dir / fastqs_key_to_name[key]),
+        )
 
     # run kallisto alignment and RNA velocity analysis on the valid fastq files
-    for sample in sorted(sample_lists)[args.partition_id :: args.num_partitions]:
+    for sample in sorted(sample_name_to_fastq_keys)[args.partition_id :: args.num_partitions]:
         result_path = run_dir / "results"
         result_path.mkdir(parents=True)
         os.chdir(result_path)
@@ -250,7 +266,7 @@ def main(logger):
             str(genome_dir),
             str(metadata_dir),
         ]
-        fastqs = [file for file in sample_lists[sample]]
+        fastqs = [str(fastq_dir / fastq) for fastq in fastqs_key_to_name[sample_name_to_fastq_keys[sample]]]
         command += fastqs
 
         failed = ut_log.log_command(
@@ -274,7 +290,7 @@ def main(logger):
                 Config=t_config,
             )
 
-        command = ["rm", "-rf", dest_dir]
+        command = ["rm", "-rf", result_path]
         ut_log.log_command(logger, command, shell=True)
 
         time.sleep(30)
