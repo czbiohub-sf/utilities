@@ -271,6 +271,7 @@ def main(logger):
             for fastq in fastq_names
         ]
         command += fastq_dirs
+        print(command) # for testing purpose
 
         failed = ut_log.log_command(
             logger,
