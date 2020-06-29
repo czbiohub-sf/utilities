@@ -37,13 +37,13 @@ def get_parser():
     requiredNamed.add_argument(
         "--taxon",
         required=True,
-        choices=reference_genomes,
+        choices=("hg38-plus", "mm10-plus"),
         help="Reference genome for the velocyto run on smartseq2 data aligned with STAR",
     )
 
     requiredNamed.add_argument(
         "--s3_input_path",
-        #required=True,
+        required=True,
         help="Location of input files (STAR alignment results of multiple samples)",
     )
 
@@ -198,7 +198,7 @@ def main(logger):
     s3u.download_files(
         [f"velocyto/{gtf_file}", f"velocyto/{mask_file}"],
         [gtf_path, mask_path],
-        b="czbiohub-reference",
+        bucket="czbiohub-reference",
         n_proc=2,
     )
 
