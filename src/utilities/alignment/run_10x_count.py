@@ -7,6 +7,7 @@ import pathlib
 import sys
 import subprocess
 import tarfile
+import posixpath
 
 from utilities.log_util import get_logger, log_command
 

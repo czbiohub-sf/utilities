@@ -45,7 +45,7 @@ def main():
     )
 
     parser.add_argument(
-        "--script_args",
+        "script_args",
         nargs=argparse.REMAINDER,
         help="Extra arguments are passed to run_10x_count",
     )
