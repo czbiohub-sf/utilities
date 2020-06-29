@@ -83,6 +83,7 @@ def get_parser():
         "--num_partitions",
         type=int,
         required=True,
+        default=10,
         help="Number of groups to divide samples "
         "into for the alignment run. Enter 10 as the default "
         "value here since we don't divide a single sample",
@@ -250,7 +251,9 @@ def main(logger):
         "sync",
         "--no-progress",
         os.path.join(result_path, sample_id, "outs"),
-        args.s3_output_path,
+        posixpath.join(
+            args.s3_output_path, sample_name.rsplit("_", 2)[0]
+        ),
     ]
     for i in range(S3_RETRY):
         if not log_command(logger, command, shell=True):

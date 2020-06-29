@@ -13,6 +13,7 @@ def main():
         description="Create a shell to run alignment jobs"
         " with 10x for multiple samples all together"
     )
+    
     # required arguments
     requiredNamed = parser.add_argument_group("required arguments")
 
@@ -75,9 +76,6 @@ def main():
     num_partitions = len(complete_input_paths)
     for i in range(num_partitions):
         s3_input_path = complete_input_paths[i]
-        s3_output_path = posixpath.join(
-            args.s3_output_path, s3_input_path.rsplit("/", 2)[1]
-        )
         print(
             " ".join(
                 (
