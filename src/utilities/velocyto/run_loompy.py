@@ -203,7 +203,7 @@ def main(logger):
         "Running partition {} of {}".format(args.partition_id, args.num_partitions)
     )
 
-    # fastq files are stored all under the s3 input folder, or in sample sub-folders
+    # fastq files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
     if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
         fastq_key_and_size = [
             (fn, s)
@@ -220,6 +220,7 @@ def main(logger):
                 if fn.endswith("fastq.gz")
             ]
             fastq_key_and_size += files
+    print(fastq_key_and_size) # testing purpose
 
     sample_name_to_fastq_keys = defaultdict(list)
     fastq_sizes = defaultdict(list)
