@@ -224,12 +224,25 @@ def main(logger):
         if fn.endswith(".loom") and dt > CURR_MIN_VER
     }
 
-    sample_files = [
-        fn
-        for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
-        if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
-    ]
+    # STAR alignment result files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
+    if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
+        sample_files = [
+            fn
+            for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
+            if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+        ]
+    else:
+        sample_folder_paths = s3u.get_folders(s3_input_bucket, s3_input_prefix + "/")
+        sample_files = []
+        for sample in sample_folder_paths:
+            sample_files = [
+                fn
+                for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
+                if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+            ]
+            sample_files += files
 
+    # Run velocyto on the alignment results of specific plates if specified. Otherwise run velocyto on all input alignment results
     plate_samples = []
 
     for fn in sample_files:
