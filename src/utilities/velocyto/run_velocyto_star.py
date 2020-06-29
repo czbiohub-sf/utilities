@@ -226,12 +226,14 @@ def main(logger):
 
     # STAR alignment result files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
     if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
+        print('plain', list(s3u.get_files(s3_input_bucket, s3_input_prefix))) # testing
         sample_files = [
             fn
             for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
             if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
         ]
     else:
+        print('sub-folders', list(s3u.get_files(s3_input_bucket, s3_input_prefix))) # testing
         sample_folder_paths = s3u.get_folders(s3_input_bucket, s3_input_prefix + "/")
         sample_files = []
         for sample in sample_folder_paths:
