@@ -45,7 +45,7 @@ def main():
     )
 
     parser.add_argument(
-        "script_args",
+        "--script_args",
         nargs=argparse.REMAINDER,
         help="Extra arguments are passed to run_10x_count",
     )
@@ -86,7 +86,7 @@ def main():
                     f"--num_partitions {num_partitions}",
                     f"--partition_id {i}",
                     f"--s3_input_path {s3_input_path}",
-                    f"--s3_output_path {s3_output_path}",
+                    f"--s3_output_path {args.s3_output_path}",
                     " ".join(args.script_args),
                 )
             )
