@@ -33,7 +33,7 @@ def display_info():
     Keyword Argument:
     mainlogger - Logger of main function (type: logging.Logger)
     """
-    info_command = ["kb", "--info"]
+    info_command = ["kb", "info"]
     
 #     if ut_log.log_command(
 #         logger,
@@ -110,39 +110,52 @@ def parse_ref(args, run_dir, logger):
     s3_kb_ref = dict()
     kb_ref_output_to_s3 = dict()
 
-    for arg in ["fasta", "gtf", "feature", "i", "g", "f1", "f2", "c1", "c2", "tmp"]:
-        if args.arg is not None:
-            print("testing purpose - see if args.arg output all argument names from ""fasta", "gtf", "feature", "i", "g", "f1", "f2", "c1", "c2", "tmp"": " + args.arg) # testing purpose
+    if "-d" not in sys.argv:
+        if "--workflow" in sys.argv and "kite" in sys.argv:
+            kb_ref_paths["feature_path"] = kallisto_index_inputs / os.path.basename(args.feature)
+            s3_kb_ref["s3_feature_bucket"] = s3u.s3_bucket_and_key(args.feature)[0]
+            s3_kb_ref["s3_feature_prefix"] = s3u.s3_bucket_and_key(args.feature)[1]
+            s3c.download_file(
+                Bucket=s3_kb_ref["s3_feature_bucket"],
+                Key=s3_kb_ref["s3_feature_prefix"],
+                Filename=str(kb_ref_paths["feature_path"]),
+            )
+        for arg in ["fasta", "gtf"]:
+            kb_ref_paths[arg + "_path"] = kallisto_index_inputs / os.path.basename(args.arg)
+            s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+            s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
+            s3c.download_file(
+                Bucket=s3_kb_ref["s3_" + arg + "_bucket"],
+                Key=s3_kb_ref["s3_" + arg + "_prefix"],
+                Filename=str(kb_ref_paths[arg + "_path"]),
+            )
+            
+    for arg in ["-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"]:
+        if arg in sys.argv:
+            arg = arg[2:] if arg == "--tmp" else arg[1:]
+            print("testing purpose - see if args.arg output all argument names from ""-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"": " + args.arg) # testing purpose
             if arg == "tmp": 
                 kb_ref_paths[arg + "_path"] = kallisto_index_dir / "alter_tmp"
                 s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
                 s3_kb_ref["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
-            elif arg != ("fasta" or "gtf" or "feature"):
+            else:
                 kb_ref_paths[arg + "_path"] = kallisto_index_outputs / os.path.basename(args.arg)
                 s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
                 s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
-            else: 
-                kb_ref_paths[arg + "_path"] = kallisto_index_inputs / os.path.basename(args.arg)
-                s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
-                s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
-                kb_ref_output_to_s3[kb_ref_paths[arg + "_path"]] = s3u.s3_bucket_and_key(args.arg)
-                s3c.download_file(
-                    Bucket=s3_kb_ref["s3_" + arg + "_bucket"],
-                    Key=s3_kb_ref["s3_" + arg + "_prefix"],
-                    Filename=str(kb_ref_paths[arg + "_path"]),
-                )
 
 
     # Build the command of running `kb ref` to generate kallisto index files
-    ref_input_positional = ['fasta', 'gtf', 'feature']
     ref_input_boolean = ['--lamanno', '--overwrite', '--keep-tmp', '--verbose']
     ref_input_upload_required = ['-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp']
     ref_input_left_args = ['-d', '-n', '-k', '--workflow']
 
     kb_ref_command = ['kb', 'ref']
-    for input in ref_input_positional:
-        if args.input is not None:
+    for input in ["fasta", "gtf"]:
+        if "-d" not in sys.argv:
             print(f"testing purpose: `ref` positional argument: {args.input}") # testing purpose
+            if "--workflow" in sys.argv and "kite" in sys.argv:
+                print(f"testing purpose: `ref` positional argument: {args.input}") # testing purpose
+                kb_ref_command += [str(kb_ref_paths["feature_path"])]
             kb_ref_command += [str(kb_ref_paths[input + "_path"])]
     for input in ref_input_boolean:
         if input in sys.argv:
@@ -200,8 +213,9 @@ def parse_count(args, run_dir, logger):
     kb_count_paths = dict()
     s3_kb_count = dict()
 
-    for arg in ["tmp", "o", "w"]:
-        if args.arg is not None:
+    for arg in ["--tmp", "-o", "-w"]:
+        if arg in sys.argv:
+            arg = arg[2:] if arg == "--tmp" else arg[1:]
             print("testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: " + args.arg) # testing purpose
             if arg == "tmp": 
                 kb_count_paths[arg + "_path"] = kb_count_dir / "alter_tmp"
@@ -647,10 +661,10 @@ def get_parser():
     }   
 
     # Show help when no arguments are given
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 0:
         parser.print_help(sys.stderr)
         sys.exit(1)
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 1:
         if sys.argv[1] in command_to_parser:
             command_to_parser[sys.argv[1]].print_help(sys.stderr)
         else:
@@ -669,6 +683,7 @@ def main(logger):
     # Parse input arguments
     parser = get_parser()
     args = parser.parse_args()
+    print("testing purpose - what is sys.argv: " + sys.argv)
     
     # Root direcotry path on the EC2 instance
     root_dir = pathlib.Path(args.root_dir)
