@@ -23,9 +23,8 @@ from boto3.s3.transfer import TransferConfig
 
 def get_default_requirements():
     return argparse.Namespace(
-        vcpus=16, memory=64000, storage=500, ecr_image="rna_velocity"
+        vcpus=16, memory=64000, storage=500, ecr_image="velocyto"
     )
-
 
 def display_info():
     """Displays kb, kallisto and bustools version + citation information, along
