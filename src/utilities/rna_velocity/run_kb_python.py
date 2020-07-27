@@ -683,7 +683,7 @@ def main(logger):
     # Parse input arguments
     parser = get_parser()
     args = parser.parse_args()
-    print("testing purpose - what is sys.argv: " + sys.argv)
+    print("testing purpose - what is sys.argv: " + str(sys.argv))
     
     # Root direcotry path on the EC2 instance
     root_dir = pathlib.Path(args.root_dir)
