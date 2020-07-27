@@ -34,7 +34,7 @@ def display_info():
     Keyword Argument:
     mainlogger - Logger of main function (type: logging.Logger)
     """
-#     info_command = ["kb", "--info"]
+    info_command = ["kb", "--info"]
     
 #     if ut_log.log_command(
 #         logger,
@@ -67,7 +67,7 @@ def display_technologies():
     Keyword Argument:
     mainlogger - Logger of main function (type: logging.Logger)
     """
-#     technology_command = ["kb", "--list"]
+    technology_command = ["kb", "--list"]
     
 #     if ut_log.log_command(
 #         logger,
@@ -180,7 +180,7 @@ def parse_ref(args, run_dir, logger):
                 Config=kb_ref_t_config,
             )
             time.sleep(30)
-            print("testing purpose: " + kb_ref_output_to_s3[file][0] + ", " + kb_ref_output_to_s3[file][1]) # testing purpose
+            print("testing purpose - see if kb_ref upload_file function intakes correct bucket and prefix names for kallisto index output files: " + kb_ref_output_to_s3[file][0] + ", " + kb_ref_output_to_s3[file][1]) # testing purpose
     return
 
 
@@ -200,11 +200,10 @@ def parse_count(args, run_dir, logger):
     kb_count_outputs.mkdir(parents=True)
     kb_count_paths = dict()
     s3_kb_count = dict()
-    kb_count_output_to_s3 = dict()
 
     for arg in list("tmp", "o", "w"):
         if args.arg is not None:
-            print("testing purpose: " + args.arg) # testing purpose
+            print("testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: " + args.arg) # testing purpose
             if arg == "tmp": 
                 kb_count_paths[arg + "_path"] = kb_count_dir / "alter_tmp"
                 s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
@@ -217,38 +216,37 @@ def parse_count(args, run_dir, logger):
             s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
 
     # Download fastq files
-    print("testing purpose - fastqs from the input argument: " + args.fastqs)
-    print("testing purpose - how fastqs are stored in the args namespace: " + type(args.fastqs)) # testing purpose: see how fastqs are stored in the args namespace (stored as a list?)
     kb_count_paths["fastqs_path"], s3_kb_count["s3_fastqs_bucket"], s3_kb_count["s3_fastqs_prefix"] = dict(), dict(), dict()
-    kb_count_fastqs_sub_paths, s3_kb_count_fastqs_bucket, s3_kb_count_fastqs_prefix = kb_count_paths["fastqs_path"], s3_kb_count["s3_fastqs_bucket"], s3_kb_count["s3_fastqs_prefix"]
+    kb_count_fastq_files_paths, s3_kb_count_fastqs_bucket, s3_kb_count_fastqs_prefix = kb_count_paths["fastqs_path"], s3_kb_count["s3_fastqs_bucket"], s3_kb_count["s3_fastqs_prefix"]
+    
+    s3_fastq_folder_bucket, s3_fastq_folder_prefix = s3u.s3_bucket_and_key(args.fastq_folder)
+    s3_fastq_files_prefix = list(s3u.get_files(bucket=s3_fastq_folder_bucket, prefix=s3_fastq_folder_prefix))[1:]
+    print("testing purpose - see if all fastq files prefix are extracted: " + s3_fastq_files_prefix) # testing purpose
     fastq_format = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
 
-    for fastq in args.fastqs:
-        if not fastq_format.search(fastq):
+    for fastq_prefix in s3_fastq_files_prefix:
+        if not fastq_format.search(os.path.basename(fastq_prefix)):
             continue
-        kb_count_fastqs_sub_paths[os.path.basename(fastq)] = kb_fastqs / os.path.basename(fastq)
-        s3_kb_count_fastqs_bucket[os.path.basename(fastq)] = s3u.s3_bucket_and_key(fastqs)[0]
-        s3_kb_count_fastqs_prefix[os.path.basename(fastq)] = s3u.s3_bucket_and_key(args.arg)[1]
-        kb_count_output_to_s3[kb_count_fastqs_sub_paths[os.path.basename(fastq)]] = s3u.s3_bucket_and_key(args.arg)
+        kb_count_fastq_files_paths[os.path.basename(fastq_prefix)] = kb_fastqs / os.path.basename(fastq_prefix)
+        s3_kb_count_fastqs_bucket[os.path.basename(fastq_prefix)] = s3_fastq_folder_bucket
+        s3_kb_count_fastqs_prefix[os.path.basename(fastq_prefix)] = fastq_prefix
         fastq_t_config = TransferConfig(use_threads=False) # testing purpose: comment this line if this runs into error.
         s3c.download_file(
-            Bucket=s3_kb_count_fastqs_bucket[os.path.basename(fastq)],
-            Key=s3_kb_count_fastqs_prefix[os.path.basename(fastq)],
-            Filename=str(kb_count_fastqs_sub_paths[os.path.basename(fastq)]),
+            Bucket=s3_kb_count_fastqs_bucket[os.path.basename(fastq_prefix)],
+            Key=s3_kb_count_fastqs_prefix[os.path.basename(fastq_prefix)],
+            Filename=str(kb_count_fastq_files_paths[os.path.basename(fastq_prefix)]),
             Config=fastq_t_config,
         )
 
-    # Build the command of running `kb count` to generate count matrices
-    print("testing purpose - fastqs from the input argument: " + args.fastqs)
-    print("testing purpose - how fastqs are stored in the args namespace: " + type(args.fastqs)) # testing purpose: see how fastqs are stored in the args namespace (stored as a list?)        
+    # Build the command of running `kb count` to generate count matrices        
     count_input_boolean = ['--keep-tmp', '--verbose', '--mm', '--tcc', '--overwrite', '--lamanno', '--nucleus', '--loom', '--h5ad']
     count_input_file_transfer_required = ['--tmp', '-o', '-w']
     count_input_kb_indices = ['-i', '-g', '-c1', '-c2']
     count_input_left_args = ['-t', '-m', '--workflow', '--filter', '-x']
 
     kb_count_command = ['kb', 'count']
-    for fastq_path in kb_count_fastqs_sub_paths.values():
-        print("testing purpose - view the paths of individual fastqs on the EC2 instance, i.e. values of dictionary `kb_count_fastqs_sub_paths`: " + kb_count_fastqs_sub_paths.values()) # testing purpose
+    for fastq_path in kb_count_fastq_files_paths.values():
+        print("testing purpose - view the paths of individual fastqs on the EC2 instance, i.e. values of dictionary `kb_count_fastq_files_paths`: " + kb_count_fastq_files_paths.values()) # testing purpose
         kb_count_command += [str(fastq_path)]
     for input in count_input_boolean:
         if input in sys.argv:
@@ -462,7 +460,7 @@ def setup_count_args(parser, parent):
     parser_count._actions[0].help = parser_count._actions[0].help.capitalize()
     
     # positional argument
-    parser_count.add_argument('fastqs', help="Paths to the FASTQ files to be processed. FASTQ files should be separated by space, and don't include index fastqs in the input (example input: s3://input-bucket/input-prefix/pbmc_1k_v3_S1_L001_R1_001.fastq.gz s3://input-bucket/input-prefix/pbmc_1k_v3_S1_L001_R2_001.fastq.gz s3://input-bucket/input-prefix/pbmc_1k_v3_S1_L002_R1_001.fastq.gz s3://input-bucket/input-prefix/pbmc_1k_v3_S1_L002_R2_001.fastq.gz)", nargs='+')
+    parser_count.add_argument('fastq_folder', help='Path to the folder containing FASTQ files to be processed')
     
     # required arguments
     required_count = parser_count.add_argument_group('required arguments')
