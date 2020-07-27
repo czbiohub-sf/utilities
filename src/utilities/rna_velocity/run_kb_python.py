@@ -68,28 +68,28 @@ def display_technologies():
     """
     technology_command = ["kb", "--list"]
     
-#     if ut_log.log_command(
-#         logger,
-#         technology_command,
-#         stdout=subprocess.PIPE,
-#         stderr=subprocess.STDOUT,
-#         shell=True,
-#     ):
-#         logger.info("Failed to view single-cell technology list compatible with the kb_python package") 
-#     sys.exit(1)
+    if ut_log.log_command(
+        logger,
+        technology_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=True,
+    ):
+        logger.info("Failed to view single-cell technology list compatible with the kb_python package") 
+    sys.exit(1)
 
-    proc = subprocess.run(" ".join(technology_command), **kwargs)
+#     proc = subprocess.run(" ".join(technology_command), **kwargs)
 
-    if proc.returncode != 0:
-        raise RuntimeError("`--list` command failed")
-        if proc.stdout and isinstance(proc.stdout, str):
-            raise RuntimeError(proc.stdout)
-        elif isinstance(proc.stdout, bytes):
-            raise RuntimeError(proc.stdout.decode())
+#     if proc.returncode != 0:
+#         raise RuntimeError("`--list` command failed")
+#         if proc.stdout and isinstance(proc.stdout, str):
+#             raise RuntimeError(proc.stdout)
+#         elif isinstance(proc.stdout, bytes):
+#             raise RuntimeError(proc.stdout.decode())
 
-        return True
-    else:
-        return False
+#         return True
+#     else:
+#         return False
 
     
 def parse_ref(args, run_dir, logger):
