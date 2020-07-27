@@ -133,7 +133,7 @@ def parse_ref(args, run_dir, logger):
     for arg in ["-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print("testing purpose - see if args.arg output all argument names from ""-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"": " + args.arg) # testing purpose
+            print(f"testing purpose - see if args.arg output all argument names from ""-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp": {args.arg}"") # testing purpose
             if arg == "tmp": 
                 kb_ref_paths[arg + "_path"] = kallisto_index_dir / "alter_tmp"
                 s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
@@ -166,7 +166,7 @@ def parse_ref(args, run_dir, logger):
     for input in ref_input_left_args:
         if input in sys.argv:
             kb_ref_command += [input, args.input]
-    print("testing purpose - check if kb_ref_command is of correct format: " + kb_ref_command) # testing purpose
+    print(f"testing purpose - check if kb_ref_command is of correct format: {kb_ref_command}") # testing purpose
 
     # Run the command to generate kallisto index files, and upload the output files on the EC2 instance back to AWS S3 
     kb_ref_failed = ut_log.log_command(
@@ -182,7 +182,7 @@ def parse_ref(args, run_dir, logger):
         raise RuntimeError("kallisto index building failed")
     else:
         kb_ref_upload_files = glob.glob(str(kallisto_index_outputs / "*"))
-        print("testing purpose - check kallisto index files: " + kb_ref_upload_files) # testing purpose
+        print(f"testing purpose - check kallisto index files: {kb_ref_upload_files}") # testing purpose
         for file in kb_ref_upload_files:
             logger.info(f"Uploading {os.path.basename(file)} from the EC2 instance to AWS S3")
             s3c.upload_file(
@@ -192,7 +192,7 @@ def parse_ref(args, run_dir, logger):
                 Config=kb_ref_t_config,
             )
             time.sleep(30)
-            print("testing purpose - see if kb_ref upload_file function intakes correct bucket and prefix names for kallisto index output files: " + kb_ref_output_to_s3[file][0] + ", " + kb_ref_output_to_s3[file][1]) # testing purpose
+            print(f"testing purpose - see if kb_ref upload_file function intakes correct bucket and prefix names for kallisto index output files: {kb_ref_output_to_s3[file][0]}, {kb_ref_output_to_s3[file][1]}") # testing purpose
     return
 
 
@@ -216,7 +216,7 @@ def parse_count(args, run_dir, logger):
     for arg in ["--tmp", "-o", "-w"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print("testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: " + args.arg) # testing purpose
+            print(f"testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: {args.arg}") # testing purpose
             if arg == "tmp": 
                 kb_count_paths[arg + "_path"] = kb_count_dir / "alter_tmp"
                 s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
@@ -234,7 +234,7 @@ def parse_count(args, run_dir, logger):
     
     s3_fastq_folder_bucket, s3_fastq_folder_prefix = s3u.s3_bucket_and_key(args.fastq_folder)
     s3_fastq_files_prefix = list(s3u.get_files(bucket=s3_fastq_folder_bucket, prefix=s3_fastq_folder_prefix))[1:]
-    print("testing purpose - see if all fastq files prefix are extracted: " + s3_fastq_files_prefix) # testing purpose
+    print("testing purpose - see if all fastq files prefix are extracted: {s3_fastq_files_prefix}") # testing purpose
     fastq_format = re.compile("([^/]+)_R\d(?:_\d+)?.fastq.gz$")
 
     for fastq_prefix in s3_fastq_files_prefix:
@@ -259,7 +259,7 @@ def parse_count(args, run_dir, logger):
 
     kb_count_command = ['kb', 'count']
     for fastq_path in kb_count_fastq_files_paths.values():
-        print("testing purpose - view the paths of individual fastqs on the EC2 instance, i.e. values of dictionary `kb_count_fastq_files_paths`: " + kb_count_fastq_files_paths.values()) # testing purpose
+        print(f"testing purpose - view the paths of individual fastqs on the EC2 instance, i.e. values of dictionary `kb_count_fastq_files_paths`: {kb_count_fastq_files_paths.values()}") # testing purpose
         kb_count_command += [str(fastq_path)]
     for input in count_input_boolean:
         if input in sys.argv:
@@ -273,7 +273,7 @@ def parse_count(args, run_dir, logger):
     for input in count_input_left_args:
         if input in sys.argv:
             kb_count_command += [input, args.input]
-    print("testing purpose - view kb count command: " + kb_count_command) # testing purpose
+    print(f"testing purpose - view kb count command: {kb_count_command}") # testing purpose
 
     # Run the command to generate count matrices, and upload the output files on the EC2 instance back to AWS S3 
     kb_count_failed = ut_log.log_command(
@@ -298,7 +298,7 @@ def parse_count(args, run_dir, logger):
                     Config=kb_count_t_config,
                 )
                 time.sleep(30)
-                print("testing purpose - see if kb data quantification outputs are uploaded to the correct s3 paths: " + s3_kb_count["s3_o_bucket"] + ", " + posixpath.join(s3_kb_count["s3_o_prefix"], file)) # testing purpose
+                print(f"testing purpose - see if kb data quantification outputs are uploaded to the correct s3 paths: {s3_kb_count["s3_o_bucket"]}, {posixpath.join(s3_kb_count["s3_o_prefix"], file)}") # testing purpose
     return
 
 
@@ -616,6 +616,7 @@ def get_parser():
         help='Display list of supported single-cell technologies',
         action='store_true'
     )
+    parser.add_argument("--root_dir", default="/mnt")
     subparsers = parser.add_subparsers(
         dest='command',
         metavar='<CMD>',
@@ -648,7 +649,6 @@ def get_parser():
     parent.add_argument(
         '--verbose', help='Print debugging information', action='store_true'
     )
-    parent.add_argument("--root_dir", default="/mnt")
 
     # Command parsers
     setup_info_args(subparsers, argparse.ArgumentParser(add_help=False))
@@ -683,7 +683,8 @@ def main(logger):
     # Parse input arguments
     parser = get_parser()
     args = parser.parse_args()
-    print("testing purpose - what is sys.argv: " + str(sys.argv))
+    print(f"testing purpose - what is sys.argv: {sys.argv}")
+    print(f"testing purpose - what is args: {args}")
     
     # Root direcotry path on the EC2 instance
     root_dir = pathlib.Path(args.root_dir)
@@ -717,7 +718,7 @@ def main(logger):
     # Run the command, and delete the temporary directory unless otherwise noted in the input
     try:
         logger.debug(args)
-        print("testing purpose - see if args.command returns `ref` or `count`: "+ args.command) # testing purpose
+        print(f"testing purpose - see if args.command returns `ref` or `count`: {args.command}") # testing purpose
         COMMAND_TO_FUNCTION[args.command](args, run_dir, logger)
     finally:
         # Always clean temp dir
