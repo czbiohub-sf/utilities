@@ -110,7 +110,7 @@ def parse_ref(args, run_dir, logger):
     s3_kb_ref = dict()
     kb_ref_output_to_s3 = dict()
 
-    for arg in list("fasta", "gtf", "feature", "i", "g", "f1", "f2", "c1", "c2", "tmp"):
+    for arg in ["fasta", "gtf", "feature", "i", "g", "f1", "f2", "c1", "c2", "tmp"]:
         if args.arg is not None:
             print("testing purpose - see if args.arg output all argument names from ""fasta", "gtf", "feature", "i", "g", "f1", "f2", "c1", "c2", "tmp"": " + args.arg) # testing purpose
             if arg == "tmp": 
@@ -200,7 +200,7 @@ def parse_count(args, run_dir, logger):
     kb_count_paths = dict()
     s3_kb_count = dict()
 
-    for arg in list("tmp", "o", "w"):
+    for arg in ["tmp", "o", "w"]:
         if args.arg is not None:
             print("testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: " + args.arg) # testing purpose
             if arg == "tmp": 
