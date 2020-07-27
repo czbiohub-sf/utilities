@@ -52,12 +52,12 @@ def prefix_gen(bucket, prefix, fn=None):
 
 
 def get_files(bucket="czb-seqbot", prefix=None):
-    """Generator of keys for a given S3 prefix"""
+    """Generator of keys for a given S3 prefix. Be careful that the first element of the generator output is simply the input prefix. Keys of files start from the second element of the generator output."""
     yield from prefix_gen(bucket, prefix, lambda r: r["Key"])
 
 
 def get_size(bucket="czb-seqbot", prefix=None):
-    """Generator of (key,size) for a given S3 prefix"""
+    """Generator of (key,size) for a given S3 prefix. Unlike get_files, the first element of the generator output is not a tuple with input prefix as key and 0 as size, but rather the (key,size) pair for the first file under the input prefix."""
     yield from prefix_gen(bucket, prefix, lambda r: (r["Key"], r["Size"]))
 
 
@@ -162,6 +162,10 @@ def download_files(src_list, dest_list, *, bucket, force_download=False, n_proc=
     with ProcessPoolExecutor(max_workers=n_proc) as executor:
         list(
             executor.map(
-                download_file, itertools.repeat(bucket), src_list, dest_list, chunksize=64
+                download_file,
+                itertools.repeat(bucket),
+                src_list,
+                dest_list,
+                chunksize=64,
             )
         )

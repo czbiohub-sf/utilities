@@ -1,0 +1,29 @@
+build_docker_image:
+  base_image: ubuntu:16.04
+
+build_image:
+  commands:
+    $extend:
+      - "yes | apt-get update"
+      - "yes | apt-get install make g++"
+      - "wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh"
+      - "bash /tmp/miniconda.sh -b -p $HOME/anaconda"
+      - "PATH=$HOME/anaconda/bin:$PATH"
+      - "conda config --set always_yes yes --set changeps1 no"
+      - "conda update -q conda"
+      - "conda config --add channels defaults"
+      - "conda config --add channels bioconda"
+      - "conda config --add channels conda-forge"
+      - "conda install -n root _license"
+      - "conda info -a"
+      - "conda install numpy scipy cython numba matplotlib scikit-learn h5py click"
+      - "pip install velocyto"
+      - "conda install kallisto"
+      - "pip install -U loompy"
+      - "pip install leidenalg"
+      - "pip install louvain"
+      - "pip install scanpy"
+      - "pip install kb-python"
+      - "git clone https://github.com/czbiohub/utilities.git"
+      - "cd utilities"
+      - "python setup.py install"
