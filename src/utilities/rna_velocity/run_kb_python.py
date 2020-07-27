@@ -133,7 +133,7 @@ def parse_ref(args, run_dir, logger):
     for arg in ["-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print(f"testing purpose - see if args.arg output all argument names from ""-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp": {args.arg}"") # testing purpose
+            print(f"testing purpose - see if args.arg output all argument names from '-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp': {args.arg}") # testing purpose
             if arg == "tmp": 
                 kb_ref_paths[arg + "_path"] = kallisto_index_dir / "alter_tmp"
                 s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
@@ -298,7 +298,7 @@ def parse_count(args, run_dir, logger):
                     Config=kb_count_t_config,
                 )
                 time.sleep(30)
-                print(f"testing purpose - see if kb data quantification outputs are uploaded to the correct s3 paths: {s3_kb_count["s3_o_bucket"]}, {posixpath.join(s3_kb_count["s3_o_prefix"], file)}") # testing purpose
+                print(f"testing purpose - see if kb data quantification outputs are uploaded to the correct s3 paths: " + s3_kb_count["s3_o_bucket"] + ", " + posixpath.join(s3_kb_count["s3_o_prefix"], file)) # testing purpose
     return
 
 
