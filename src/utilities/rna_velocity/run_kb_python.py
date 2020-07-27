@@ -225,7 +225,7 @@ def parse_count(args, run_dir, logger):
 
     for fastq in args.fastqs:
         if not fastq_format.search(fastq):
-            raise RuntimeError("Only R1 and R2 fastqs, not index fastqs, are required.")
+            continue
         kb_count_fastqs_sub_paths[os.path.basename(fastq)] = kb_fastqs / os.path.basename(fastq)
         s3_kb_count_fastqs_bucket[os.path.basename(fastq)] = s3u.s3_bucket_and_key(fastqs)[0]
         s3_kb_count_fastqs_prefix[os.path.basename(fastq)] = s3u.s3_bucket_and_key(args.arg)[1]
