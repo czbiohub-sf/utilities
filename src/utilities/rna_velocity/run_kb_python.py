@@ -150,9 +150,9 @@ def parse_ref(args, run_dir, logger):
     kb_ref_command = ['kb', 'ref']
     for input in ["fasta", "gtf"]:
         if "-d" not in sys.argv:
-            print(f"testing purpose: `ref` positional argument: {args.input}") # testing purpose
+            print(f"testing purpose: `ref` positional argument: {getattr(args, input)}") # testing purpose
             if "--workflow" in sys.argv and "kite" in sys.argv:
-                print(f"testing purpose: `ref` positional argument: {args.input}") # testing purpose
+                print(f"testing purpose: `ref` positional argument: {getattr(args, input)}") # testing purpose
                 kb_ref_command += [str(kb_ref_paths["feature_path"])]
             kb_ref_command += [str(kb_ref_paths[input + "_path"])]
     for input in ref_input_boolean:
@@ -163,7 +163,7 @@ def parse_ref(args, run_dir, logger):
             kb_ref_command += [input, str(kb_ref_paths[input[2:] + "_path"]) if input == "--tmp" else str(kb_ref_paths[input[1:] + "_path"])]
     for input in ref_input_left_args:
         if input in sys.argv:
-            kb_ref_command += [input, args.input]
+            kb_ref_command += [input, getattr(args, input)]
     print(f"testing purpose - check if kb_ref_command is of correct format: {kb_ref_command}") # testing purpose
 
     # Run the command to generate kallisto index files, and upload the output files on the EC2 instance back to AWS S3 
@@ -208,6 +208,7 @@ def parse_count(args, run_dir, logger):
     kb_count_inputs = kb_count_dir / "inputs"
     kb_count_outputs = kb_count_dir / "outputs"
     kb_fastqs.mkdir(parents=True)
+    kb_count_inputs.mkdir(parents=True)
     kb_count_outputs.mkdir(parents=True)
     kb_count_paths = dict()
     s3_kb_count = dict()
@@ -279,7 +280,7 @@ def parse_count(args, run_dir, logger):
             kb_count_command += [input, str(kb_count_paths[input[1:] + "_path"])]
     for input in count_input_left_args:
         if input in sys.argv:
-            kb_count_command += [input, args.input]
+            kb_count_command += [input, getattr(args, input)]
     print(f"testing purpose - view kb count command: {kb_count_command}") # testing purpose
 
     # Run the command to generate count matrices, and upload the output files on the EC2 instance back to AWS S3 
