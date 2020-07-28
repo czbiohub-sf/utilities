@@ -280,7 +280,7 @@ def parse_count(args, run_dir, logger):
             kb_count_command += [input, str(kb_count_paths[input[1:] + "_path"])]
     for input in count_input_left_args:
         if input in sys.argv:
-            kb_count_command += [input, getattr(args, input)]
+            kb_count_command += [input, getattr(args, input[2:]) if input == ("--workflow" or "--filter") else getattr(args, input[1:])]
     print(f"testing purpose - view kb count command: {kb_count_command}") # testing purpose
 
     # Run the command to generate count matrices, and upload the output files on the EC2 instance back to AWS S3 
