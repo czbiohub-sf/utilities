@@ -26,7 +26,7 @@ def get_default_requirements():
         vcpus=16, memory=64000, storage=500, ecr_image="velocyto"
     )
 
-def display_info():
+def display_info(logger):
     """Displays kb, kallisto and bustools version + citation information, along
     with a brief description and examples.
     
@@ -59,7 +59,7 @@ def display_info():
         return False
 
 
-def display_technologies():
+def display_technologies(logger):
     """Displays a list of supported technologies along with whether kb provides
     a whitelist for that technology and the FASTQ argument order for kb count.
     
@@ -121,6 +121,7 @@ def parse_ref(args, run_dir, logger):
                 Filename=str(kb_ref_paths["feature_path"]),
             )
         for arg in ["fasta", "gtf"]:
+            print(f"testing purpose - see if args.arg output the values of fasta or gtf this time. change the format of all args.arg if this works: {args.arg[1:-1]}") # testing purpose
             kb_ref_paths[arg + "_path"] = kallisto_index_inputs / os.path.basename(args.arg)
             s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
             s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
@@ -204,19 +205,20 @@ def parse_count(args, run_dir, logger):
     run_dir -- Path on the EC2 instance under which jobs are run (type: pathlib.Path)
     logger -- Logger object that exposes the interface the code directly uses (type: logging.Logger)
     """
-    # Build paths on the EC2 instance to store inputs and outputs of kb data quantification results. Download fastq files from the AWS S3 bucket to the EC2 instance.
+    # Build paths on the EC2 instance to store inputs and outputs of kb data quantification results.
     kb_count_dir = run_dir / "kb_count"
     kb_fastqs = kb_count_dir / "fastqs"
+    kb_count_inputs = kb_count_dir / "inputs"
     kb_count_outputs = kb_count_dir / "outputs"
     kb_fastqs.mkdir(parents=True)
     kb_count_outputs.mkdir(parents=True)
     kb_count_paths = dict()
     s3_kb_count = dict()
 
-    for arg in ["--tmp", "-o", "-w"]:
+    for arg in ["--tmp", "-o", "-w", "-i", "-g", "-c1", "-c2"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print(f"testing purpose - see if args.tmp, args.o, args.w outputs correct values in running `count`: {args.arg}") # testing purpose
+            print(f"testing purpose - see if args.arg returns the correct values for `kb count` inputs: {args.arg}") # testing purpose
             if arg == "tmp": 
                 kb_count_paths[arg + "_path"] = kb_count_dir / "alter_tmp"
                 s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
@@ -224,11 +226,12 @@ def parse_count(args, run_dir, logger):
                 kb_count_paths[arg + "_path"] = kb_count_outputs
                 s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "outputs")
             else:
-                kb_count_paths[arg + "_path"] = kb_count_dir / os.path.basename(args.arg)
+                kb_count_paths[arg + "_path"] = kb_count_inputs / os.path.basename(args.arg)
                 s3_kb_count["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
             s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+                
 
-    # Download fastq files
+    # Download fastq files from the AWS S3 bucket to the EC2 instance.
     kb_count_paths["fastqs_path"], s3_kb_count["s3_fastqs_bucket"], s3_kb_count["s3_fastqs_prefix"] = dict(), dict(), dict()
     kb_count_fastq_files_paths, s3_kb_count_fastqs_bucket, s3_kb_count_fastqs_prefix = kb_count_paths["fastqs_path"], s3_kb_count["s3_fastqs_bucket"], s3_kb_count["s3_fastqs_prefix"]
     
@@ -269,7 +272,7 @@ def parse_count(args, run_dir, logger):
             kb_count_command += [input, str(kb_count_paths[input[2:] + "_path"]) if input == "--tmp" else str(kb_count_paths[input[1:] + "_path"])]
     for input in count_input_kb_indices:
         if input in sys.argv:
-            kb_count_command += [input, str(kb_ref_paths[input[1:] + "_path"])]
+            kb_count_command += [input, str(kb_count_paths[input[1:] + "_path"])]
     for input in count_input_left_args:
         if input in sys.argv:
             kb_count_command += [input, args.input]
@@ -698,9 +701,9 @@ def main(logger):
     
     # Run `kb --info` to see kb_python package details, or `kb --list` to see supported technologies list
     if 'info' in sys.argv:
-        display_info()
+        display_info(logger)
     elif '--list' in sys.argv:
-        display_technologies() 
+        display_technologies(logger) 
     
     # Use the updated input format for non-standard workflows
     if any(arg in sys.argv for arg in {'--lamanno', '--nucleus'}):
