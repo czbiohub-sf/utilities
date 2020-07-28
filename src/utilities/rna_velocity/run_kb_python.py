@@ -228,7 +228,15 @@ def parse_count(args, run_dir, logger):
             else:
                 kb_count_paths[arg + "_path"] = kb_count_inputs / os.path.basename(args.arg)
                 s3_kb_count["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
+                s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+                s3c.download_file(
+                    Bucket=s3_kb_count["s3_" + arg + "_bucket"],
+                    Key=s3_kb_count["s3_" + arg + "_prefix"],
+                    Filename=str(kb_count_paths[arg + "_path"]),
+                )
             s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+                
+                
                 
 
     # Download fastq files from the AWS S3 bucket to the EC2 instance.
