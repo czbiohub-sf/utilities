@@ -113,28 +113,32 @@ def parse_ref(args, run_dir, logger):
     if "-d" not in sys.argv:
         if "--workflow" in sys.argv and "kite" in sys.argv:
             kb_ref_paths["feature_path"] = kallisto_index_inputs / os.path.basename(args.feature)
-            s3_kb_ref["s3_feature_bucket"] = s3u.s3_bucket_and_key(args.feature)[0]
-            s3_kb_ref["s3_feature_prefix"] = s3u.s3_bucket_and_key(args.feature)[1]
+            s3_kb_ref["s3_feature_bucket"], s3_kb_ref["s3_feature_prefix"] = s3u.s3_bucket_and_key(args.feature)
             s3c.download_file(
                 Bucket=s3_kb_ref["s3_feature_bucket"],
                 Key=s3_kb_ref["s3_feature_prefix"],
                 Filename=str(kb_ref_paths["feature_path"]),
             )
-        for arg in ["fasta", "gtf"]:
-            print(f"testing purpose - see if args.arg output the values of fasta or gtf this time. change the format of all args.arg if this works: {args.arg[1:-1]}") # testing purpose
-            kb_ref_paths[arg + "_path"] = kallisto_index_inputs / os.path.basename(args.arg)
-            s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
-            s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
-            s3c.download_file(
-                Bucket=s3_kb_ref["s3_" + arg + "_bucket"],
-                Key=s3_kb_ref["s3_" + arg + "_prefix"],
-                Filename=str(kb_ref_paths[arg + "_path"]),
-            )
+            
+        kb_ref_paths["fasta_path"] = kallisto_index_inputs / os.path.basename(args.fasta)
+        s3_kb_ref["s3_fasta_bucket"], s3_kb_ref["s3_fasta_prefix"] = s3u.s3_bucket_and_key(args.fasta)
+        s3c.download_file(
+            Bucket=s3_kb_ref["s3_fasta_bucket"],
+            Key=s3_kb_ref["s3_fasta_prefix"],
+            Filename=str(kb_ref_paths["fasta_path"]),
+        )
+        kb_ref_paths["gtf_path"] = kallisto_index_inputs / os.path.basename(args.gtf)
+        s3_kb_ref["s3_gtf_bucket"], s3_kb_ref["s3_gtf_prefix"] = s3u.s3_bucket_and_key(args.gtf)
+        s3c.download_file(
+            Bucket=s3_kb_ref["s3_gtf_bucket"],
+            Key=s3_kb_ref["s3_gtf_prefix"],
+            Filename=str(kb_ref_paths["gtf_path"]),
+        )
             
     for arg in ["-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print(f"testing purpose - see if args.arg output all argument names from '-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp': {args.arg}") # testing purpose
+            print(f"testing purpose - see if args.arg output all argument names from '-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp': {args.{arg}}") # testing purpose
             if arg == "tmp": 
                 kb_ref_paths[arg + "_path"] = kallisto_index_dir / "alter_tmp"
                 s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
