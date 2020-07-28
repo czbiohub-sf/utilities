@@ -120,33 +120,26 @@ def parse_ref(args, run_dir, logger):
                 Filename=str(kb_ref_paths["feature_path"]),
             )
             
-        kb_ref_paths["fasta_path"] = kallisto_index_inputs / os.path.basename(args.fasta)
-        s3_kb_ref["s3_fasta_bucket"], s3_kb_ref["s3_fasta_prefix"] = s3u.s3_bucket_and_key(args.fasta)
-        s3c.download_file(
-            Bucket=s3_kb_ref["s3_fasta_bucket"],
-            Key=s3_kb_ref["s3_fasta_prefix"],
-            Filename=str(kb_ref_paths["fasta_path"]),
-        )
-        kb_ref_paths["gtf_path"] = kallisto_index_inputs / os.path.basename(args.gtf)
-        s3_kb_ref["s3_gtf_bucket"], s3_kb_ref["s3_gtf_prefix"] = s3u.s3_bucket_and_key(args.gtf)
-        s3c.download_file(
-            Bucket=s3_kb_ref["s3_gtf_bucket"],
-            Key=s3_kb_ref["s3_gtf_prefix"],
-            Filename=str(kb_ref_paths["gtf_path"]),
-        )
+        for arg in ["fasta", "gtf"]:
+            kb_ref_paths[arg + "_path"] = kallisto_index_inputs / os.path.basename(getattr(args, arg))
+            s3_kb_ref["s3_" + arg + "_bucket"], s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(getattr(args, arg))
+            s3c.download_file(
+                Bucket=s3_kb_ref["s3_" + arg + "_bucket"],
+                Key=s3_kb_ref["s3_" + arg + "_prefix"],
+                Filename=str(kb_ref_paths[arg + "_path"]),
+            )
             
     for arg in ["-i", "-g", "-f1", "-f2", "-c1", "-c2", "--tmp"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print(f"testing purpose - see if args.arg output all argument names from '-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp': {getattr(args, arg)}") # testing purpose
+            print(f"testing purpose - see if getattr(args, arg) output all argument names from '-i', '-g', '-f1', '-f2', '-c1', '-c2', '--tmp': {getattr(args, arg)}") # testing purpose
             if arg == "tmp": 
                 kb_ref_paths[arg + "_path"] = kallisto_index_dir / "alter_tmp"
-                s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
-                s3_kb_ref["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
+                s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(getattr(args, arg))[0]
+                s3_kb_ref["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(getattr(args, arg))[1], "alter_tmp")
             else:
-                kb_ref_paths[arg + "_path"] = kallisto_index_outputs / os.path.basename(args.arg)
-                s3_kb_ref["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
-                s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
+                kb_ref_paths[arg + "_path"] = kallisto_index_outputs / os.path.basename(getattr(args, arg))
+                s3_kb_ref["s3_" + arg + "_bucket"], s3_kb_ref["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(getattr(args, arg))
 
 
     # Build the command of running `kb ref` to generate kallisto index files
@@ -222,23 +215,22 @@ def parse_count(args, run_dir, logger):
     for arg in ["--tmp", "-o", "-w", "-i", "-g", "-c1", "-c2"]:
         if arg in sys.argv:
             arg = arg[2:] if arg == "--tmp" else arg[1:]
-            print(f"testing purpose - see if args.arg returns the correct values for `kb count` inputs: {args.arg}") # testing purpose
+            print(f"testing purpose - see if getattr(args, arg) returns the correct values for `kb count` inputs: {getattr(args, arg)}") # testing purpose
             if arg == "tmp": 
                 kb_count_paths[arg + "_path"] = kb_count_dir / "alter_tmp"
-                s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "alter_tmp")
+                s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(getattr(args, arg))[1], "alter_tmp")
             elif arg == "o":
                 kb_count_paths[arg + "_path"] = kb_count_outputs
-                s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(args.arg)[1], "outputs")
+                s3_kb_count["s3_" + arg + "_prefix"] = posixpath.join(s3u.s3_bucket_and_key(getattr(args, arg))[1], "outputs")
             else:
-                kb_count_paths[arg + "_path"] = kb_count_inputs / os.path.basename(args.arg)
-                s3_kb_count["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(args.arg)[1]
-                s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+                kb_count_paths[arg + "_path"] = kb_count_inputs / os.path.basename(getattr(args, arg))
+                s3_kb_count["s3_" + arg + "_bucket"], s3_kb_count["s3_" + arg + "_prefix"] = s3u.s3_bucket_and_key(getattr(args, arg))
                 s3c.download_file(
                     Bucket=s3_kb_count["s3_" + arg + "_bucket"],
                     Key=s3_kb_count["s3_" + arg + "_prefix"],
                     Filename=str(kb_count_paths[arg + "_path"]),
                 )
-            s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(args.arg)[0]
+            s3_kb_count["s3_" + arg + "_bucket"] = s3u.s3_bucket_and_key(getattr(args, arg))[0]
                 
                 
                 
