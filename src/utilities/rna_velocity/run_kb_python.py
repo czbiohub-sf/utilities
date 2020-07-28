@@ -293,7 +293,7 @@ def parse_count(args, run_dir, logger):
         universal_newlines=True,
     )
     kb_count_t_config = TransferConfig(use_threads=False) # testing purpose: comment this line if this runs into error. count matrices are not pretty big and don't necessarily need a transfer config
-    if failed:
+    if kb_count_failed:
         raise RuntimeError("kb data quantification failed")
     else:
         logger.info(f"Uploading kb quantification data from the EC2 instance to AWS S3")
