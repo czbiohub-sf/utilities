@@ -13,7 +13,7 @@ def main():
         description="Create a shell to run alignment jobs"
         " with 10x for multiple samples all together"
     )
-    
+
     # required arguments
     requiredNamed = parser.add_argument_group("required arguments")
 

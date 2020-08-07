@@ -11,7 +11,8 @@ A collection of scripts for common data management and processing tasks
 | Align using 10X (fast) | ```aws_10x [see --help for input format] --taxon TAXON --s3_input_path s3://input-bucket/path/to/sample/folders --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
 | Align using STAR and htseq (slow) | ```evros alignment.run_star_and_htseq [see --help for input format] --taxon [see --help for options] --num_partitions NUM_PARTITIONS --partition_id PARTITION_ID --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
 | Align using STAR and htseq (fast) | ```aws_star [see --help for input format] --taxon TAXON --num_partitions NUM_PARTITIONS --s3_input_path s3://input-bucket/path/to/sample/folders --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
-| Run Velocyto | ```aws_velocyto [see --help for taxon] [# partitions] --s3_input_path s3://input-bucket/path/to/star_output --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to run velocyto on STAR output |
+| Run Velocyto for smartseq2 data aligned with STAR (slow) | ```evros velocyto.run_velocyto_star [see --help for input format] --taxon [see --help for options] --s3_input_path s3://input-bucket/path/to/one-sample-folder-of-star-alignment-results --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
+| Run Velocyto for smartseq2 data aligned with STAR (fast) | ```aws_velocyto [see --help for taxon] [# partitions] --s3_input_path s3://input-bucket/path/to/sample-folders-of-star-alignment-results --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to run velocyto on STAR output |
 | Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czb-seqbot` bucket |
 
 
@@ -121,7 +122,7 @@ Scripts are located inside this repository. Scripts are referred to using *Pytho
 
 If the script defines a function named `get_default_requirements` it will call that function to set instance requirements for your job, so you do not need to specify them.
 
-If you write custom scripts that follow these conventions, `evros` will be able to run them. A template script is included as an example. To run custom scripts, use the `--branch` option. First, create a new branch of the repo, then write your script (or modify an existing one). Once you've committed your changes, push them back to this repo. The batch job will run `git checkout [branch]` at runtime.
+If you write custom scripts that follow these conventions, `evros` will be able to run them. A template script is included as an example. To run custom scripts, use the `--branch` option. First, create a new branch of the repo, then write your script (or modify an existing one). Once you've committed your changes, push them back to this repo. You can't launch jobs with local scripts. The batch job will run `git checkout [branch]` at runtime.
 
 
 ```zsh
@@ -159,11 +160,11 @@ If you want to stick the results somewhere other than czb-seqbot/fastqs, you can
 
 #### How to choose the right genome (--taxon argument in running the alignment job):
 
-To choose the right genome as the --taxon input, first decide on the species of the sample, then select from the genomes of that species.
-The following is our reference_genomes dictionary, with input argument in alignment jobs as keys, and genome name as values:
+To choose the right genome as the --taxon input, first decide on the species of the sample as well as the technology used for alignment jobs, then select from the reference genomes of that species.
+The following is the 10X_reference_genomes dictionary used in cellranger alignment jobs of 10X data, with input argument in alignment jobs as keys, and reference genome name in S3 bucket as values:
 
 ```zsh
-reference_genomes = {
+10X_reference_genomes = {
     "homo": "HG38-PLUS",
     "hg38-plus": "HG38-PLUS",
     "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
@@ -180,8 +181,8 @@ reference_genomes = {
 }
 ```  
 
-The genomes above span four species: human, mouse, mouse lemur, and zebrafish.
-Human genomes are shown below:
+The genomes above span four species: human, mouse, mouse lemur, and zebrafish. Cellranger reference genomes are built according to the [cellranger reference building instruction](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_mr#mkrefsetup), taking fasta and gtf files as inputs. Some of the reference genomes are directly available online, and others need to be built from fasta and gtf files. The following sections explain how to find these.
+We start with human genomes:
 ```zsh
 human_genomes = {
     "homo": "HG38-PLUS"
@@ -210,6 +211,8 @@ Again, the first and fourth keys are deprecated. "mm10-plus" is now the key to g
 To wrap up human and mouse sections, `"[hg19-mm10-3.0.0": "hg19-mm10-3.0.0](https://support.10xgenomics.com/single-cell-gene-expression/software/release-notes/build#hg19mm10_3.0.0)"` is the human and mouse genome, downloadable also on 10X Genomics website.
 
 Now we have two genomes left. "danio_rerio_plus_STAR2.6.1d" is the danio rerio (zebrafish) genome taken from [Ensembl](https://uswest.ensembl.org/Danio_rerio/Info/Index). "MicMur3-PLUS" is the mouse lemur genome taken from [Ensembl](https://uswest.ensembl.org/Microcebus_murinus/Info/Index), and you can browse the genome on the website of [UCSC](http://genome-preview.cse.ucsc.edu/cgi-bin/hgTracks?db=micMur3&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr17%3A30720951%2D30776185&hgsid=394238320_4HFkLIDhzsNba96BNgHUlsvY5Ldc).
+
+Similar rules are applied to reference genomes used in STAR and htseq alignment jobs of smartseq2 data.
 
 After selecting a proper genome, you can go ahead running the alignment job.
 
@@ -391,3 +394,14 @@ To fix the error, try installing aegea version 2.6.9 which is compatible with th
 ```zsh
 (utilities-env) ➜ pip install aegea==2.6.9
 ```
+### Evros script help argument error
+
+If you run a script with `evros`, you'll see an error in the following format when you input `-h` or `--help` for help message of the script:
+
+```zsh
+(utilities-env) ➜ evros [module_name].[script_name] -h
+[date] [time] - utilities.scripts.evros - ERROR - [module_name].[script_name] failed with the given arg string
+        ['-h']
+```
+
+This doesn't hurt in any way. The reason it's reported as an error is because `-h` or `--help` can't be parsed into the command line required by the script. Although using `-h` or `--help` is totally fine for script instructions, using `python -m utilities.[module_name].[script_name] -h` can get help message without an error reported.

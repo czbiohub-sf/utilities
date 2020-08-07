@@ -32,7 +32,9 @@ CURR_MIN_VER = datetime.datetime(2017, 3, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=16, memory=64000, storage=500, ecr_image="rna_velocity")
+    return argparse.Namespace(
+        vcpus=16, memory=64000, storage=500, ecr_image="rna_velocity"
+    )
 
 
 def get_parser():
@@ -264,13 +266,12 @@ def main(logger):
             str(genome_dir),
             str(metadata_dir),
         ]
-        fastq_names = [fastqs_key_to_name[key] for key in sample_name_to_fastq_keys[sample]]
-        fastq_dirs = [
-            str(fastq_dir / fastq)
-            for fastq in fastq_names
+        fastq_names = [
+            fastqs_key_to_name[key] for key in sample_name_to_fastq_keys[sample]
         ]
+        fastq_dirs = [str(fastq_dir / fastq) for fastq in fastq_names]
         command += fastq_dirs
-        print(command) # for testing purpose
+        print(command)  # for testing purpose
 
         failed = ut_log.log_command(
             logger,

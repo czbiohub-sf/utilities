@@ -18,7 +18,7 @@ CURR_MIN_VER = datetime.datetime(2018, 10, 1, tzinfo=datetime.timezone.utc)
 
 
 def get_default_requirements():
-    return argparse.Namespace(vcpus=2, memory=64000, storage=500, ecr_image="rna_velocity")
+    return argparse.Namespace(vcpus=2, memory=64000, storage=500, ecr_image="velocyto")
 
 
 def get_parser():
@@ -38,7 +38,7 @@ def get_parser():
         "--taxon",
         required=True,
         choices=("hg38-plus", "mm10-plus"),
-        help="Reference genome for the velocyto run on smartseq2 data aligned with STAR",
+        help="Reference genome for the velocyto run on smartseq2 data aligned with STAR. Choose the same genome used in the alignment job.",
     )
 
     requiredNamed.add_argument(
@@ -56,15 +56,17 @@ def get_parser():
         type=int,
         required=True,
         default=10,
-        help="Number of velocyto jobs to launch on the STAR "
-        "alignment outputs"
+        help="Number of velocyto jobs to launch on the STAR " "alignment outputs",
     )
-    
+
     requiredNamed.add_argument(
-        "--partition_id",
-        type=int,
+        "--partition_id", type=int, required=True, help="Index of velocyto job group",
+    )
+    requiredNamed.add_argument(
+        "--input_dirs",
+        nargs="+",
         required=True,
-        help="Index of velocyto job group",
+        help="List of input folders to process",
     )
 
     # optional arguments
@@ -190,7 +192,8 @@ def main(logger):
                     gtf_file:\t{gtf_file}
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
-                s3_input_path:\t{args.s3_input_path}"""
+                s3_input_path:\t{args.s3_input_path}
+                input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
@@ -207,70 +210,89 @@ def main(logger):
 
     s3_output_bucket, s3_output_prefix = s3u.s3_bucket_and_key(args.s3_output_path)
 
-    # Check the output folder for existing runs
-    logger.info(
-    "Running partition {} of {} for {}".format(
-        args.partition_id, args.num_partitions, args.s3_input_path
-    ))
-    
-    if not args.force_redo:
-        output = s3u.prefix_gen(s3_output_bucket, s3_output_prefix, lambda r: (r["LastModified"], r["Key"]))
-    else:
-        output = []
+    for input_dir in args.input_dirs:
+        logger.info(
+            "Running partition {} of {} for {}".format(
+                args.partition_id, args.num_partitions, input_dir
+            )
+        )
 
-    output_files = {
-        os.path.basename(fn).split(".")[0]
-        for dt, fn in output
-        if fn.endswith(".loom") and dt > CURR_MIN_VER
-    }
+        # Check the output folder for existing runs
+        if not args.force_redo:
+            output = s3u.prefix_gen(
+                s3_output_bucket,
+                s3_output_prefix,
+                lambda r: (r["LastModified"], r["Key"]),
+            )
+        else:
+            output = []
 
-    # STAR alignment result files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
-    if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
-        print('plain', list(s3u.get_files(s3_input_bucket, s3_input_prefix))) # testing
-        sample_files = [
-            fn
-            for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
-            if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
-        ]
-    else:
-        print('sub-folders', list(s3u.get_files(s3_input_bucket, s3_input_prefix))) # testing
-        sample_folder_paths = s3u.get_folders(s3_input_bucket, s3_input_prefix + "/")
-        sample_files = []
-        for sample in sample_folder_paths:
+        output_files = {
+            os.path.basename(fn).split(".")[0]
+            for dt, fn in output
+            if fn.endswith(".loom") and dt > CURR_MIN_VER
+        }
+
+        # STAR alignment result files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
+        if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
+            print(
+                "plain", list(s3u.get_files(s3_input_bucket, s3_input_prefix))
+            )  # testing
             sample_files = [
                 fn
-                for fn in s3u.get_files(s3_input_bucket, s3_input_prefix)
+                for fn in s3u.get_files(
+                    s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+                )
                 if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
             ]
-            sample_files += files
+        else:
+            print(
+                "sub-folders", list(s3u.get_files(s3_input_bucket, s3_input_prefix))
+            )  # testing
+            sample_folder_paths = s3u.get_folders(
+                s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+            )
+            for folder in sample_folder_paths:
+                if not folder.endswith("/"):
+                    folder += "/"
+            sample_files = []
+            for sample in sample_folder_paths:
+                sample_files = [
+                    fn
+                    for fn in s3u.get_files(
+                        s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+                    )
+                    if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+                ]
+                sample_files += files
 
-    # Run velocyto on the alignment results of specific plates if specified. Otherwise run velocyto on all input alignment results
-    plate_samples = []
+        # Run velocyto on the alignment results of specific plates if specified. Otherwise run velocyto on all input alignment results
+        plate_samples = []
 
-    for fn in sample_files:
-        matched = sample_re.search(os.path.basename(fn))
-        if matched.group(1) not in output_files:
-            if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
-                plate_samples.append(fn)
+        for fn in sample_files:
+            matched = sample_re.search(os.path.basename(fn))
+            if matched.group(1) not in output_files:
+                if len(plate_set) == 0 or matched.group(1).split("_")[1] in plate_set:
+                    plate_samples.append(fn)
 
-    logger.info(f"number of bam files: {len(plate_samples)}")
+        logger.info(f"number of bam files: {len(plate_samples)}")
 
-    for sample_name in sorted(plate_samples)[
+        for sample_name in sorted(plate_samples)[
             args.partition_id :: args.num_partitions
         ]:
-        run_sample(
-            sample_name,
-            mask_path,
-            gtf_path,
-            s3_input_bucket,
-            s3_output_bucket,
-            s3_output_prefix,
-            run_dir,
-            logger,
-        )
-        time.sleep(30)
+            run_sample(
+                sample_name,
+                mask_path,
+                gtf_path,
+                s3_input_bucket,
+                s3_output_bucket,
+                os.path.join(s3_output_prefix, input_dir),
+                run_dir,
+                logger,
+            )
+            time.sleep(30)
 
-    logger.info("Job completed")
+        logger.info("Job completed")
 
 
 if __name__ == "__main__":

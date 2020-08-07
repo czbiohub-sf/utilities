@@ -252,9 +252,7 @@ def main(logger):
         "sync",
         "--no-progress",
         os.path.join(result_path, sample_id, "outs"),
-        posixpath.join(
-            args.s3_output_path, sample_name.rsplit("_", 2)[0]
-        ),
+        posixpath.join(args.s3_output_path, sample_name.rsplit("_", 2)[0]),
     ]
     for i in range(S3_RETRY):
         if not log_command(logger, command, shell=True):
