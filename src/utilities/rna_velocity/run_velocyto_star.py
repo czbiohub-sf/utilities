@@ -8,6 +8,7 @@ import time
 
 import utilities.log_util as ut_log
 import utilities.s3_util as s3u
+from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
 
 import boto3
 from boto3.s3.transfer import TransferConfig
@@ -21,26 +22,58 @@ def get_default_requirements():
 
 
 def get_parser():
+    """ Construct and return the ArgumentParser object that parses input command.
+    """
+
     parser = argparse.ArgumentParser(
-        prog="velocyto.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        prog="velocyto.py",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Run expression dynamics (RNA velocity) analysis on smartseq2 data aligned with STAR for a sample folder",
     )
 
-    parser.add_argument("--taxon", choices=("homo", "mus"), required=True)
+    # required arguments
+    requiredNamed = parser.add_argument_group("required arguments")
 
-    parser.add_argument(
-        "--s3_input_path", required=True, help="Location of input folders"
+    requiredNamed.add_argument(
+        "--taxon",
+        required=True,
+        choices=("hg38-plus", "mm10-plus"),
+        help="Reference genome for the velocyto run on smartseq2 data aligned with STAR. Choose the same genome used in the alignment job.",
     )
-    parser.add_argument("--s3_output_path", required=True, help="Location for output")
 
-    parser.add_argument("--num_partitions", type=int, required=True)
-    parser.add_argument("--partition_id", type=int, required=True)
-    parser.add_argument(
+    requiredNamed.add_argument(
+        "--s3_input_path",
+        required=True,
+        help="Location of input files (STAR alignment results of multiple samples)",
+    )
+
+    requiredNamed.add_argument(
+        "--s3_output_path", required=True, help="Location for output",
+    )
+
+    requiredNamed.add_argument(
+        "--num_partitions",
+        type=int,
+        required=True,
+        default=10,
+        help="Number of velocyto jobs to launch on the STAR " "alignment outputs",
+    )
+
+    requiredNamed.add_argument(
+        "--partition_id", type=int, required=True, help="Index of velocyto job group",
+    )
+    requiredNamed.add_argument(
         "--input_dirs",
         nargs="+",
         required=True,
         help="List of input folders to process",
     )
-    parser.add_argument("--plates", nargs="*", default=(), help="List of plates to run")
+
+    # optional arguments
+    parser.add_argument(
+        "--plates", nargs="*", default=(), help="List of plates to run",
+    )
+
     parser.add_argument(
         "--force_redo",
         action="store_true",
@@ -60,6 +93,18 @@ def run_sample(
     run_dir,
     logger,
 ):
+    """ Run RNA velocity analysis with Velocyto on smartseq2 data aligned with STAR.
+
+        sample_key - Sample alignment result file name that ends with ".bam"
+        mask_path - .gtf file containing intervals to mask (i.e. genes not considered for RNA velocity analysis)
+        gtf_path - Path to the .gtf file used for velocyto run
+        s3_input_bucket - Name of the bucket with smartseq2 alignment results
+        s3_output_bucket - Name of the bucket to store smartseq2 velocyto results
+        s3_output_prefix - Pathname under the output bucket to store smartseq2 velocyto results
+        run_dir - Path local to the machine on EC2 under which alignment results
+                  are stored before uploaded to S3
+        logger - Logger object that exposes the interface the code directly uses
+    """
 
     t_config = TransferConfig(num_download_attempts=25)
 
@@ -111,6 +156,11 @@ def run_sample(
 
 
 def main(logger):
+    """ Download reference genome, run velocyto jobs, and upload results to S3.
+
+        logger - Logger object that exposes the interface the code directly uses
+    """
+
     parser = get_parser()
 
     args = parser.parse_args()
@@ -126,11 +176,11 @@ def main(logger):
     os.mkdir(os.path.join(run_dir, "reference"))
     os.mkdir(os.path.join(run_dir, "input"))
 
-    if args.taxon == "homo":
-        gtf_file = "HG38-PLUS.gtf"
+    if args.taxon == "hg38-plus":
+        gtf_file = f"{reference_genomes[args.taxon]}.gtf"
         mask_file = "hg38_rmsk.gtf"
-    elif args.taxon == "mus":
-        gtf_file = "MM10-PLUS.gtf"
+    elif args.taxon == "mm10-plus":
+        gtf_file = f"{reference_genomes[args.taxon]}.gtf"
         mask_file = "mm10_rmsk.gtf"
     else:
         raise ValueError("Invalid taxon {}".format(args.taxon))
@@ -139,11 +189,11 @@ def main(logger):
 
     logger.info(
         f"""Run Info: partition {args.partition_id} out of {args.num_partitions}
-                     gtf_file:\t{gtf_file}
+                    gtf_file:\t{gtf_file}
                     mask_file:\t{mask_file}
                         taxon:\t{args.taxon}
                 s3_input_path:\t{args.s3_input_path}
-                   input_dirs:\t{', '.join(args.input_dirs)}"""
+                input_dirs:\t{', '.join(args.input_dirs)}"""
     )
 
     gtf_path = os.path.join(run_dir, "reference", gtf_file)
@@ -151,7 +201,7 @@ def main(logger):
     s3u.download_files(
         [f"velocyto/{gtf_file}", f"velocyto/{mask_file}"],
         [gtf_path, mask_path],
-        b="czbiohub-reference",
+        bucket="czbiohub-reference",
         n_proc=2,
     )
 
@@ -183,14 +233,40 @@ def main(logger):
             if fn.endswith(".loom") and dt > CURR_MIN_VER
         }
 
-        sample_files = [
-            fn
-            for fn in s3u.get_files(
+        # STAR alignment result files are either stored directly under the s3 input folder, or in sample sub-folders under the s3 input foloder
+        if list(s3u.get_files(s3_input_bucket, s3_input_prefix)):
+            print(
+                "plain", list(s3u.get_files(s3_input_bucket, s3_input_prefix))
+            )  # testing
+            sample_files = [
+                fn
+                for fn in s3u.get_files(
+                    s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+                )
+                if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+            ]
+        else:
+            print(
+                "sub-folders", list(s3u.get_files(s3_input_bucket, s3_input_prefix))
+            )  # testing
+            sample_folder_paths = s3u.get_folders(
                 s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
             )
-            if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
-        ]
+            for folder in sample_folder_paths:
+                if not folder.endswith("/"):
+                    folder += "/"
+            sample_files = []
+            for sample in sample_folder_paths:
+                sample_files = [
+                    fn
+                    for fn in s3u.get_files(
+                        s3_input_bucket, os.path.join(s3_input_prefix, input_dir)
+                    )
+                    if fn.endswith(f"{args.taxon}.Aligned.out.sorted.bam")
+                ]
+                sample_files += files
 
+        # Run velocyto on the alignment results of specific plates if specified. Otherwise run velocyto on all input alignment results
         plate_samples = []
 
         for fn in sample_files:
@@ -216,7 +292,7 @@ def main(logger):
             )
             time.sleep(30)
 
-    logger.info("Job completed")
+        logger.info("Job completed")
 
 
 if __name__ == "__main__":

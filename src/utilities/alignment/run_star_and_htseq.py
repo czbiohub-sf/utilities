@@ -122,6 +122,7 @@ def get_parser():
         "into for the alignment run. Enter 10 as the default "
         "value here since we don't divide a single sample",
     )
+
     requiredNamed.add_argument(
         "--partition_id",
         type=int,
