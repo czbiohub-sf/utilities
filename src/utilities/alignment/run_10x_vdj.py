@@ -32,6 +32,8 @@ reference_genomes = {
     "gencode.vM19": "gencode.vM19",
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
+
+    "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0.tar.gz",
 }
 deprecated = {
     "homo": "hg38-plus",
@@ -221,11 +223,11 @@ def main(logger):
     os.chdir(result_path)
     command = [
         CELLRANGER,
-        "count",
+        "vdj",
         "--localmem=240",
         "--nosecondary",
         "--disable-ui",
-        f"--expect-cells={args.cell_count}",
+        # f"--expect-cells={args.cell_count}",
         f"--id={sample_id}",
         f"--fastqs={fastq_path}",
         f"--transcriptome={genome_dir}",
