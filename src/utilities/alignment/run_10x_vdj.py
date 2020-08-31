@@ -225,12 +225,12 @@ def main(logger):
         CELLRANGER,
         "vdj",
         "--localmem=240",
-        "--nosecondary",
-        "--disable-ui",
+        # "--nosecondary",
+        # "--disable-ui",
         # f"--expect-cells={args.cell_count}",
         f"--id={sample_id}",
         f"--fastqs={fastq_path}",
-        f"--transcriptome={genome_dir}",
+        f"--reference={genome_dir}",
     ]
     if args.dobby:
         command.append(f"--sample={sample_name}")
@@ -245,7 +245,7 @@ def main(logger):
     )
 
     if failed:
-        raise RuntimeError("cellranger count failed")
+        raise RuntimeError("cellranger vdj failed")
 
     # Move outs folder to S3
     command = [
