@@ -33,7 +33,7 @@ reference_genomes = {
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
 
-    "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0.tar.gz",
+    "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
 }
 deprecated = {
     "homo": "hg38-plus",
