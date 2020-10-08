@@ -19,25 +19,7 @@ S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 
 # valid and deprecated reference genomes
 reference_genomes = {
-    "homo": "HG38-PLUS",
-    "hg38-plus": "HG38-PLUS",
-    "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
-    "mus": "MM10-PLUS",
-    "mm10-plus": "MM10-PLUS",
-    "mm10-1.2.0": "mm10-1.2.0",
-    "mus-premrna": "mm10-1.2.0-premrna",
-    "mm10-1.2.0-premrna": "mm10-1.2.0-premrna",
-    "hg19-mm10-3.0.0": "hg19-mm10-3.0.0",
-    "microcebus": "MicMur3-PLUS",
-    "gencode.vM19": "gencode.vM19",
-    "GRCh38_premrna": "GRCh38_premrna",
-    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
-}
-deprecated = {
-    "homo": "hg38-plus",
-    "mus": "mm10-plus",
-    "mus-premrna": "mm10-1.2.0-premrna",
 }
 
 # other helpful constants
@@ -157,12 +139,6 @@ def main(logger):
 
     # check if the input genome and region are valid
     if args.taxon in reference_genomes:
-        if args.taxon in deprecated:
-            logger.warn(
-                f"The name '{args.taxon}' will be removed in the future,"
-                f" start using '{deprecated[args.taxon]}'"
-            )
-
         genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
