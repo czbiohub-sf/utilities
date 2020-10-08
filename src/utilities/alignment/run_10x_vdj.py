@@ -38,7 +38,7 @@ def get_parser():
     """
 
     parser = argparse.ArgumentParser(
-        prog="run_10x_count.py",
+        prog="run_10x_vdj.py",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description="Run alignment jobs using 10x",
     )
