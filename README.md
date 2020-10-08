@@ -180,6 +180,7 @@ The following is the 10X_reference_genomes dictionary used in cellranger alignme
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
+    "gencode_human_mouse_MTB": "gencode_human_mouse_MTB",
 }
 ```  
 
