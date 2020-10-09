@@ -33,8 +33,10 @@ reference_genomes = {
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "gencode_human_mouse_MTB": "gencode_human_mouse_MTB",
-    "SARS.GRCh38_genome": "SARS.GRCh38_genome"
+    "SARS.GRCh38_genome": "SARS.GRCh38_genome",
+    "homo.gencode.v30.ERCC.chrM.sarsCov2":"homo.gencode.v30.annotation.ERCC92_and_sars.cov2.wa1.tgz",
 }
+
 deprecated = {
     "homo": "hg38-plus",
     "mus": "mm10-plus",
