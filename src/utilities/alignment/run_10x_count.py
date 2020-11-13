@@ -103,9 +103,9 @@ def get_parser():
     parser.add_argument("--cell_count", type=int, default=3000)
 
     parser.add_argument(
-        "--dobby",
+        "--legacy",
         action="store_true",
-        help="Use if 10x run was demuxed locally (post November 2019)",
+        help="Use if 10x run was not demuxed locally (pre November 2019)",
     )
 
     parser.add_argument(
@@ -146,10 +146,10 @@ def main(logger):
 
     sample_id = os.path.basename(args.s3_input_path)
     result_path = args.root_dir / "data" / sample_id
-    if args.dobby:
-        fastq_path = result_path
-    else:
+    if args.legacy:
         fastq_path = result_path / "fastqs"
+    else:
+        fastq_path = result_path
     fastq_path.mkdir(parents=True)
 
     genome_base_dir = args.root_dir / "genome" / "cellranger"
@@ -230,9 +230,8 @@ def main(logger):
         f"--id={sample_id}",
         f"--fastqs={fastq_path}",
         f"--transcriptome={genome_dir}",
+        f"--sample={sample_name}",
     ]
-    if args.dobby:
-        command.append(f"--sample={sample_name}")
 
     failed = log_command(
         logger,

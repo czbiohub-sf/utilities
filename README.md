@@ -26,7 +26,7 @@ Create a conda environment called `utilities-env` specific to this Python packag
 
 ```zsh
 # Create an environment called `utilities-env` with Python and pip
-➜  conda create --name utilities-env python=3.6 pip
+➜  conda create --name utilities-env python=3
 ➜  source activate utilities-env
 (utilities-env) ➜
 ```
