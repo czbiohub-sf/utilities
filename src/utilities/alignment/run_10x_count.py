@@ -36,6 +36,7 @@ reference_genomes = {
     "gencode_human_mouse_MTB_old_version" : "gencode_human_mouse_MTB_old_version",
     "SARS.GRCh38_genome": "SARS.GRCh38_genome",
     "homo.gencode.v30.ERCC.chrM.sarsCov2":"homo.gencode.v30.annotation.ERCC92_and_sars.cov2.wa1",
+    "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
 }
 
 deprecated = {
