@@ -8,6 +8,7 @@ import sys
 import subprocess
 import tarfile
 import posixpath
+import re
 
 from utilities.log_util import get_logger, log_command
 
@@ -214,7 +215,7 @@ def main(logger):
 
     # check the input folder for existing runs
     sample_name = {
-        os.path.basename(fn).rsplit("_", 4)[0] for fn in fastq_path.glob("*fastq.gz")
+        re.split("_S\d+_.*.fastq.gz", os.path.basename(fn))[0] for fn in fastq_path.glob("*fastq.gz")
     }
     assert len(sample_name) == 1, "Should only have one sample name to process"
     sample_name = sample_name.pop()
