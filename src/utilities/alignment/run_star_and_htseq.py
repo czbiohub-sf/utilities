@@ -31,6 +31,7 @@ reference_genomes = {
     "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "homo.gencode.v30-plus-HAV18": "gencode.v30.annotation.ERCC92.HAV_18f_KP879216",
+    "gencode_mouse_MTB": "gencode_mouse_MTB"
 }
 deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
 
