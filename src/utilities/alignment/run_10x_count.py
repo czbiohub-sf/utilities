@@ -34,7 +34,8 @@ reference_genomes = {
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "botryllus": "botryllus",
-    "zebrabow" : "Danio.rerio_ZebraBow_genome"
+    "zebrabow" : "Danio.rerio_ZebraBow_genome",
+    "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
 }
 deprecated = {
     "homo": "hg38-plus",
