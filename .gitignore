@@ -102,3 +102,9 @@ ENV/
 
 # DS_Store
 .DS_Store
+
+# Pycharm
+.idea/*
+
+# VsCode
+.vscode/settings.json
