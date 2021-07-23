@@ -108,3 +108,6 @@ ENV/
 
 # VsCode
 .vscode/settings.json
+
+# Cellranger ARC
+multiomics/cellranger-arc-2.0.0.tar.gz
