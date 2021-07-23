@@ -1,7 +1,7 @@
 import numpy as np
 
 def q(x):
-    return npaarray(list(x))
+    return np.array(list(x))
 
 def subsample(adata,clname1,clname2=None,nc=10000,MIN=15):
     """
