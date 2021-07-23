@@ -72,5 +72,7 @@ def subsample(adata,clname1,clname2=None,nc=10000,MIN=15,exclude=[],verbose=Fals
                 CELLS.append(np.random.choice(xx,replace=False,size = min(xx.size,min(MIN,obsnc.size) - z)))
     CELLS=np.concatenate(CELLS)
     assert np.unique(CELLS,return_counts=True)[1].max()==1
+    print('Downsampled to',CELLS.size,'cells',end='\033[1\ ')
+    
     CELLS = q(adata.obs_names)[np.in1d(q(adata.obs_names),CELLS)]
     return adata[CELLS].copy()
