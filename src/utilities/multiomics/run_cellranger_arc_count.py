@@ -87,21 +87,26 @@ def main(logger):
     result_path = args.root_dir / "data" / run_id
     result_path.mkdir(parents=True)
 
+    orignial_libraries_path = data_dir / "original_libraries.csv"
     libraries_path = data_dir / "libraries.csv"
 
     genome_dir = args.root_dir / "genome" / "reference"
     genome_dir.mkdir(parents=True)
 
+    s3_cp(logger, args.s3_libraries_csv_path, str(orignial_libraries_path))
+
     ref_path = download_cellranger_reference(args.taxon, genome_dir, logger)
 
-    with open(args.s3_libraries_csv_path, newline='') as csvfile, \
+    with open(orignial_libraries_path, newline='') as csvfile, \
          open(libraries_path, 'w') as new_csv:
         headers = next(csvfile)
         new_csv.write(f"{headers}")
 
         for row in csv.reader(csvfile):
             s3_path_of_fastqs = row[0]
-            local_path = data_dir / posixpath.basename(s3_path_of_fastqs)
+            sample_id = row[1]
+            method = row[-1].replace(" ", "_")
+            local_path = data_dir / posixpath.basename(s3_path_of_fastqs) / sample_id / method
             s3_sync(logger, s3_path_of_fastqs, str(local_path))
             row[0] = str(local_path)
             row_values = ",".join(row)
@@ -153,6 +158,22 @@ def s3_sync(logger, input, output):
     else:
         raise RuntimeError(f"couldn't sync output")
 
+    
+def s3_cp(logger, input, output):
+    command = [
+        "aws",
+        "s3",
+        "cp",
+        input,
+        output,
+    ]
+    for _ in range(S3_RETRY):
+        if not log_command(logger, command, shell=True):
+            break
+        logger.info(f"retrying cp")
+    else:
+        raise RuntimeError(f"couldn't cp output")
+    
 
 if __name__ == "__main__":
     mainlogger, log_file, file_handler = get_logger(__name__)

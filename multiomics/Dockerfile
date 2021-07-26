@@ -10,9 +10,10 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 RUN cd /opt && tar xvf cellranger-arc-2.0.0.tar.gz && rm cellranger-arc-2.0.0.tar.gz
 
-RUN cd /opt && git clone https://github.com/czbiohub/utilities.git
-
-RUN cd /opt/utilities && git checkout neevor/cellrangerarc
+RUN cd /opt && \
+    git clone https://github.com/czbiohub/utilities.git && \
+    cd /opt/utilities && \
+    git checkout neevor/cellrangerarc
 
 WORKDIR /opt
 
