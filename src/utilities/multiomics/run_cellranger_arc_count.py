@@ -15,7 +15,7 @@ from utilities.references import (
 
 
 # other helpful constants
-CELLRANGER = "cellranger-arc"
+CELLRANGER = "/bin/cellranger-arc"
 S3_RETRY = 5
 
 
@@ -176,5 +176,6 @@ def s3_cp(logger, input, output):
     
 
 if __name__ == "__main__":
+    print("Starting job processing")
     mainlogger, log_file, file_handler = get_logger(__name__)
     main(mainlogger)

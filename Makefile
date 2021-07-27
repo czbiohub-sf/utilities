@@ -7,6 +7,8 @@ build-multiomics-docker: multiomics/cellranger-arc-2.0.0.tar.gz
 	cd multiomics && \
 	docker build . --no-cache -t multiomics:latest
 
-push-multiomics-docker: build-multiomics-docker
+push-multiomics-docker:
 	docker tag multiomics:latest $(MULTIOMICS_ECR):latest
 	docker push $(MULTIOMICS_ECR)
+
+release-multiomics-docker: build-multiomics-docker push-multiomics-docker
