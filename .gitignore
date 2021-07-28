@@ -111,3 +111,4 @@ ENV/
 
 # Cellranger ARC
 multiomics/cellranger-arc-2.0.0.tar.gz
+multiomics/cellranger-6.0.2.tar.gz

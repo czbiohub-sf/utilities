@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import csv
 import os
 import pathlib
 import subprocess
@@ -9,6 +8,7 @@ import posixpath
 
 from utilities.log_util import get_logger, log_command
 from utilities.multiomics.common import (
+    get_base_parser,
     get_default_requirements,
     process_libraries_file
 )
@@ -19,45 +19,28 @@ from utilities.references import (
 from utilities.s3_util import s3_cp, s3_sync
 
 
-CELLRANGER = "/bin/cellranger-arc"  # NOTE(neevor): I'm not very happy to have to have the /bin so I would like to be able to get rid of it.
+CELLRANGER = "/bin/cellranger"  # NOTE(neevor): I'm not very happy to have to have the /bin so I would like to be able to get rid of it.
 get_default_requirements = get_default_requirements
+
 
 def get_parser():
     """ Construct and return the ArgumentParser object that parses input command.
     """
 
-    parser = argparse.ArgumentParser(
-        prog="run_cellranger_arc_count.py",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description="Run counts using cellranger arc",
+    parser = get_base_parser(prog="run_cellranger_cite_seq.py",
+                             description="Run cite-seq using cellranger count")
+
+    parser.add_argument(
+        "--s3_feature_ref_path",
+        required=True,
+        help="The s3 path of the feature reference csv",
     )
 
     parser.add_argument(
-        "--taxon",
-        required=True,
-        choices=list(reference_genomes.keys()),
-        help="Reference genome for the alignment run",
+        "--expect_cells",
+        default=3000,
+        help="Expected number of cells",
     )
-
-    parser.add_argument(
-        "--run_id",
-        required=True,
-        help="Name of the folder to write results to"
-    )
-
-    parser.add_argument(
-        "--s3_libraries_csv_path",
-        required=True,
-        help="The csv with the s3 paths and metadata needed for cellranger arc count"
-    )
-
-    parser.add_argument(
-        "--s3_output_path",
-        required=True,
-        help="The folder to store the alignment results",
-    )
-
-    parser.add_argument("--root_dir", default="/mnt")
 
     return parser
 
@@ -71,26 +54,27 @@ def main(logger):
     parser = get_parser()
     args = parser.parse_args()
 
-    args.root_dir = pathlib.Path(args.root_dir)
-
-    run_id = args.run_id
+    root_dir = pathlib.Path(args.root_dir)
 
     if os.environ.get("AWS_BATCH_JOB_ID"):
-        args.root_dir = args.root_dir / os.environ["AWS_BATCH_JOB_ID"]
+        root_dir = root_dir / os.environ["AWS_BATCH_JOB_ID"]
 
-    data_dir = args.root_dir / "data"
+    data_dir = root_dir / "data"
     data_dir.mkdir(parents=True)
 
-    result_path = args.root_dir / "data" / run_id
+    result_path = root_dir / "data" / args.run_id
     result_path.mkdir(parents=True)
 
     original_libraries_path = data_dir / "original_libraries.csv"
     libraries_path = data_dir / "libraries.csv"
 
-    genome_dir = args.root_dir / "genome" / "reference"
+    genome_dir = root_dir / "genome" / "reference"
     genome_dir.mkdir(parents=True)
 
+    feature_ref = result_path / "feature_ref.csv"
+
     s3_cp(logger, args.s3_libraries_csv_path, str(original_libraries_path))
+    s3_cp(logger, args.s3_feature_ref_path, str(feature_ref))
 
     ref_path = download_cellranger_reference(args.taxon, genome_dir, logger)
 
@@ -101,9 +85,11 @@ def main(logger):
     command = [
         CELLRANGER,
         "count",
-        f"--id={run_id}",
-        f"--reference={ref_path}",
+        f"--id={args.run_id}",
+        f"--transcriptome={ref_path}",
         f"--libraries={libraries_path}",
+        f"--feature-ref={feature_ref}",
+        f"--expect-cells={args.expect_cells}",
         "--localmem=256",
         "--localcores=64",
     ]
@@ -120,8 +106,8 @@ def main(logger):
     if failed:
         raise RuntimeError("cellranger-arc count failed")
 
-    local_output_path = posixpath.join(result_path, run_id, "outs")
-    s3_output_path = posixpath.join(args.s3_output_path, run_id)
+    local_output_path = posixpath.join(result_path, args.run_id, "outs")
+    s3_output_path = posixpath.join(args.s3_output_path, args.run_id)
 
     s3_sync(logger, local_output_path, s3_output_path)
 

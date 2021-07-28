@@ -6,10 +6,13 @@ from concurrent.futures import ProcessPoolExecutor
 import boto3
 from boto3.s3.transfer import TransferConfig
 
+from utilities.log_util import log_command
+
 
 s3c = boto3.client("s3")
 s3r = boto3.resource("s3")
 bucket_resource = s3r.Bucket("czbiohub-seqbot")
+S3_RETRY = 3
 
 
 # cribbed from https://github.com/chanzuckerberg/s3mi/blob/master/scripts/s3mi
@@ -169,3 +172,36 @@ def download_files(src_list, dest_list, *, bucket, force_download=False, n_proc=
                 chunksize=64,
             )
         )
+
+
+def s3_sync(logger, input, output, retries=S3_RETRY):
+    command = [
+        "aws",
+        "s3",
+        "sync",
+        "--no-progress",
+        input,
+        output,
+    ]
+    for _ in range(retries):
+        if not log_command(logger, command, shell=True):
+            break
+        logger.info(f"retrying sync")
+    else:
+        raise RuntimeError(f"couldn't sync output")
+
+
+def s3_cp(logger, input, output, retries=S3_RETRY):
+    command = [
+        "aws",
+        "s3",
+        "cp",
+        input,
+        output,
+    ]
+    for _ in range(retries):
+        if not log_command(logger, command, shell=True):
+            break
+        logger.info(f"retrying cp")
+    else:
+        raise RuntimeError(f"couldn't cp output")

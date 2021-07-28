@@ -23,6 +23,9 @@ reference_genomes = {
     "GRCh38premrna_and_SARSCoV2": "GRCh38premrna_and_SARSCoV2",
     "arc-GRCh38": "refdata-cellranger-arc-GRCh38-2020-A-2.0.0",
     "arc-mm10": "refdata-cellranger-arc-mm10-2020-A-2.0.0",
+    "gex-GRCh38": "refdata-gex-GRCh38-2020-A.tgz",
+    "gex-mm10": "refdata-gex-mm10-2020-A.tgz",
+    "gex-GRCh38-and-mm10": "refdata-gex-GRCh38-and-mm10-2020-A.tgz",
 }
 
 
