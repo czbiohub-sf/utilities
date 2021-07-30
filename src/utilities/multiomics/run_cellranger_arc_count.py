@@ -52,10 +52,10 @@ def main(logger):
     for library in args.s3_libraries_csv_path:
         library_base = posixpath.basename(library)
         library_results_path = paths["result_path"] / posixpath.basename(library)
+        library_results_path.mkdir(parents=True)
 
         original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
         libraries_path = paths["data_dir"] / library_base / "libraries.csv"
-        library_results_path = paths["result_path"] / posixpath.basename(library)
 
         s3_cp(
             logger,
