@@ -59,8 +59,8 @@ def main(logger):
 
         s3_cp(
             logger,
-            libraries_path,
-            original_libraries_path
+            library,
+            str(original_libraries_path)
         )
 
         process_libraries_file(
