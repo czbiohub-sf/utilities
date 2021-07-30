@@ -48,12 +48,25 @@ def main(logger):
     parser = get_parser()
     args = parser.parse_args()
 
+    if len(args.s3_libraries_csv_path) > 1:
+        raise ValueError("CITE-Seq processing only accepts one libraries.csv input.")
+    else:
+        args.s3_libraries_csv_path = args.s3_libraries_csv_path[0]
+
     run_id = args.run_id
 
     paths = prepare_and_return_base_data_paths(run_id,
                                                args,
                                                logger)
     paths["feature_ref"] = paths["result_path"] / "feature_ref.csv"
+    paths["original_libraries_path"] = paths["data_dir"] / "original_libraries.csv"
+    paths["libraries_path"] = paths["data_dir"] / "libraries.csv"
+    s3_cp(
+        logger,
+        args.s3_libraries_csv_path,
+        str(paths["original_libraries_path"])
+    )
+
     s3_cp(logger, args.s3_feature_ref_path, str(paths["feature_ref"]))
 
     process_libraries_file(paths["original_libraries_path"],

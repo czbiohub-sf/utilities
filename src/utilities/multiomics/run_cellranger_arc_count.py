@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import posixpath
+
+import pandas as pd
 
 from utilities.log_util import get_logger
 from utilities.multiomics.common import (
@@ -10,6 +13,7 @@ from utilities.multiomics.common import (
     process_libraries_file,
     process_results
 )
+from utilities.s3_util import s3_cp
 
 
 CELLRANGER = "/bin/cellranger-arc"  # NOTE(neevor): I'm not very happy to have to have the /bin so I would like to be able to get rid of it.
@@ -36,20 +40,64 @@ def main(logger):
     run_id = args.run_id
 
     paths = prepare_and_return_base_data_paths(run_id, args, logger)
+    paths["aggr_libraries_path"] = paths['data_dir'] / "aggr_libraries.csv"
 
-    process_libraries_file(paths["original_libraries_path"],
-                           paths["libraries_path"],
-                           paths["data_dir"],
-                           logger)
+    aggr_df = pd.DataFrame({
+        "library_id": [],
+        "atac_fragments": [],
+        "per_barcode_metrics": [],
+        "gex_molecule_info": []
+    })
 
-    # Run cellranger
+    for library in args.s3_libraries_csv_path:
+        library_base = posixpath.basename(library)
+        library_results_path = paths["result_path"] / posixpath.basename(library)
+
+        original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
+        libraries_path = paths["data_dir"] / library_base / "libraries.csv"
+        library_results_path = paths["result_path"] / posixpath.basename(library)
+
+        s3_cp(
+            logger,
+            libraries_path,
+            original_libraries_path
+        )
+
+        process_libraries_file(
+            original_libraries_path,
+            libraries_path,
+            paths["data_dir"],
+            logger
+        )
+
+        os.chdir(library_results_path)
+        command = [
+            CELLRANGER,
+            "count",
+            f"--id={run_id}",
+            f"--reference={paths['ref_path']}",
+            f"--libraries={libraries_path}",
+            "--localmem=256",
+            "--localcores=64",
+        ]
+
+        aggr_df.loc[len(aggr_df.index)] = [
+            library_base,
+            f"{library_results_path}/{run_id}/outs/atac_fragments.tsv.gz",
+            f"{library_results_path}/{run_id}/outs/per_barcode_metrics.csv",
+            f"{library_results_path}/{run_id}/outs/gex_molecule_info.h5"
+        ]
+
+    aggr_df.to_csv(str(paths["aggr_libraries_path"]), index=False)
+
     os.chdir(paths["result_path"])
     command = [
         CELLRANGER,
-        "count",
+        "aggr",
         f"--id={run_id}",
+        f"--csv={str(paths['aggr_libraries_path'])}",
         f"--reference={paths['ref_path']}",
-        f"--libraries={paths['libraries_path']}",
+        "--normalize=depth",
         "--localmem=256",
         "--localcores=64",
     ]
@@ -57,7 +105,7 @@ def main(logger):
     process_results(logger,
                     command,
                     paths,
-                    "cellranger-arc count failed")
+                    "cellranger-arc count and aggr failed")
 
 
 if __name__ == "__main__":

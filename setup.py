@@ -30,7 +30,7 @@ setuptools.setup(
     ],
     include_package_data=True,
     zip_safe=False,
-    install_requires=["boto3 >= 1.7.41"],
+    install_requires=["boto3 >= 1.7.41", "pandas"],
     extras_require={
         "evros": ["aegea == 2.6.9", "awscli >= 1.15.41", "awscli-cwlogs >= 1.4.4"],
         "h5ad": ["anndata"],
