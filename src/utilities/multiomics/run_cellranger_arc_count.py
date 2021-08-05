@@ -50,8 +50,8 @@ def main(logger):
     })
 
     for library in args.s3_libraries_csv_path:
-        library_base = posixpath.basename(library)
-        library_results_path = paths["result_path"] / posixpath.basename(library)
+        library_base = os.path.splitext(posixpath.basename(library))[0]
+        library_results_path = paths["result_path"] / library_base
         library_results_path.mkdir(parents=True)
 
         original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
@@ -81,6 +81,11 @@ def main(logger):
             "--localcores=64",
         ]
 
+        process_results(logger,
+                        command,
+                        paths,
+                        "cellranger-arc count failed")
+
         aggr_df.loc[len(aggr_df.index)] = [
             library_base,
             f"{library_results_path}/{run_id}/outs/atac_fragments.tsv.gz",
@@ -105,7 +110,7 @@ def main(logger):
     process_results(logger,
                     command,
                     paths,
-                    "cellranger-arc count and aggr failed")
+                    "cellranger-arc aggr failed")
 
 
 if __name__ == "__main__":
