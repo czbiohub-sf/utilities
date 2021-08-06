@@ -84,7 +84,7 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
     data_dir = root_dir / "data"
     data_dir.mkdir(parents=True)
 
-    result_path = root_dir / "data" / args.run_id
+    result_path = root_dir / "results" / args.run_id
     result_path.mkdir(parents=True)
 
     genome_dir = root_dir / "genome" / "reference"
@@ -107,7 +107,7 @@ def process_results(logger,
                     command,
                     paths,
                     error_message,
-                    s3_sync=True):
+                    sync_to_s3=True):
     failed = log_command(
         logger,
         command,
@@ -120,9 +120,9 @@ def process_results(logger,
     if failed:
         raise RuntimeError(error_message)
 
-    if s3_sync:
+    if sync_to_s3:
         s3_sync(
             logger,
-            str(paths["result_path"]),
+            str(paths["sync_to_s3"]),
             str(paths["output_dir"])
         )

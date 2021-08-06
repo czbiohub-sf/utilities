@@ -40,7 +40,16 @@ def main(logger):
     run_id = args.run_id
 
     paths = prepare_and_return_base_data_paths(run_id, args, logger)
-    paths["aggr_libraries_path"] = paths['data_dir'] / "aggr_libraries.csv"
+
+    paths["count_path"] = paths['result_path'] / "count"
+    paths["count_path"].mkdir(parents=True)
+
+    paths["aggr_path"] = paths['result_path'] / "aggr"
+    paths["aggr_path"].mkdir(parents=True)
+
+    paths["aggr_libraries_path"] = paths["aggr_path"] / "aggr_libraries.csv"
+
+    paths["sync_to_s3"] = paths["aggr_path"] / args.run_id / "outs"
 
     aggr_df = pd.DataFrame({
         "library_id": [],
@@ -51,9 +60,6 @@ def main(logger):
 
     for library in args.s3_libraries_csv_path:
         library_base = os.path.splitext(posixpath.basename(library))[0]
-        library_results_path = paths["result_path"] / library_base
-        library_results_path.mkdir(parents=True)
-
         original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
         libraries_path = paths["data_dir"] / library_base / "libraries.csv"
 
@@ -70,11 +76,11 @@ def main(logger):
             logger
         )
 
-        os.chdir(library_results_path)
+        os.chdir(str(paths["count_path"]))
         command = [
             CELLRANGER,
             "count",
-            f"--id={run_id}",
+            f"--id={library_base}",
             f"--reference={paths['ref_path']}",
             f"--libraries={libraries_path}",
             "--localmem=256",
@@ -85,18 +91,18 @@ def main(logger):
                         command,
                         paths,
                         "cellranger-arc count failed",
-                        s3_sync=False)
+                        sync_to_s3=False)
 
         aggr_df.loc[len(aggr_df.index)] = [
             library_base,
-            f"{library_results_path}/{run_id}/outs/atac_fragments.tsv.gz",
-            f"{library_results_path}/{run_id}/outs/per_barcode_metrics.csv",
-            f"{library_results_path}/{run_id}/outs/gex_molecule_info.h5"
+            f"{paths['count_path']}/{library_base}/outs/atac_fragments.tsv.gz",
+            f"{paths['count_path']}/{library_base}/outs/per_barcode_metrics.csv",
+            f"{paths['count_path']}/{library_base}/outs/gex_molecule_info.h5"
         ]
 
     aggr_df.to_csv(str(paths["aggr_libraries_path"]), index=False)
 
-    os.chdir(paths["result_path"])
+    os.chdir(str(paths["aggr_path"]))
     command = [
         CELLRANGER,
         "aggr",

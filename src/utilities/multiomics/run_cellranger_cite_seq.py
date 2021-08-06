@@ -61,6 +61,8 @@ def main(logger):
     paths["feature_ref"] = paths["result_path"] / "feature_ref.csv"
     paths["original_libraries_path"] = paths["data_dir"] / "original_libraries.csv"
     paths["libraries_path"] = paths["data_dir"] / "libraries.csv"
+    paths["sync_to_s3"] = paths["result_path"] / args.run_id / "outs"
+
     s3_cp(
         logger,
         args.s3_libraries_csv_path,
@@ -75,7 +77,7 @@ def main(logger):
                            logger)
 
     # Run cellranger
-    os.chdir(paths["result_path"])
+    os.chdir(str(paths["result_path"]))
     command = [
         CELLRANGER,
         "count",
