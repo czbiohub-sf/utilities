@@ -84,7 +84,8 @@ def main(logger):
         process_results(logger,
                         command,
                         paths,
-                        "cellranger-arc count failed")
+                        "cellranger-arc count failed",
+                        s3_sync=False)
 
         aggr_df.loc[len(aggr_df.index)] = [
             library_base,

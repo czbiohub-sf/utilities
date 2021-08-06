@@ -106,7 +106,8 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
 def process_results(logger,
                     command,
                     paths,
-                    error_message):
+                    error_message,
+                    s3_sync=True):
     failed = log_command(
         logger,
         command,
@@ -119,4 +120,9 @@ def process_results(logger,
     if failed:
         raise RuntimeError(error_message)
 
-    s3_sync(logger, paths["local_output_path"], paths["output_dir"])
+    if s3_sync:
+        s3_sync(
+            logger,
+            str(paths["result_path"]),
+            str(paths["output_dir"])
+        )
