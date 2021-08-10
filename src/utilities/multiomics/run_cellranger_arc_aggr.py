@@ -25,7 +25,7 @@ def get_parser():
     """
 
     return get_base_parser(prog="run_cellranger_arc_count.py",
-                           description="Run counts using cellranger arc")
+                           description="Run aggr using cellranger arc")
 
 
 def main(logger):
@@ -38,34 +38,17 @@ def main(logger):
     args = parser.parse_args()
 
     run_id = args.run_id
-    library = args.s3_libraries_csv_path
 
     paths = prepare_and_return_base_data_paths(run_id, args, logger)
-
-    library_base = os.path.splitext(posixpath.basename(library))[0]
-    original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
-    libraries_path = paths["data_dir"] / library_base / "libraries.csv"
-
-    s3_cp(
-        logger,
-        library,
-        str(original_libraries_path)
-    )
-
-    process_libraries_file(
-        original_libraries_path,
-        libraries_path,
-        paths["data_dir"],
-        logger
-    )
 
     os.chdir(str(paths["local_output_path"]))
     command = [
         CELLRANGER,
-        "count",
-        f"--id={library_base}",
+        "aggr",
+        f"--id={run_id}",
+        f"--csv={args.s3_libraries_csv_path}",
         f"--reference={paths['ref_path']}",
-        f"--libraries={libraries_path}",
+        "--normalize=depth",
         "--localmem=256",
         "--localcores=64",
     ]
@@ -73,7 +56,7 @@ def main(logger):
     process_results(logger,
                     command,
                     paths,
-                    "cellranger-arc count failed")
+                    "cellranger-arc aggr failed")
 
 
 if __name__ == "__main__":

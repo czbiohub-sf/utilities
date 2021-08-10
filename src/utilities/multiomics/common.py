@@ -35,7 +35,6 @@ def get_base_parser(prog, description):
 
     parser.add_argument(
         "--s3_libraries_csv_path",
-        nargs='+',
         required=True,
         help="The csv with the s3 paths and metadata needed for cellranger arc count"
     )
@@ -92,13 +91,16 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
 
     ref_path = download_cellranger_reference(args.taxon, genome_dir, logger)
 
+    local_output_path = result_path / "outs"
+    local_output_path.mkdir(parents=True)
+
     return {
         "root_dir": root_dir,
         "data_dir": data_dir,
         "result_path": result_path,
         "genome_dir": genome_dir,
         "ref_path": ref_path,
-        "local_output_path": posixpath.join(result_path, run_id, "outs"),
+        "local_output_path": local_output_path,
         "output_dir": posixpath.join(args.s3_output_path, run_id)
     }
 
@@ -123,6 +125,6 @@ def process_results(logger,
     if sync_to_s3:
         s3_sync(
             logger,
-            str(paths["sync_to_s3"]),
+            str(paths["local_output_path"]),
             str(paths["output_dir"])
         )
