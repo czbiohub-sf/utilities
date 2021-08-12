@@ -56,18 +56,22 @@ def main(logger):
         new_csv.write(f"{header}")
 
         for row in csv.reader(csvfile):
+            library = row[0]
             atac_fragments = row[1]
+            atac_fragments_tbi = f"{atac_fragments}.tbi"
             per_barcode_metrics = row[2]
             gex_molecule_info = row[3]
 
             # TODO(neevor): clean up duplicated logic.
-            atac_fragments_local_path = data_dir / posixpath.basename(atac_fragments)
-            per_barcode_metrics_local_path = data_dir / posixpath.basename(per_barcode_metrics)
-            gex_molecule_info_local_path = data_dir / posixpath.basename(gex_molecule_info)
+            atac_fragments_local_path = data_dir / library / posixpath.basename(atac_fragments)
+            atac_fragments_tbi_local_path = data_dir / library / f"{posixpath.basename(atac_fragments)}.tbi"
+            per_barcode_metrics_local_path = data_dir / library / posixpath.basename(per_barcode_metrics)
+            gex_molecule_info_local_path = data_dir / library / posixpath.basename(gex_molecule_info)
 
-            s3_sync(logger, atac_fragments, str(atac_fragments_local_path))
-            s3_sync(logger, per_barcode_metrics, str(per_barcode_metrics_local_path))
-            s3_sync(logger, gex_molecule_info, str(gex_molecule_info_local_path))
+            s3_cp(logger, atac_fragments, str(atac_fragments_local_path))
+            s3_cp(logger, atac_fragments_tbi, str(atac_fragments_tbi_local_path))
+            s3_cp(logger, per_barcode_metrics, str(per_barcode_metrics_local_path))
+            s3_cp(logger, gex_molecule_info, str(gex_molecule_info_local_path))
 
             row[1] = str(atac_fragments_local_path)
             row[2] = str(per_barcode_metrics_local_path)

@@ -3,8 +3,6 @@
 import os
 import posixpath
 
-import pandas as pd
-
 from utilities.log_util import get_logger
 from utilities.multiomics.common import (
     get_base_parser,
