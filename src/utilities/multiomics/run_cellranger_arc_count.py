@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import posixpath
 
 from utilities.log_util import get_logger
 from utilities.multiomics.common import (
@@ -40,9 +39,8 @@ def main(logger):
 
     paths = prepare_and_return_base_data_paths(run_id, args, logger)
 
-    library_base = os.path.splitext(posixpath.basename(library))[0]
-    original_libraries_path = paths["data_dir"] / library_base / "original_libraries.csv"
-    libraries_path = paths["data_dir"] / library_base / "libraries.csv"
+    original_libraries_path = paths["data_dir"] / "original_libraries.csv"
+    libraries_path = paths["data_dir"] / "libraries.csv"
 
     s3_cp(
         logger,
@@ -61,7 +59,7 @@ def main(logger):
     command = [
         CELLRANGER,
         "count",
-        f"--id={library_base}",
+        f"--id={run_id}",
         f"--reference={paths['ref_path']}",
         f"--libraries={libraries_path}",
         "--localmem=256",

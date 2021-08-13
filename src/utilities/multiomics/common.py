@@ -83,7 +83,7 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
     data_dir = root_dir / "data"
     data_dir.mkdir(parents=True)
 
-    result_path = root_dir / "results" / args.run_id
+    result_path = root_dir / "results"
     result_path.mkdir(parents=True)
 
     genome_dir = root_dir / "genome" / "reference"
@@ -91,7 +91,7 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
 
     ref_path = download_cellranger_reference(args.taxon, genome_dir, logger)
 
-    local_output_path = result_path / "outs"
+    local_output_path = result_path / args.run_id / "outs"
     local_output_path.mkdir(parents=True)
 
     return {
@@ -105,11 +105,10 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
     }
 
 
-def process_results(logger,
-                    command,
-                    paths,
-                    error_message,
-                    sync_to_s3=True):
+def run_command(logger,
+                command,
+                error_message):
+
     failed = log_command(
         logger,
         command,
@@ -122,9 +121,18 @@ def process_results(logger,
     if failed:
         raise RuntimeError(error_message)
 
-    if sync_to_s3:
-        s3_sync(
-            logger,
-            str(paths["local_output_path"]),
-            str(paths["output_dir"])
-        )
+
+def sync_results(logger, paths):
+    s3_sync(
+        logger,
+        str(paths["local_output_path"]),
+        str(paths["output_dir"])
+    )
+
+
+def process_results(logger,
+                    command,
+                    paths,
+                    error_message):
+    run_command(logger, command, error_message)
+    sync_results(logger, paths)

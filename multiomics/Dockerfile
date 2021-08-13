@@ -19,7 +19,10 @@ RUN cd /opt && \
     tar xvf cellranger-6.1.0.tar.gz && \
     rm cellranger-6.1.0.tar.gz
 
-RUN pip3 install --upgrade awscli
+RUN pip3 install --upgrade awscli \
+                           pandas==1.3.1 \
+                           numpy==1.21.1 \
+                           scanpy==1.8.1
 
 RUN cd /opt && \
     git clone https://github.com/czbiohub/utilities.git && \

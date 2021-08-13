@@ -9,7 +9,9 @@ from utilities.multiomics.common import (
     get_base_parser,
     get_default_requirements,
     prepare_and_return_base_data_paths,
-    process_results
+    process_results,
+    run_command,
+    sync_results
 )
 from utilities.s3_util import s3_cp
 
@@ -22,8 +24,46 @@ def get_parser():
     """ Construct and return the ArgumentParser object that parses input command.
     """
 
-    return get_base_parser(prog="run_cellranger_arc_count.py",
-                           description="Run aggr using cellranger arc")
+    parser = get_base_parser(prog="run_cellranger_arc_count.py",
+                             description="Run aggr using cellranger arc")
+
+    parser.add_argument("--neurips", action='store_true')
+
+    return parser
+
+
+def create_annotated_results(
+    feature_matrix_path,
+    libraries_csv,
+    output_path):
+
+    import scanpy as sc
+    import pandas as pd
+    import numpy as np
+
+    adata = sc.read_10x_h5(feature_matrix_path, gex_only=False)
+
+    # Load aggr.csv and make 1-indexed
+    aggr = pd.read_csv(libraries_csv)
+    aggr.index = pd.Index(np.arange(aggr.shape[0])+1)
+
+    # Get site and donor for each GEM well
+    sites = {}
+    donors = {}
+    for ix, lib_id in aggr['library_id'].iteritems():
+        *_, site, donor = lib_id.split('_')
+        sites[ix] = site
+        donors[ix] = donor
+
+    # Get GEM well for each cell barcode
+    gem_well = [ix.split('-')[1] for ix in adata.obs.index]
+
+    # Append site and donor information
+    adata.obs['site'] = [sites[int(g_well)] for g_well in gem_well]
+    adata.obs['donor'] = [donors[int(g_well)] for g_well in gem_well]
+
+    # Write output
+    adata.write_h5ad(output_path, compression=9)
 
 
 def main(logger):
@@ -80,7 +120,6 @@ def main(logger):
             row_values = ",".join(row)
             new_csv.write(f"{row_values}\n")
 
-
     os.chdir(str(paths["result_path"]))
     command = [
         CELLRANGER,
@@ -93,10 +132,18 @@ def main(logger):
         "--localcores=64",
     ]
 
-    process_results(logger,
-                    command,
-                    paths,
-                    "cellranger-arc aggr failed")
+    run_command(logger,
+                command,
+                "cellranger-arc aggr failed")
+
+    if args.neurips:
+        create_annotated_results(
+            f"{paths['local_output_path']}/filtered_feature_bc_matrix.h5",
+            libraries_path,
+            f"{paths['local_output_path']}/filtered_feature_bc_matrix.annotated.h5ad"
+        )
+
+    sync_results(logger, paths)
 
 
 if __name__ == "__main__":
