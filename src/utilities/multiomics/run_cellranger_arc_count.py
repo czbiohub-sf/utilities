@@ -57,7 +57,7 @@ def main(logger):
         logger
     )
 
-    os.chdir(str(paths["local_output_path"]))
+    os.chdir(str(paths["result_path"]))
     command = [
         CELLRANGER,
         "count",

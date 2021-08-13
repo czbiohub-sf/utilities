@@ -11,7 +11,7 @@ from utilities.multiomics.common import (
     prepare_and_return_base_data_paths,
     process_results
 )
-from utilities.s3_util import s3_cp, s3_sync
+from utilities.s3_util import s3_cp
 
 
 CELLRANGER = "/bin/cellranger-arc"  # NOTE(neevor): I'm not very happy to have to have the /bin so I would like to be able to get rid of it.
@@ -81,7 +81,7 @@ def main(logger):
             new_csv.write(f"{row_values}\n")
 
 
-    os.chdir(str(paths["local_output_path"]))
+    os.chdir(str(paths["result_path"]))
     command = [
         CELLRANGER,
         "aggr",
