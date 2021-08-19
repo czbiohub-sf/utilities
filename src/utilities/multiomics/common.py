@@ -92,7 +92,6 @@ def prepare_and_return_base_data_paths(run_id, args, logger):
     ref_path = download_cellranger_reference(args.taxon, genome_dir, logger)
 
     local_output_path = result_path / args.run_id / "outs"
-    local_output_path.mkdir(parents=True)
 
     return {
         "root_dir": root_dir,
