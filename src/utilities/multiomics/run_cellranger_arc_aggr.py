@@ -27,15 +27,18 @@ def get_parser():
     parser = get_base_parser(prog="run_cellranger_arc_count.py",
                              description="Run aggr using cellranger arc")
 
+    parser.add_argument("--peaks",
+                        help="Path to the s3 bed file to use for peak calling")
+
     parser.add_argument("--neurips", action='store_true')
 
     return parser
 
 
 def create_annotated_results(
-    feature_matrix_path,
-    libraries_csv,
-    output_path):
+        feature_matrix_path,
+        libraries_csv,
+        output_path):
 
     import scanpy as sc
     import pandas as pd
@@ -131,6 +134,15 @@ def main(logger):
         "--localmem=256",
         "--localcores=64",
     ]
+
+    if args.peaks:
+        peaks = paths["data_dir"] / run_id / "peaks.bed"
+        s3_cp(
+            logger,
+            args.peaks,
+            str(peaks)
+        )
+        command.append(f"--peaks={str(peaks)}")
 
     run_command(logger,
                 command,

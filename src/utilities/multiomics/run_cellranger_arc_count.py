@@ -21,8 +21,13 @@ def get_parser():
     """ Construct and return the ArgumentParser object that parses input command.
     """
 
-    return get_base_parser(prog="run_cellranger_arc_count.py",
-                           description="Run counts using cellranger arc")
+    parser = get_base_parser(prog="run_cellranger_arc_count.py",
+                             description="Run counts using cellranger arc")
+
+    parser.add_argument("--peaks",
+                        help="Path to the s3 bed file to use for peak calling")
+
+    return parser
 
 
 def main(logger):
@@ -65,6 +70,15 @@ def main(logger):
         "--localmem=256",
         "--localcores=64",
     ]
+
+    if args.peaks:
+        peaks = paths["data_dir"] / run_id / "peaks.bed"
+        s3_cp(
+            logger,
+            args.peaks,
+            str(peaks)
+        )
+        command.append(f"--peaks={str(peaks)}")
 
     process_results(logger,
                     command,
