@@ -1,5 +1,6 @@
 import argparse
 import csv
+import hashlib
 import os
 import pathlib
 import posixpath
@@ -61,7 +62,8 @@ def process_libraries_file(original_libraries_path, libraries_path, data_dir, lo
             s3_path_of_fastqs = row[0]
             sample_id = row[1]
             method = row[-1].replace(" ", "_")
-            local_path = data_dir / posixpath.basename(s3_path_of_fastqs) / sample_id / method
+            digest = hashlib.md5(s3_path_of_fastqs.encode()).hexdigest()
+            local_path = data_dir / digest / sample_id / method
             s3_sync(logger, s3_path_of_fastqs, str(local_path))
             row[0] = str(local_path)
             row_values = ",".join(row)

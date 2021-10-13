@@ -21,7 +21,7 @@ RUN cd /opt && \
 
 RUN pip3 install --upgrade awscli \
                            pandas==1.3.1 \
-                           numpy==1.21.1 \
+			   "numpy<1.21,>=1.17" \
                            scanpy==1.8.1
 
 RUN cd /opt && \
