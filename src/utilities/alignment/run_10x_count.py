@@ -37,6 +37,7 @@ reference_genomes = {
     "botryllus": "botryllus",
     "zebrabow" : "Danio.rerio_ZebraBow_genome",
     "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
+    "mouse_genome_mcherry":"mouse_genome_mcherry",
 }
 deprecated = {
     "homo": "hg38-plus",
