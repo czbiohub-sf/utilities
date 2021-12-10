@@ -36,6 +36,7 @@ reference_genomes = {
     "SARS.GRCh38_genome": "SARS.GRCh38_genome",
     "botryllus": "botryllus",
     "zebrabow" : "Danio.rerio_ZebraBow_genome",
+    "zebrafishChromacode" : "Danio.rerio_Chromacode",
     "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
     "mouse_genome_mcherry":"mouse_genome_mcherry",
 }
