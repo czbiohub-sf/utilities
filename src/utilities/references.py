@@ -29,6 +29,7 @@ reference_genomes = {
     "gex-GRCh38-and-mm10": "refdata-gex-GRCh38-and-mm10-2020-A",
 }
 
+
 def validate_taxon(taxon):
     if taxon not in reference_genomes:
         raise ValueError(f"unknown taxon {taxon}")
