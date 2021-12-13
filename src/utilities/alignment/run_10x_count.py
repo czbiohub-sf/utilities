@@ -33,9 +33,12 @@ reference_genomes = {
     "gencode.vM19": "gencode.vM19",
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
+    "SARS.GRCh38_genome": "SARS.GRCh38_genome",
     "botryllus": "botryllus",
     "zebrabow" : "Danio.rerio_ZebraBow_genome",
+    "zebrafishChromacode" : "Danio.rerio_Chromacode",
     "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
+    "mouse_genome_mcherry":"mouse_genome_mcherry",
 }
 deprecated = {
     "homo": "hg38-plus",
