@@ -27,7 +27,7 @@ RUN pip3 install --upgrade awscli \
 RUN cd /opt && \
     git clone https://github.com/czbiohub/utilities.git && \
     cd /opt/utilities && \
-    #git checkout neevor/cellrangerarc && \
+    git checkout neevor/cellrangerarc && \
     python setup.py install
 
 WORKDIR /opt
