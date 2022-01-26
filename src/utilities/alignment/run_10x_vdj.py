@@ -20,6 +20,7 @@ S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 # valid and deprecated reference genomes
 reference_genomes = {
     "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
+    "GRCm38-VDJ":"refdata-cellranger-vdj-GRCm38-alts-ensembl-5.0.0.tgz",
 }
 
 # other helpful constants
