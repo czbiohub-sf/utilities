@@ -50,6 +50,7 @@ def main():
         help="Extra arguments are passed to run_10x_count",
     )
 
+    parser.add_argument("--glacier", action="store_true")
     args = parser.parse_args()
 
     # check if the input genome is valid
@@ -74,6 +75,7 @@ def main():
 
     # print input arguments of running alignment.run_10x_count for each sample folder
     num_partitions = len(complete_input_paths)
+    glacier_flag = '--glacier' if args.glacier else ''
     for i in range(num_partitions):
         s3_input_path = complete_input_paths[i]
         print(
@@ -82,6 +84,7 @@ def main():
                     "evros",
                     f"--branch {args.branch}",
                     "alignment.run_10x_count",
+                    glacier_flag,
                     f"--taxon {args.taxon}",
                     f"--num_partitions {num_partitions}",
                     f"--partition_id {i}",

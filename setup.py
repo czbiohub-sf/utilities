@@ -32,7 +32,7 @@ setuptools.setup(
     zip_safe=False,
     install_requires=["boto3 >= 1.7.41"],
     extras_require={
-        "evros": ["aegea >= 2.2.3", "awscli >= 1.15.41", "awscli-cwlogs >= 1.4.4"],
+        "evros": ["aegea == 2.6.9", "awscli >= 1.15.41", "awscli-cwlogs >= 1.4.4"],
         "h5ad": ["anndata"],
     },
     entry_points={

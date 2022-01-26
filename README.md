@@ -27,7 +27,7 @@ Create a conda environment called `utilities-env` specific to this Python packag
 
 ```zsh
 # Create an environment called `utilities-env` with Python and pip
-➜  conda create --name utilities-env python=3.6 pip
+➜  conda create --name utilities-env python=3
 ➜  source activate utilities-env
 (utilities-env) ➜
 ```
@@ -143,7 +143,7 @@ Branch 'my_custom_branch' set up to track remote branch 'my_custom_branch' from 
 
 ### How to demux something:
 
-*First consider: maybe don't? Demuxing should happen automatically for most runs* 
+*First consider: maybe don't? Demuxing should happen automatically for most runs*
 
 If your BCLs were uploaded to czb-seqbot/bcl and your sample sheet is in czb-seqbot/sample-sheets, you can do this:
 
@@ -181,10 +181,11 @@ The following is the 10X_reference_genomes dictionary used in cellranger alignme
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
     "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
     "gencode_human_mouse_MTB": "gencode_human_mouse_MTB",
+    "SARS.GRCh38_genome": "SARS.GRCh38_genome",
 }
-```  
+```
 
-The genomes above span four species: human, mouse, mouse lemur, and zebrafish. Cellranger reference genomes are built according to the [cellranger reference building instruction](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_mr#mkrefsetup), taking fasta and gtf files as inputs. Some of the reference genomes are directly available online, and others need to be built from fasta and gtf files. The following sections explain how to find these.
+The genomes above span four species: human, mouse, mouse lemur, and zebrafish. There is an additional genome that contains both the human GRCh38 and SARS-CoV2 genomes combined, SARS.GRCh38_genome. Cellranger reference genomes are built according to the [cellranger reference building instruction](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_mr#mkrefsetup), taking fasta and gtf files as inputs. Some of the reference genomes are directly available online, and others need to be built from fasta and gtf files. The following sections explain how to find these.
 We start with human genomes:
 ```zsh
 human_genomes = {
@@ -273,10 +274,10 @@ For some reason, a fraction of alignment jobs fail to start because of AWS probl
 ```zsh
 (utilities-env) ➜ starfails my_star_jobs.sh
 8d920e9f-313a-465a-ae4d-df77bdbe990d
-(utilities-env) ➜ cat my_star_jobs_failed_jobs.sh 
+(utilities-env) ➜ cat my_star_jobs_failed_jobs.sh
 evros --branch master alignment.run_star_and_htseq --taxon mus --num_partitions 10 --partition_id 4 --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results
 sleep 20
-(utilities-env) ➜ source my_star_jobs_failed_jobs.sh 
+(utilities-env) ➜ source my_star_jobs_failed_jobs.sh
 ```
 
 This new file contains the commands to re-try the failed jobs.
@@ -338,7 +339,7 @@ sleep 10
 (utilities-env) ➜ source my_velocyto_jobs.sh
 ```
 
-This will run Velocyto on every BAM file under the input paths 
+This will run Velocyto on every BAM file under the input paths
 
 ### How to share data with an outside collaborator
 
@@ -387,8 +388,8 @@ botocore.errorfactory.ResourceNotFoundException: An error occurred (ResourceNotF
 botocore.exceptions.ClientError: An error occurred (AccessDenied) when calling the PutRolePolicy operation: User: arn:aws:iam::[a number series]:user/[AWS IAM user name] is not authorized to perform: iam-PutRolePolicy on resource: role aegea-dev-process_batch_event
 chalice.deploy.deployer.ChaliceDeploymentError: ERROR - While deploying your chalice application, received the following error:
 
-  An error occurred (AccessDenied) when calling the PutRolePolicy operation: 
-  User: arn:aws:iam::[a number series]:user/[AWS IAM user name] is not authorized to perform: 
+  An error occurred (AccessDenied) when calling the PutRolePolicy operation:
+  User: arn:aws:iam::[a number series]:user/[AWS IAM user name] is not authorized to perform:
   iam-PutRolePolicy on resource: role aegea-dev-process_batch_event
 ```
 

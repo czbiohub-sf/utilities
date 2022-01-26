@@ -102,3 +102,13 @@ ENV/
 
 # DS_Store
 .DS_Store
+
+# Pycharm
+.idea/*
+
+# VsCode
+.vscode/settings.json
+
+# Cellranger ARC
+multiomics/cellranger-arc-2.0.0.tar.gz
+multiomics/cellranger-6.1.0.tar.gz
