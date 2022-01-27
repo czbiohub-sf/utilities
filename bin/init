@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Check Java installed
+if ! command -v java --version &> /dev/null
+then
+    echo "Please ensure Java Runtime ≥8 is installed. You can find an open source installer here: https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot"
+    exit
+fi
+
+# Check Docker installed
+if ! command -v docker --version &> /dev/null
+then
+    echo "Please ensure Docker is installed and up-to-date. Instructions at https://www.docker.com/get-started"
+    exit
+fi
+
+# get the root of the directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# ensure that the command below is run from the root of the repository
+cd "$REPO_ROOT"
+
+curl -fsSL get.viash.io | bash -s -- \
+  --tag 0.5.5
+
+cd bin
+
+curl -s https://get.nextflow.io | bash
