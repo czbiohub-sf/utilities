@@ -1,0 +1,41 @@
+functionality:
+  name: run_10x_count
+  namespace: alignment
+  description: Run alignment jobs using 10x
+  arguments:
+    - type: string
+      name: "--taxon"
+      required: true
+      description: |
+        Reference genome for the alignment run.
+        Options: homo,hg38-plus,homo.gencode.v30.ERCC.chrM,mus,mm10-plus,mm10-1.2.0,mus-premrna,mm10-1.2.0-premrna,hg19-mm10-3.0.0,microcebus,gencode.vM19,GRCh38_premrna,zebrafish-plus,SARS.GRCh38_genome,botryllus,zebrabow,zebrafishChromacode,GRCh38premrna_and_SARSCoV2,mouse_genome_mcherry
+    - type: file
+      name: --input_path
+      required: true
+      description: The folder with fastq.gz files to align
+    - type: file
+      name: --output_path
+      direction: output
+      required: true
+      description: The folder to store the alignment results
+    - type: integer
+      name: --num_partitions
+      required: true
+      default: 10
+      description: |
+        Number of groups to divide samples
+        into for the alignment run. Enter 10 as the default
+        value here since we don't divide a single sample
+    - type: integer
+      name: --partition_id
+      required: true
+      default: 10
+      description: |
+        Index of sample group. Enter 0 as the default value here 
+        since we only have one sample.
+  resources:
+    - type: bash_script
+      path: script.sh
+platforms:
+  - type: docker
+    image: litd/docker-cellranger:v6.1.1
