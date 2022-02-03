@@ -1,0 +1,60 @@
+functionality:
+  name: bcl2fastq
+  namespace: demux
+  description: Demultiplex raw sequencing data
+  arguments:
+    - type: integer
+      name: --exp_id
+      required: true
+      description: The experiment ID
+    - type: file
+      name: --input_path
+      required: true
+      description: The folder with the input files
+    - type: file
+      name: --sample_sheet
+      required: true
+      description: The folder containing the sample sheet
+    - type: file
+      name: --output_path
+      direction: output
+      required: true
+      description: The folder to store the demux results
+      default: "./fastqs"
+    - type: file
+      name: --report_path
+      direction: output
+      required: true
+      description: The folder to store the report in
+      default: "./reports"
+
+    - type: boolean_true
+      name: --star_structure
+      required: false
+      description: Group the fastq files into folders based on sample name
+    - type: boolean_true
+      name: --skip_undetermined
+      required: false
+      description: Don't upload the Undetermined files (can save time)
+    - type: string
+      name: --sample_sheet_name
+      required: false
+      description: Defaults to experiment ID
+    - type: boolean_true
+      name: --force-glacier
+      required: false
+      description: Force a transfer from Glacier storage
+    - type: string
+      name: --bcl2fast1_options
+      required: false
+      description: Options to pass to bcl2fastq
+      multiple_sep: ","
+  resources:
+    - type: python_script
+      path: ../utilities/demux/bcl2fastq.py
+    - type: python_script
+      path: ../utilities/log_util.py
+platforms:
+  - type: native
+setup:
+  - pip: argparse, glob, os, re, subprocess, sys

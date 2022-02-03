@@ -1,5 +1,16 @@
 #!/usr/bin/env python
+# Dependencies:
+# pip: argparse, glob, os, re, subprocess, sys
 
+### 1 ###
+
+## VIASH START
+
+par = {
+    
+}
+
+## VIASH END
 import argparse
 import glob
 import os
@@ -26,6 +37,7 @@ def get_default_requirements():
     )
 
 
+'''
 def get_parser():
     parser = argparse.ArgumentParser(
         prog="bcl2fastq.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -82,12 +94,10 @@ def get_parser():
     )
 
     return parser
-
+'''
 
 def main(logger):
-    parser = get_parser()
-
-    args = parser.parse_args()
+    args = par
 
     if os.environ.get("AWS_BATCH_JOB_ID"):
         root_dir = os.path.join("/mnt", os.environ["AWS_BATCH_JOB_ID"])
