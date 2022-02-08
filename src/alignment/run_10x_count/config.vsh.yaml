@@ -33,6 +33,12 @@ functionality:
       description: |
         Index of sample group. Enter 0 as the default value here 
         since we only have one sample.
+    - type: integer
+      name: --cores
+      description:  Set max cores the pipeline may request at one time.
+    - type: integer
+      name: --memory
+      description: Set max GB the pipeline may request at one time.
   resources:
     - type: bash_script
       path: script.sh
