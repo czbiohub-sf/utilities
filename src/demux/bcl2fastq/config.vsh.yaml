@@ -44,12 +44,12 @@ functionality:
       multiple_sep: ","
   resources:
     - type: python_script
-      path: ./bcl2fastq.py
-    - path: ../../utilities
+      path: script.py
+    - path: ../../helpers
+  tests:
+    - type: python_script
+      path: test.py
 platforms:
   - type: native
-setup:
-  - type: python
-    pip: [ argparse, glob, os, re, subprocess, sys ]
-  - conda: bcl2fastq
-  - apt: awscli
+  - type: docker
+    image: umccr/bcl2fastq
