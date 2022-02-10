@@ -3,53 +3,53 @@ functionality:
   namespace: demux
   description: Demultiplex raw sequencing data
   arguments:
-    - type: string
-      name: --exp_id
-      description: The experiment ID
+    # - type: string
+    #   name: --exp_id
+    #   description: The experiment ID
     - type: file
-      name: --input_path
+      name: --input
       description: The folder with the input files
     - type: file
       name: --sample_sheet
       description: The folder containing the sample sheet
     - type: file
-      name: --output_path
+      name: --output
       direction: output
       description: The folder to store the demux results
       default: "./fastqs"
-    - type: file
-      name: --report_path
-      direction: output
-      description: The folder to store the report in
-      default: "./reports"
+    # - type: file
+    #   name: --report_path
+    #   direction: output
+    #   description: The folder to store the report in
+    #   default: "./reports"
 
-    - type: boolean_false
-      name: --s3
-      description: If input and output will be hosted on s3
-    - type: boolean_true
-      name: --star_structure
-      description: Group the fastq files into folders based on sample name
-    - type: boolean_true
-      name: --skip_undetermined
-      description: Don't upload the Undetermined files (can save time)
-    - type: string
-      name: --sample_sheet_name
-      description: Defaults to experiment ID
-    - type: boolean_true
-      name: --force_glacier
-      description: Force a transfer from Glacier storage
-    - type: string
-      name: --bcl2fastq_options
-      description: Options to pass to bcl2fastq
-      multiple_sep: ","
+    # - type: boolean_false
+    #   name: --s3
+    #   description: If input and output will be hosted on s3
+    # - type: boolean_true
+    #   name: --star_structure
+    #   description: Group the fastq files into folders based on sample name
+    # - type: boolean_true
+    #   name: --skip_undetermined
+    #   description: Don't upload the Undetermined files (can save time)
+    # - type: string
+    #   name: --sample_sheet_name
+    #   description: Defaults to experiment ID
+    # - type: boolean_true
+    #   name: --force_glacier
+    #   description: Force a transfer from Glacier storage
+    # - type: string
+    #   name: --bcl2fastq_options
+    #   description: Options to pass to bcl2fastq
+    #   multiple_sep: ","
   resources:
-    - type: python_script
-      path: script.py
-    - path: ../../helpers
+    - type: bash_script
+      path: script.sh
+    #- path: ../../helpers
   tests:
     - type: python_script
       path: test.py
 platforms:
-  - type: native
   - type: docker
     image: umccr/bcl2fastq
+  - type: native
