@@ -1,0 +1,52 @@
+functionality:
+  name: mkfastq
+  namespace: demux
+  description: Demultiplex raw sequencing data
+  usage: |
+    cellranger mkfastq --localmem=60 --run /path/to/bcl \
+      --sample_sheet sample_sheet.csv --output-dir fastqs
+  arguments:
+    # - type: string
+    #   name: --exp_id
+    #   description: The experiment ID
+    - type: file
+      name: --input
+      description: Path to the untarred BCL files. Expects 'RunParameters.xml' at './'.
+      example: /path/to/bcl
+      required: true
+    - type: file
+      name: --sample_sheet
+      description: The path to the sample sheet.
+      example: SampleSheet.csv
+    - type: file
+      name: --output
+      direction: output
+      description: The folder to store the demux results
+      example: "/path/to/output"
+      required: true
+    - type: file
+      name: --reports
+      direction: output
+      description: The folder to store the demux results
+      example: "/path/to/reports"
+      required: false
+  resources:
+    - type: python_script
+      path: script.py
+  tests:
+    - type: python_script
+      path: test.py
+platforms:
+#  - type: docker
+#    image: umccr/bcl2fastq:v2.20.0.422
+#   setup:
+#      - type: yum
+#        packages:
+#          - python3
+#      - type: docker
+#        run: 
+#          - ln -fs /usr/bin/python3 /usr/bin/python
+  - type: native
+
+  echo 'export PATH="/home/samuel.dsouza/cellranger/cellranger/cellranger-6.1.2/cellranger":$PATH' >> ~/.bashrc
+  source ~/.bashrc
