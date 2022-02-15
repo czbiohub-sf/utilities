@@ -2,26 +2,34 @@ functionality:
   name: bcl2fastq
   namespace: demux
   description: Demultiplex raw sequencing data
+  usage: |
+    bcl2fastq --input /path/to/bcl --sample_sheet \
+      sample_sheet.csv --output fastqs --reports reports
   arguments:
     # - type: string
     #   name: --exp_id
     #   description: The experiment ID
     - type: file
       name: --input
-      description: The folder with the input files
+      description: Path to the untarred BCL files.
+      example: /path/to/bcl
+      required: true
     - type: file
       name: --sample_sheet
-      description: The folder containing the sample sheet
+      description: The path to the sample sheet.
+      example: SampleSheet.csv
     - type: file
       name: --output
       direction: output
       description: The folder to store the demux results
-      default: "./fastqs"
+      example: "/path/to/output"
+      required: true
     - type: file
       name: --reports
       direction: output
       description: The folder to store the demux results
-      default: "./reports"
+      example: "/path/to/reports"
+      required: false
     # - type: file
     #   name: --report_path
     #   direction: output
@@ -31,12 +39,12 @@ functionality:
     # - type: boolean_false
     #   name: --s3
     #   description: If input and output will be hosted on s3
-     - type: boolean_true
-       name: --star_structure
-       description: Group the fastq files into folders based on sample name
-     - type: boolean_true
-       name: --skip_undetermined
-       description: Don't upload the Undetermined files (can save time)
+    - type: boolean_true
+      name: --star_structure
+      description: Group the fastq files into folders based on sample name
+    - type: boolean_true
+      name: --skip_undetermined
+      description: Don't upload the Undetermined files (can save time)
     # - type: string
     #   name: --sample_sheet_name
     #   description: Defaults to experiment ID
@@ -55,5 +63,12 @@ functionality:
       path: test.py
 platforms:
   - type: docker
-    image: umccr/bcl2fastq
+    image: umccr/bcl2fastq:v2.20.0.422
+    setup:
+      - type: yum
+        packages:
+          - python3
+      - type: docker
+        run: 
+          - ln -fs /usr/bin/python3 /usr/bin/python
   - type: native
