@@ -37,15 +37,8 @@ functionality:
     - type: python_script
       path: test.py
 platforms:
-#  - type: docker
-#    image: umccr/bcl2fastq:v2.20.0.422
-#   setup:
-#      - type: yum
-#        packages:
-#          - python3
-#      - type: docker
-#        run: 
-#          - ln -fs /usr/bin/python3 /usr/bin/python
-  - type: native
   - type: docker
     image: litd/docker-cellranger:v6.1.1
+    setup:
+      - type: docker
+        image: python:latest

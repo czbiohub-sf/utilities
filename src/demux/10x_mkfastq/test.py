@@ -37,7 +37,6 @@ with subprocess.Popen(
     command,
     stdout=subprocess.PIPE,
     stderr=subprocess.STDOUT,
-    shell=True,
 ) as p:
     for line in p.stdout:
         print(line.decode(), end="")

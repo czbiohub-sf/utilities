@@ -34,7 +34,7 @@ if par["sample_sheet"] is not None:
 with subprocess.Popen(
     command,
     stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT
+    stderr=subprocess.STDOUT,
 ) as p:
     for line in p.stdout:
         print(line.decode(), end="")

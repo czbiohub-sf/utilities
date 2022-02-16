@@ -2,44 +2,43 @@ import subprocess
 ## VIASH START
 
 par = {
-    "sample_sheet" : "resources_test/bcl/sample_sheet.csv",
-    "input": "resources_test/bcl/input/",
-    "output": "resources_test/bcl/output/",
-    "reports": "resources_test/bcl/reports/",
+    "sample_sheet" : "../resources_test/bcl/sample_sheet.csv",
+    "input": "../resources_test/bcl/input/",
+    "output": "../resources_test/bcl/output/",
+    "reports": "../resources_test/bcl/reports/",
     "skip_undetermined": True,
     "star_structure": True,
 }
 
 ## VIASH END
 
-# Run command: 
+# Run command: viash test config.vsh.yaml 
 
 # get some data
 input = 'resources_test/bcls'
-sample_sheet = 'resources_test/sample_sheet/20220125_FS10000331_179_BRB11620-3029.csv'
+sample_sheet = 'resources_test/sample_sheet/*.csv'
 output = 'resources_test/output'
-executable = "bcl2fastq"
 
-# Run memory monitor
-command = (
-    "while true;"
-    ' do echo "memory usage" `cat /sys/fs/cgroup/memory/memory.usage_in_bytes`;'
-    ' echo "disk usage" `df -h | grep "/mnt"`;'
-    " sleep 300;"
-    " done"
-)
-p = subprocess.Popen([command], shell=True)
-
-# Run bcl2 fastq
+# construct command args
+print("Help")
 command = [
     "bcl2fastq",
-    "--sample-sheet", sample_sheet,
-    "--runfolder-dir", input,
-    "--output-dir", output,
+    "--runfolder-dir", par["input"],
+    "--output-dir", par["output"],
 ]
-pipe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-if pipe.communicate()[1]:
-    p.kill()
-    raise RuntimeError("bcl2fastq failed: " + str(pipe[1]))
+if par["sample_sheet"] is not None:
+    command = command + [ "--sample-sheet", par["sample_sheet"] ]
+
+# run bcl2fastq
+with subprocess.Popen(
+    command,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+) as p:
+    for line in p.stdout:
+        print(line.decode(), end="")
+
+if p.returncode > 0:
+    raise RuntimeError(f"bcl2fastq failed with exit code {p.returncode}")
 
 print("Completed Successfully!")

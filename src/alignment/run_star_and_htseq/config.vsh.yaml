@@ -1,0 +1,50 @@
+functionality:
+  name: run_star_and_htseq
+  namespace: alignment
+  description: Align sequencing data
+  usage: UNK
+  arguments:
+    # - type: string
+    #   name: --exp_id
+    #   description: The experiment ID
+    - type: string
+      name: --taxon
+      description: Reference genome for alignment fun
+      example: homo
+      required: true
+    - type: file
+      name: --input
+      description: Path to the directory containing the fastq.gz files to align
+      example: path/to/fastqs
+      required: true
+    - type: file
+      name: --output
+      direction: output
+      description: Output folder
+      required: true
+
+    - type: integer
+      name: --num_partitions
+      description: Number of groups to divide samples into
+      default: 10
+    - type: integer
+      name: --partition_id
+      description: Index of sample group.
+      default: 0
+    - type: boolean
+      name: force_realign
+      description: Align files even when results already exist
+      default: false
+    - type: integer
+      name: --min_size
+      description: Minimum file syze in bytes for a file to be realigned
+      default: 50000
+
+  resources:
+    - type: python_script
+      path: script.py
+  tests:
+    - type: python_script
+      path: test.py
+  platforms:
+    - type: native
