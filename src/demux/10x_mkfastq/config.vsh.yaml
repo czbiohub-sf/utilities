@@ -47,6 +47,5 @@ platforms:
 #        run: 
 #          - ln -fs /usr/bin/python3 /usr/bin/python
   - type: native
-
-  echo 'export PATH="/home/samuel.dsouza/cellranger/cellranger/cellranger-6.1.2/cellranger":$PATH' >> ~/.bashrc
-  source ~/.bashrc
+  - type: docker
+    image: litd/docker-cellranger:v6.1.1
