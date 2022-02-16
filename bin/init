@@ -21,7 +21,8 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 curl -fsSL get.viash.io | bash -s -- \
-  --tag 0.5.5
+  --tag 0.5.7 \
+  --viash bin/viash
 
 cd bin
 
