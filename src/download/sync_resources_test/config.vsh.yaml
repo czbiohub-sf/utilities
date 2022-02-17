@@ -1,0 +1,38 @@
+functionality:
+  name: "sync_resources_test"
+  namespace: "download"
+  version: "dev"
+  description: Synchronise the test resources from s3://czbiohub-pipelines/resources_test to resources_test
+  usage: |
+    sync_resources_test
+    sync_resources_test --input s3://czbiohub-pipelines/resources_test --output resources_test
+  authors:
+    - name: Robrecht Cannoodt
+      email: rcannood@gmail.com
+      roles: [ maintainer ]
+      props: { github: rcannood, orcid: "0000-0003-3641-729X" }
+  arguments:
+    - name: "--input"
+      alternatives: ["-i"]
+      type: string
+      description: "Path to the S3 bucket to sync from."
+      default: "s3://czbiohub-pipelines/resources_test"
+    - name: "--output"
+      alternatives: ["-o"]
+      type: file
+      default: resources_test
+      direction: output
+      description: "Path to the test resource directory."
+    - name: "--dryrun"
+      type: boolean_true
+      description: "Displays the operations that would be performed using the specified command without actually running them."
+  resources:
+    - type: bash_script
+      path: script.sh
+  tests:
+    - type: bash_script
+      path: run_test.sh
+platforms:
+  - type: docker
+    image: "amazon/aws-cli:2.4.15"
+  - type: nextflow
