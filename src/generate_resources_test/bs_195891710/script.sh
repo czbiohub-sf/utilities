@@ -2,7 +2,7 @@
 
 DIR=resources_test/bs_195891710
 ID=`basename "$OUT"`
-S3DIR=`echo "$DIR" | sed 's#test_resources#s3://czbiohub-pipelines#'`
+S3DIR=`echo "$DIR" | sed 's#resources_test#s3://czbiohub-pipelines#'`
 
 # download bcl files from basespace
 target/docker/download/download_basespace/download_basespace \
