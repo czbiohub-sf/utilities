@@ -1,44 +1,29 @@
 import subprocess
+
 ## VIASH START
-
-par = {
-    "sample_sheet" : "../resources_test/bcl/sample_sheet.csv",
-    "input": "../resources_test/bcl/input/",
-    "output": "../resources_test/bcl/output/",
-    "reports": "../resources_test/bcl/reports/",
-    "skip_undetermined": True,
-    "star_structure": True,
+meta = {
+    "functionality_name": "bcl2fastq",
+    "resources_dir": "resources_test"
 }
-
 ## VIASH END
 
-# Run command: viash test config.vsh.yaml 
-
 # get some data
-input = 'resources_test/bcls'
-sample_sheet = 'resources_test/sample_sheet/*.csv'
-output = 'resources_test/output'
+bcl_data = f"{meta['resources_dir']}/bs_195891710/bcl_data"
+fastq_output = 'test_output'
 
 # construct command args
-print("Help")
 command = [
-    "bcl2fastq",
-    "--runfolder-dir", par["input"],
-    "--output-dir", par["output"],
+    "./" + meta["functionality_name"],
+    "--input", bcl_data,
+    "--output", fastq_output,
 ]
-if par["sample_sheet"] is not None:
-    command = command + [ "--sample-sheet", par["sample_sheet"] ]
 
-# run bcl2fastq
-with subprocess.Popen(
+print(f"> Running {meta['functionality_name']}")
+out = subprocess.run(
     command,
     stdout=subprocess.PIPE,
     stderr=subprocess.STDOUT,
-) as p:
-    for line in p.stdout:
-        print(line.decode(), end="")
-
-if p.returncode > 0:
-    raise RuntimeError(f"bcl2fastq failed with exit code {p.returncode}")
+    check=True
+)
 
 print("Completed Successfully!")

@@ -6,9 +6,6 @@ functionality:
     bcl2fastq --input /path/to/bcl --sample_sheet \
       sample_sheet.csv --output fastqs --reports reports
   arguments:
-    # - type: string
-    #   name: --exp_id
-    #   description: The experiment ID
     - type: file
       name: --input
       description: Path to the untarred BCL files.
@@ -30,27 +27,12 @@ functionality:
       description: The folder to store the demux results
       example: "/path/to/reports"
       required: false
-    # - type: file
-    #   name: --report_path
-    #   direction: output
-    #   description: The folder to store the report in
-    #   default: "./reports"
-
-    # - type: boolean_false
-    #   name: --s3
-    #   description: If input and output will be hosted on s3
     - type: boolean_true
       name: --star_structure
       description: Group the fastq files into folders based on sample name
     - type: boolean_true
       name: --skip_undetermined
       description: Don't upload the Undetermined files (can save time)
-    # - type: string
-    #   name: --sample_sheet_name
-    #   description: Defaults to experiment ID
-    # - type: boolean_true
-    #   name: --force_glacier
-    #   description: Force a transfer from Glacier storage
     # - type: string
     #   name: --bcl2fastq_options
     #   description: Options to pass to bcl2fastq
@@ -61,6 +43,7 @@ functionality:
   tests:
     - type: python_script
       path: test.py
+    - path: ../../../resources_test/bs_195891710
 platforms:
   - type: docker
     image: umccr/bcl2fastq:v2.20.0.422

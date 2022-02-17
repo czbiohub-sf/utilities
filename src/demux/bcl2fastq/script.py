@@ -21,9 +21,10 @@ if not os.path.isdir(par["output"]):
     os.makedirs(par["output"])
 
 # construct command args
-print("Help")
+# hard-code path to bcl2fastq for now; change to
+# 'bcl2fastq' when viash is updated to viash 0.5.8
 command = [
-    "bcl2fastq",
+    "/usr/local/bin/bcl2fastq",
     "--runfolder-dir", par["input"],
     "--output-dir", par["output"],
 ]
