@@ -46,7 +46,7 @@ functionality:
     - path: ../../../resources_test/bs_195891710
 platforms:
   - type: docker
-    image: umccr/bcl2fastq:v2.20.0.422
+    image: ghcr.io/data-intuitive/cellranger:6.1
     setup:
       - type: yum
         packages:

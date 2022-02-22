@@ -44,4 +44,11 @@ functionality:
       path: script.sh
 platforms:
   - type: docker
-    image: litd/docker-cellranger:v6.1.1
+    image: ghcr.io/data-intuitive/cellranger:6.1
+    setup:
+      - type: yum
+        packages:
+          - python3
+      - type: docker
+        run: 
+          - ln -fs /usr/bin/python3 /usr/bin/python

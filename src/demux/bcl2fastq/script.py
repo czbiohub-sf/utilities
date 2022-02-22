@@ -24,7 +24,7 @@ if not os.path.isdir(par["output"]):
 # hard-code path to bcl2fastq for now; change to
 # 'bcl2fastq' when viash is updated to viash 0.5.8
 command = [
-    "/usr/local/bin/bcl2fastq",
+    "bcl2fastq",
     "--runfolder-dir", par["input"],
     "--output-dir", par["output"],
 ]
