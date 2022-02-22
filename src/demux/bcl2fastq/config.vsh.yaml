@@ -21,12 +21,6 @@ functionality:
       description: The folder to store the demux results
       example: "/path/to/output"
       required: true
-    - type: file
-      name: --reports
-      direction: output
-      description: The folder to store the demux results
-      example: "/path/to/reports"
-      required: false
     - type: boolean_true
       name: --star_structure
       description: Group the fastq files into folders based on sample name

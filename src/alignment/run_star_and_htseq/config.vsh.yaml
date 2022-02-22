@@ -24,6 +24,10 @@ functionality:
       required: true
 
     - type: integer
+      name: --star_proc
+      description: Number of processes to give to each STAR run
+      default: 16
+    - type: integer
       name: --num_partitions
       description: Number of groups to divide samples into
       default: 10
@@ -31,10 +35,6 @@ functionality:
       name: --partition_id
       description: Index of sample group.
       default: 0
-    - type: boolean
-      name: force_realign
-      description: Align files even when results already exist
-      default: false
     - type: integer
       name: --min_size
       description: Minimum file syze in bytes for a file to be realigned
