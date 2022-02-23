@@ -46,5 +46,5 @@ functionality:
   tests:
     - type: python_script
       path: test.py
-  platforms:
-    - type: native
+platforms:
+  - type: native

@@ -47,11 +47,4 @@ functionality:
 platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1
-    setup:
-      - type: yum
-        packages:
-          - python3
-      - type: docker
-        run: 
-          - ln -fs /usr/bin/python3 /usr/bin/python
   - type: native
