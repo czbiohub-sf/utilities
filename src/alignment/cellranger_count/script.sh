@@ -21,11 +21,11 @@ cellranger \
   count \
   --nosecondary \
   --disable-ui \
-  --expect-cells $par_cell_count \
-  --id $SAMPLE_ID \
-  --fastqs $FASTQ_PATH \
-  --transcriptome $TRANSCRIPTIME_DIR \
-  --sample $SAMPLE_NAME \
+  --expect-cells "$par_cell_count" \
+  --id "$SAMPLE_ID" \
+  --fastqs "$FASTQ_PATH" \
+  --transcriptome "$TRANSCRIPTIME_DIR" \
+  --sample "$SAMPLE_NAME" \
   "${extra_params[@]}"
 
 # output checks

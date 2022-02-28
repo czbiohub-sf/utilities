@@ -159,8 +159,7 @@ def run_sample(
     output_command = [
         SAMTOOLS,
         "sort",
-        "-m",
-        "6000000000",
+        "-m", "6000000000",
         "-n",
         "-o",
         "./Pass1/Aligned.out.sorted-byname.bam",
