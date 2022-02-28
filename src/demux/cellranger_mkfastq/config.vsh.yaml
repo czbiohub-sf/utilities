@@ -8,33 +8,31 @@ functionality:
       --sample_sheet SampleSheet.csv \
       --output /path/to/output
   arguments:
-    # - type: string
-    #   name: --exp_id
-    #   description: The experiment ID
     - type: file
       name: --input
-      description: Path to the untarred BCL files. Expects 'RunParameters.xml' at './'.
+      description: Path to the (untarred) BCL files. Expects 'RunParameters.xml' at './'.
       example: /path/to/bcl
       required: true
     - type: file
       name: --sample_sheet
       description: The path to the sample sheet.
       example: SampleSheet.csv
+      required: true
     - type: file
       name: --output
       direction: output
       description: The folder to store the demux results
       example: "/path/to/output"
       required: true
-    - type: file
-      name: --reports
-      direction: output
-      description: The folder to store the demux results
-      example: "/path/to/reports"
-      required: false
+    - type: integer
+      name: --cores
+      description:  Set max cores the pipeline may request at one time.
+    - type: integer
+      name: --memory
+      description: Set max GB the pipeline may request at one time.
   resources:
-    - type: python_script
-      path: script.py
+    - type: bash_script
+      path: script.sh
   tests:
     - type: python_script
       path: test.py
