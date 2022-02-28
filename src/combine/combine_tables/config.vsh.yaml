@@ -1,0 +1,24 @@
+functionality:
+  name: combine_tables
+  namespace: combine
+  description: |
+    Combine the gene-cell counts from two flow cells. 
+    Input files should have genes as rows and cells as columns.
+  usage: combine_tables --input fileA.csv --input fileB.csv --output output.csv.
+  arguments:
+    - name: --input
+      type: file
+      required: true
+      multiple: true
+      description: Gene cell table for the flow cell.
+    - name: --output
+      type: file
+      direction: output
+      required: true
+      description: File to write combined counts.
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: docker
+    image: python:3.9
