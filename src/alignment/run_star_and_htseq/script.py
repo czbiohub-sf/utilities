@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-import argparse
+
 import datetime
 import os
 import re
 import subprocess
-import tarfile
 import time
 
 from collections import defaultdict
@@ -45,40 +44,21 @@ SAMTOOLS = "samtools"
 
 COMMON_PARS = [
     STAR,
-    "--outFilterType",
-    "BySJout",
-    "--outFilterMultimapNmax",
-    "20",
-    "--alignSJoverhangMin",
-    "8",
-    "--alignSJDBoverhangMin",
-    "1",
-    "--outFilterMismatchNmax",
-    "999",
-    "--outFilterMismatchNoverLmax",
-    "0.04",
-    "--alignIntronMin",
-    "20",
-    "--alignIntronMax",
-    "1000000",
-    "--alignMatesGapMax",
-    "1000000",
-    "--outSAMstrandField",
-    "intronMotif",
-    "--outSAMtype",
-    "BAM",
-    "Unsorted",
-    "--outSAMattributes",
-    "NH",
-    "HI",
-    "NM",
-    "MD",
-    "--genomeLoad",
-    "LoadAndKeep",
-    "--outReadsUnmapped",
-    "Fastx",
-    "--readFilesCommand",
-    "zcat",
+    "--outFilterType", "BySJout",
+    "--outFilterMultimapNmax", "20",
+    "--alignSJoverhangMin", "8",
+    "--alignSJDBoverhangMin", "1",
+    "--outFilterMismatchNmax", "999",
+    "--outFilterMismatchNoverLmax", "0.04",
+    "--alignIntronMin", "20",
+    "--alignIntronMax", "1000000",
+    "--alignMatesGapMax", "1000000",
+    "--outSAMstrandField", "intronMotif",
+    "--outSAMtype", "BAM", "Unsorted", 
+    "--outSAMattributes", "NH", "HI", "NM", "MD",
+    "--genomeLoad", "LoadAndKeep",
+    "--outReadsUnmapped", "Fastx",
+    "--readFilesCommand", "zcat",
 ]
 
 CURR_MIN_VER = datetime.datetime(2017, 3, 1, tzinfo=datetime.timezone.utc)
@@ -118,10 +98,8 @@ def run_sample(
     input_command = COMMON_PARS[:]
     input_command.extend(
         (
-            "--runThreadN",
-            str(star_proc),
-            "--genomeDir",
-            genome_dir,
+            "--runThreadN", str(star_proc),
+            "--genomeDir", genome_dir,
             "--readFilesIn",
             " ".join(reads),
         )
@@ -143,8 +121,7 @@ def run_sample(
     sample_command = [
         SAMTOOLS,
         "sort",
-        "-m",
-        "6000000000",
+        "-m", "6000000000",
         "-o",
         "./Pass1/Aligned.out.sorted.bam",
         "./Pass1/Aligned.out.bam",
@@ -218,15 +195,11 @@ def run_htseq(dest_dir, sjdb_gtf, id_attr):
     failed = False
     htseq_command = [
         HTSEQ,
-        "-r",
-        "name",
-        "-s",
-        "no",
-        "-f",
-        "bam",
+        "-r", "name",
+        "-s", "no",
+        "-f", "bam",
         f"--idattr={id_attr}",
-        "-m",
-        "intersection-nonempty",
+        "-m", "intersection-nonempty",
         os.path.join(dest_dir, "results", "Pass1", "Aligned.out.sorted-byname.bam"),
         sjdb_gtf,
         ">",

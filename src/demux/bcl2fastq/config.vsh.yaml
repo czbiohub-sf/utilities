@@ -3,8 +3,10 @@ functionality:
   namespace: demux
   description: Demultiplex raw sequencing data
   usage: |
-    bcl2fastq --input /path/to/bcl --sample_sheet \
-      sample_sheet.csv --output fastqs --reports reports
+    bcl2fastq \
+      --input /path/to/bcl \
+      --sample_sheet sample_sheet.csv \
+      --output fastqs
   arguments:
     - type: file
       name: --input
