@@ -13,13 +13,11 @@ par = {
 }
 ### VIASH END
 
-CELLRANGER = "cellranger-arc" 
-
 run_id = par["run_id"]
 
 os.chdir(par["output"])
 command = [
-    CELLRANGER,
+    "cellranger-arc",
     "count",
     f"--id={run_id}",
     f"--reference={par['reference_genome']}",

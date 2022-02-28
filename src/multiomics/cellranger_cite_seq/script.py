@@ -22,7 +22,7 @@ run_id = par["run_id"]
 # Run cellranger
 os.chdir(str(par["output"]))
 command = [
-    CELLRANGER,
+    "cellranger-arc",
     "count",
     f"--id={par['run_id']}",
     f"--transcriptome={par['reference_genome']}",

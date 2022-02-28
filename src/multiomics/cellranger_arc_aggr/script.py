@@ -20,8 +20,6 @@ par = {
 }
 ### VIASH END
 
-CELLRANGER = "cellranger-arc"
-
 def create_annotated_results(
         feature_matrix_path,
         libraries_csv,
@@ -86,8 +84,7 @@ with open(original_libraries_path) as csvfile, \
 
 os.chdir(str(par["output"]))
 command = [
-    CELLRANGER,
-    "aggr",
+    "cellranger-arc", "aggr",
     f"--id={run_id}",
     f"--csv={str(libraries_path)}",
     f"--reference={paths['ref_path']}",
