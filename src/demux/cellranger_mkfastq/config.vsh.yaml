@@ -1,10 +1,12 @@
 functionality:
-  name: mkfastq
+  name: cellranger_mkfastq
   namespace: demux
   description: Demultiplex raw sequencing data
   usage: |
-    cellranger mkfastq --localmem=60 --run /path/to/bcl \
-      --sample_sheet sample_sheet.csv --output-dir fastqs
+    cellranger_mkfastq \
+      --input /path/to/bcl \
+      --sample_sheet SampleSheet.csv \
+      --output /path/to/output
   arguments:
     # - type: string
     #   name: --exp_id

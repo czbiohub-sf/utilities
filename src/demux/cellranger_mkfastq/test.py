@@ -1,7 +1,8 @@
 import subprocess
+
 ## VIASH START
 meta = {
-    "functionality_name": "mkfastq",
+    "functionality_name": "cellranger_mkfastq",
     "resources_dir": "resources_test"
 }
 ## VIASH END

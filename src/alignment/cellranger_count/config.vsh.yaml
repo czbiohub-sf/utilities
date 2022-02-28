@@ -1,5 +1,5 @@
 functionality:
-  name: run_10x_count
+  name: cellranger_count
   namespace: alignment
   description: Run alignment jobs using 10x
   arguments:
