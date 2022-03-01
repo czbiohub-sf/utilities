@@ -20,36 +20,36 @@ function clean_up {
 trap clean_up EXIT
 
 # download bcl data
-if [ ! -f "${OUT}/bcl/sample_sheet.csv" ]; then
-  mkdir -p "$OUT/bcl"
+if [ ! -f "${OUT}/bcl_data/sample_sheet.csv" ]; then
+  mkdir -p "$OUT/bcl_data"
 
   # download tar gz
   target/docker/download/download_file/download_file \
     --input https://cf.10xgenomics.com/supp/cell-exp/cellranger-tiny-bcl-1.2.0.tar.gz \
-    --output "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz"
+    --output "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz"
   
   # untar
-  tar -xf "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz" \
+  tar -xf "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz" \
     --strip-components=1 \
-    -C "$OUT/bcl"
+    -C "$OUT/bcl_data"
 
   # remove tar
-  rm "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz"
+  rm "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz"
 
   # download sample sheet
   target/docker/download/download_file/download_file \
     --input https://cf.10xgenomics.com/supp/cell-exp/cellranger-tiny-bcl-simple-1.2.0.csv \
-    --output "${OUT}/bcl/sample_sheet.csv"
+    --output "${OUT}/bcl_data/sample_sheet.csv"
 fi
 
-if [ ! -f "${OUT}/fastq" ]; then
-  mkdir -p "$OUT/fastq"
+if [ ! -f "${OUT}/fastqs" ]; then
+  mkdir -p "$OUT/fastqs"
 
   target/docker/demux/cellranger_mkfastq/cellranger_mkfastq \
-    --input "${OUT}/bcl" \
-    --sample_sheet "${OUT}/bcl/sample_sheet.csv" \
+    --input "${OUT}/bcl_data" \
+    --sample_sheet "${OUT}/bcl_data/sample_sheet.csv" \
     --output "${OUT}/fastqs"
 fi
 
-aws s3 sync --profile czb "$DIR" "$S3DIR"
+#aws s3 sync --profile czb "$DIR" "$S3DIR"
 
