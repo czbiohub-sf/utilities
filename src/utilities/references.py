@@ -27,6 +27,7 @@ reference_genomes = {
     "gex-GRCh38": "refdata-gex-GRCh38-2020-A",
     "gex-mm10": "refdata-gex-mm10-2020-A",
     "gex-GRCh38-and-mm10": "refdata-gex-GRCh38-and-mm10-2020-A",
+    "mm10_genome_SNseq_Harwell": "mm10_genome_SNseq_Harwell",
 }
 
 
