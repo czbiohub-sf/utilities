@@ -11,6 +11,7 @@ import posixpath
 import re
 
 from utilities.log_util import get_logger, log_command
+from utilities.references import reference_genomes
 
 import boto3
 
@@ -18,33 +19,6 @@ import boto3
 # reference genome bucket name for different regions
 S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 
-# valid and deprecated reference genomes
-reference_genomes = {
-    "homo": "HG38-PLUS",
-    "hg38-plus": "HG38-PLUS",
-    "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
-    "mus": "MM10-PLUS",
-    "mm10-plus": "MM10-PLUS",
-    "mm10-1.2.0": "mm10-1.2.0",
-    "mus-premrna": "mm10-1.2.0-premrna",
-    "mm10-1.2.0-premrna": "mm10-1.2.0-premrna",
-    "hg19-mm10-3.0.0": "hg19-mm10-3.0.0",
-    "microcebus": "MicMur3-PLUS",
-    "gencode.vM19": "gencode.vM19",
-    "GRCh38_premrna": "GRCh38_premrna",
-    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
-    "SARS.GRCh38_genome": "SARS.GRCh38_genome",
-    "botryllus": "botryllus",
-    "zebrabow" : "Danio.rerio_ZebraBow_genome",
-    "zebrafishChromacode" : "Danio.rerio_Chromacode",
-    "GRCh38premrna_and_SARSCoV2":"GRCh38premrna_and_SARSCoV2",
-    "mouse_genome_mcherry":"mouse_genome_mcherry",
-}
-deprecated = {
-    "homo": "hg38-plus",
-    "mus": "mm10-plus",
-    "mus-premrna": "mm10-1.2.0-premrna",
-}
 
 # other helpful constants
 CELLRANGER = "cellranger"
