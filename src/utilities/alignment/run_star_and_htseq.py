@@ -10,6 +10,7 @@ import time
 from collections import defaultdict
 
 import utilities.log_util as ut_log
+from utilities.references import reference_genomes
 import utilities.s3_util as s3u
 
 import boto3
@@ -19,21 +20,6 @@ from boto3.s3.transfer import TransferConfig
 # reference genome bucket name for different regions
 S3_REFERENCE = {"east": "czbiohub-reference-east", "west": "czbiohub-reference"}
 
-# valid and deprecated reference genomes
-reference_genomes = {
-    "homo": "HG38-PLUS",
-    "hg38-plus": "HG38-PLUS",
-    "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
-    "mus": "MM10-PLUS",
-    "mm10-plus": "MM10-PLUS",
-    "microcebus": "MicMur3-PLUS",
-    "gencode.vM19": "gencode.vM19",
-    "gencode.vM19.ERCC": "gencode.vM19.ERCC.SP1",
-    "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
-    "homo.gencode.v30-plus-HAV18": "gencode.v30.annotation.ERCC92.HAV_18f_KP879216",
-    "gencode_mouse_MTB": "gencode_mouse_MTB"
-}
-deprecated = {"homo": "hg38-plus", "mus": "mm10-plus"}
 
 # other helpful constants
 STAR = "STAR"
@@ -390,12 +376,6 @@ def main(logger):
 
     # check if the input genome and region are valid
     if args.taxon in reference_genomes:
-        if args.taxon in deprecated:
-            logger.warn(
-                f"The name '{args.taxon}' will be removed in the future,"
-                f" start using '{deprecated[args.taxon]}'"
-            )
-
         genome_name = reference_genomes[args.taxon]
     else:
         raise ValueError(f"unknown taxon {args.taxon}")
