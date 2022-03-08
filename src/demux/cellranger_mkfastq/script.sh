@@ -38,19 +38,23 @@ fi
 
 
 echo "Running cellranger demux"
+orig_pwd=`pwd`
 work_dir="$tmpdir/out"
 mkdir -p "$work_dir"
 
 id=myoutput
 
+cd "$work_dir"
 cellranger mkfastq \
   --id "$id" \
   --sample-sheet "$par_sample_sheet" \
   --run "$par_input" \
-  --output-dir "$work_dir" \
   "${extra_params[@]}" \
   --disable-ui
+  # --output-dir "$work_dir" \
+cd "$orig_pwd"
 
+ls -l "$work_dir/$id/outs/"
 if [ -d "$work_dir/$id/outs/" ]; then
   mv "$work_dir/$id/outs/fastq_path" "$par_output/"
 fi
