@@ -13,7 +13,8 @@ DIR="$OUT"
 S3DIR="s3://czbiohub-pipelines/$DIR"
 
 # create tempdir
-TMPDIR=$(mktemp -d "$VIASH_TEMP/$ID-XXXXXX")
+MY_TEMP="${VIASH_TEMP:-/tmp}"
+TMPDIR=$(mktemp -d "$MY_TEMP/$ID-XXXXXX")
 function clean_up {
   [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
 }
@@ -51,5 +52,5 @@ if [ ! -f "${OUT}/fastqs" ]; then
     --output "${OUT}/fastqs"
 fi
 
-#aws s3 sync --profile czb "$DIR" "$S3DIR"
+# aws s3 sync --profile czb "$DIR" "$S3DIR"
 
