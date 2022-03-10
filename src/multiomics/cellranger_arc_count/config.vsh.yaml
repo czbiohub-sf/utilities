@@ -47,5 +47,5 @@ functionality:
   #   - path: ../../../resources_test/bs_195891710
 platforms:
   - type: docker
-    image: ghcr.io/data-intuitive/cellranger:6.1
+    image: ghcr.io/data-intuitive/cellranger_arc:6.1
   - type: native
