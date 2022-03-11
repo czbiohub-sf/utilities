@@ -22,8 +22,12 @@ cd "$REPO_ROOT"
 
 curl -fsSL get.viash.io | bash -s -- \
   --tag 0.5.8 \
-  --viash bin/viash
-
+  --viash bin/viash \
+  --registry ghcr.io \
+  --organisation czbiohub/utilities \
+  --config_mod '.platforms[.type == "nextflow"].setup += { type: "docker", label: "org.opencontainers.image.source="https://github.com/czbiohub/utilities" }'
+# config is a temporary workaround for missing labels ↑
+ 
 cd bin
 
 curl -s https://get.nextflow.io | bash

@@ -1,7 +1,13 @@
 #!/bin/bash
 
 ## VIASH START
+par_input=resources_test/cellranger_tiny_bcl_1.2.0/bcl_data
+par_sample_sheet=resources_test/cellranger_tiny_bcl_1.2.0/bcl_data/sample_sheet.csv
+par_output=foo
 meta_resources_name=foo
+par_input=`realpath $par_input`
+par_sample_sheet=`realpath $par_sample_sheet`
+par_output=`realpath $par_output`
 ## VIASH END
 
 # create temporary directory
@@ -47,7 +53,7 @@ id=myoutput
 cd "$work_dir"
 cellranger mkfastq \
   --id "$id" \
-  --sample-sheet "$par_sample_sheet" \
+  --csv "$par_sample_sheet" \
   --run "$par_input" \
   "${extra_params[@]}" \
   --disable-ui
