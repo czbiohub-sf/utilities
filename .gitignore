@@ -116,8 +116,7 @@ multiomics/cellranger-6.1.0.tar.gz
 # Viash-related
 resources_test/
 target/
-log.txt
-log.tsv
+.viash_log*
 
 # NextFlow
 work/
