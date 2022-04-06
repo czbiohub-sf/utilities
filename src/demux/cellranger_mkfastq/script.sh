@@ -4,7 +4,6 @@
 par_input='resources_test/cellranger_tiny_bcl_1.2.0/bcl'
 par_sample_sheet='resources_test/cellranger_tiny_bcl_1.2.0/bcl/sample_sheet.csv'
 par_output=foo
-meta_resources_name=foo
 par_input=`realpath $par_input`
 par_sample_sheet=`realpath $par_sample_sheet`
 par_output=`realpath $par_output`
@@ -53,9 +52,9 @@ cellranger mkfastq \
   --run "$par_input" \
   "${extra_params[@]}" \
   --disable-ui
-  # --output-dir "$work_dir" \
 cd "$orig_pwd"
 
+echo "Copying output"
 if [ -d "$work_dir/$id/outs/fastq_path/" ]; then
   if [ ! -d "$par_output" ]; then
     mkdir -p "$par_output"

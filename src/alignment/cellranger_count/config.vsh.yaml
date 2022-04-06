@@ -4,15 +4,17 @@ functionality:
   description: Run alignment jobs using 10x
   arguments:
     - type: file
-      name: --input_path
+      name: --input
       required: true
       description: The folder with fastq.gz files to align.
+      # multiple: true
+      # multiple_sep: ","
     - type: file
       name: --transcriptome
       required: true
-      description: The folder with fastq.gz files to align.
+      description: The path to reference tar.gz file.
     - type: file
-      name: --output_path
+      name: --output
       direction: output
       required: true
       description: The folder to store the alignment results.
@@ -40,6 +42,11 @@ functionality:
   resources:
     - type: bash_script
       path: script.sh
+  tests:
+    - type: python_script
+      path: test.py
+    - path: ../../../resources_test/pbmc_1k_protein_v3
+    - path: ../../../resources_test/reference/refdata-gex-GRCh38-2020-A
 platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1
