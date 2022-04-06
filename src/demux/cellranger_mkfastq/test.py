@@ -1,4 +1,5 @@
 import subprocess
+from os import path
 
 ## VIASH START
 meta = {
@@ -7,25 +8,20 @@ meta = {
 }
 ## VIASH END
 
-# Run command: viash test config.vsh.yaml 
+print("> Running command")
+input = meta["resources_dir"] + "/cellranger_tiny_bcl_1.2.0/bcl"
+sample_sheet = meta["resources_dir"] + "/cellranger_tiny_bcl_1.2.0/bcl/sample_sheet.csv"
+output = "test_output"
 
-# get some data
-bcl_data = f"{meta['resources_dir']}/bs_195891710/bcl_data"
-fastq_output = 'test_output'
-
-# construct command args
-command = [
+cmd_pars = [
     "./" + meta["functionality_name"],
-    "--input", bcl_data,
-    "--output", fastq_output,
+    "--input", input,
+    "--sample_sheet", sample_sheet,
+    "--output", output,
 ]
+out = subprocess.check_output(cmd_pars).decode("utf-8")
 
-print(f"> Running {meta['functionality_name']}")
-out = subprocess.run(
-    command,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT,
-    check=True
-)
+print("> Check if file exists")
+assert path.exists(output + "/H35KCBCXY/test_sample"), "No output was created."
 
-print("Completed Successfully!")
+print("> Completed Successfully!")
