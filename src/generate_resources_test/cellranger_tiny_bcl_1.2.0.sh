@@ -47,10 +47,20 @@ if [ ! -f "${OUT}/fastqs" ]; then
   mkdir -p "$OUT/fastqs"
 
   target/docker/demux/cellranger_mkfastq/cellranger_mkfastq \
-    --input "${OUT}/bcl_data" \
-    --sample_sheet "${OUT}/bcl_data/sample_sheet.csv" \
+    --input "${OUT}/bcl" \
+    --sample_sheet "${OUT}/bcl/sample_sheet.csv" \
     --output "${OUT}/fastqs"
 fi
+
+# if [ ! -f "${OUT}/bam" ]; then
+#   mkdir -p "$OUT/bam"
+
+#   target/docker/alignment/cellranger_count/cellranger_count \
+#     --input "${OUT}/fastqs" \
+#     --transcriptome "resources_test/reference/refdata-gex-GRCh38-2020-A" \
+#     --chemistry "SC5P-PE" \
+#     --output "${OUT}/bam"
+# fi
 
 # aws s3 sync --profile czb "$DIR" "$S3DIR"
 

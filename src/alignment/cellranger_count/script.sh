@@ -1,9 +1,10 @@
 #!/bin/bash
 
 ## VIASH START
-par_input='resources_test/pbmc_1k_protein_v3/fastqs/pbmc_1k_protein_v3_gex_fastqs/'
+# par_input='resources_test/pbmc_1k_protein_v3/fastqs/pbmc_1k_protein_v3_gex_fastqs/'
+par_input='resources_test/cellranger_tiny_bcl_1.2.0/fastqs/test_sample'
 par_transcriptome='resources_test/reference/refdata-gex-GRCh38-2020-A'
-par_output='resources_test/pbmc_1k_protein_v3/bam'
+par_output='resources_test/cellranger_tiny_bcl_1.2.0/bam'
 par_input=`realpath $par_input`
 par_transcriptome=`realpath $par_transcriptome`
 par_output=`realpath $par_output`
@@ -30,12 +31,9 @@ fi
 if [ ! -z "$par_expect_cells" ]; then 
   extra_params+=( "--expect-cells" "$par_expect_cells" )
 fi
-# if [ ! -z "$par_libraries" ]; then 
-#   extra_params+=( "--libraries" "$par_libraries" )
-# fi
-# if [ ! -z "$par_feature_ref" ]; then 
-#   extra_params+=( "--feature-ref" "$par_feature_ref" )
-# fi
+if [ ! -z "$par_chemistry" ]; then 
+  extra_params+=( "--chemistry" "$par_chemistry" )
+fi
 
 echo "Running cellranger count"
 orig_pwd=`pwd`
@@ -51,14 +49,13 @@ cellranger count \
   --transcriptome "$par_transcriptome" \
   "${extra_params[@]}" \
   --disable-ui \
-  --nosecondary \
-  --output-dir "$par_output"
+  --nosecondary
 cd "$orig_pwd"
 
-# echo "Copying output"
-# if [ -d "$work_dir/$id/outs/" ]; then
-#   if [ ! -d "$par_output" ]; then
-#     mkdir -p "$par_output"
-#   fi
-#   mv "$work_dir/$id/outs/"* "$par_output"
-# fi
+echo "Copying output"
+if [ -d "$work_dir/$id/outs/" ]; then
+  if [ ! -d "$par_output" ]; then
+    mkdir -p "$par_output"
+  fi
+  mv "$work_dir/$id/outs/"* "$par_output"
+fi
