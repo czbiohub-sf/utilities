@@ -3,21 +3,30 @@ functionality:
   namespace: alignment
   description: Run alignment jobs using 10x
   arguments:
+    # inputs
     - type: file
       name: --input
       required: true
       description: The folder with fastq.gz files to align.
-      # multiple: true
-      # multiple_sep: ","
     - type: file
       name: --transcriptome
       required: true
       description: The path to reference tar.gz file.
+    
+    # outputs
     - type: file
       name: --output
       direction: output
       required: true
       description: The folder to store the alignment results.
+    # TODO: implement split component for splitting output into a tuple of files.
+
+    # arguments
+    - type: integer
+      name: --expect_cells
+      default: 3000
+      description: "Expected number of recovered cells, used as input to cell calling algorithm."
+
     # - type: integer
     #   name: --num_partitions
     #   required: true
@@ -33,6 +42,8 @@ functionality:
     #   description: |
     #     Index of sample group. Enter 0 as the default value here 
     #     since we only have one sample.
+
+    # runtime args
     - type: integer
       name: --cores
       description:  Set max cores the pipeline may request at one time.
