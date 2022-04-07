@@ -51,13 +51,14 @@ cellranger mkfastq \
   --csv "$par_sample_sheet" \
   --run "$par_input" \
   "${extra_params[@]}" \
-  --disable-ui
+  --disable-ui \
+  --output-dir "$par_output"
 cd "$orig_pwd"
 
-echo "Copying output"
-if [ -d "$work_dir/$id/outs/fastq_path/" ]; then
-  if [ ! -d "$par_output" ]; then
-    mkdir -p "$par_output"
-  fi
-  mv "$work_dir/$id/outs/fastq_path/"* "$par_output"
-fi
+# echo "Copying output"
+# if [ -d "$work_dir/$id/outs/fastq_path/" ]; then
+#   if [ ! -d "$par_output" ]; then
+#     mkdir -p "$par_output"
+#   fi
+#   mv "$work_dir/$id/outs/fastq_path/"* "$par_output"
+# fi
