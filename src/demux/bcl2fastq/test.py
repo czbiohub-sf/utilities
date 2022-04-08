@@ -8,7 +8,7 @@ meta = {
 ## VIASH END
 
 # get some data
-bcl_data = f"{meta['resources_dir']}/sbs_195891710/bcl_data"
+bcl_data = f"{meta['resources_dir']}/sbs_195891710/bcl"
 fastq_output = 'test_output'
 
 # construct command args

@@ -18,6 +18,7 @@ functionality:
       name: --output
       direction: output
       required: true
+      example: output_dir
       description: The folder to store the alignment results.
     # TODO: implement split component for splitting output into a tuple of files.
 

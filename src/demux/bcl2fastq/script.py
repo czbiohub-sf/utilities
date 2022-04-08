@@ -8,7 +8,7 @@ import subprocess
 ## VIASH START
 par = {
     "sample_sheet" : None,
-    "input": "resources_test/bs_195891710/bcl_data/",
+    "input": "resources_test/bs_195891710/bcl/",
     "output": "resources_test/bs_195891710/fastqs/",
     "reports": "resources_test/bs_195891710/reports/",
     "skip_undetermined": True,
