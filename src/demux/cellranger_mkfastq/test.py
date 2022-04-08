@@ -9,8 +9,8 @@ meta = {
 ## VIASH END
 
 print("> Running command")
-input = meta["resources_dir"] + "/cellranger_tiny_bcl_1.2.0/bcl"
-sample_sheet = meta["resources_dir"] + "/cellranger_tiny_bcl_1.2.0/bcl/sample_sheet.csv"
+input = meta["resources_dir"] + "/cellranger_tiny_bcl/bcl"
+sample_sheet = meta["resources_dir"] + "/cellranger_tiny_bcl/bcl/sample_sheet.csv"
 output = "test_output"
 
 cmd_pars = [

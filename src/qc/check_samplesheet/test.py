@@ -12,7 +12,7 @@ out = subprocess.run(
     [
         # "viash", "run", "src/qc/check_samplesheet/config.vsh.yaml", "--", 
         "./" + meta["functionality_name"],
-        "--input", f"{meta['resources_dir']}/bs_195891710/bcl_data/SampleSheet.csv"
+        "--input", f"{meta['resources_dir']}/bs_195891710/bcl/SampleSheet.csv"
     ],
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE

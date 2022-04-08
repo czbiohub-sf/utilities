@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ## VIASH START
-par_input='resources_test/cellranger_tiny_bcl_1.2.0/bcl'
-par_sample_sheet='resources_test/cellranger_tiny_bcl_1.2.0/bcl/sample_sheet.csv'
+par_input='resources_test/cellranger_tiny_bcl/bcl'
+par_sample_sheet='resources_test/cellranger_tiny_bcl/bcl/sample_sheet.csv'
 par_output=foo
 par_input=`realpath $par_input`
 par_sample_sheet=`realpath $par_sample_sheet`

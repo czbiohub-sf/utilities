@@ -7,7 +7,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 # settings
-ID=cellranger_tiny_bcl_1.2.0
+ID=cellranger_tiny_bcl
 OUT="resources_test/$ID/"
 DIR="$OUT"
 S3DIR="s3://czbiohub-pipelines/$DIR"
@@ -21,26 +21,26 @@ function clean_up {
 trap clean_up EXIT
 
 # download bcl data
-if [ ! -f "${OUT}/bcl_data/sample_sheet.csv" ]; then
-  mkdir -p "$OUT/bcl_data"
+if [ ! -f "${OUT}/bcl/sample_sheet.csv" ]; then
+  mkdir -p "$OUT/bcl"
 
   # download tar gz
   target/docker/download/download_file/download_file \
     --input https://cf.10xgenomics.com/supp/cell-exp/cellranger-tiny-bcl-1.2.0.tar.gz \
-    --output "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz"
+    --output "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz"
   
   # untar
-  tar -xf "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz" \
+  tar -xf "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz" \
     --strip-components=1 \
-    -C "$OUT/bcl_data"
+    -C "$OUT/bcl"
 
   # remove tar
-  rm "${OUT}/bcl_data/cellranger-tiny-bcl-1.2.0.tar.gz"
+  rm "${OUT}/bcl/cellranger-tiny-bcl-1.2.0.tar.gz"
 
   # download sample sheet
   target/docker/download/download_file/download_file \
     --input https://cf.10xgenomics.com/supp/cell-exp/cellranger-tiny-bcl-simple-1.2.0.csv \
-    --output "${OUT}/bcl_data/sample_sheet.csv"
+    --output "${OUT}/bcl/sample_sheet.csv"
 fi
 
 if [ ! -f "${OUT}/fastqs" ]; then

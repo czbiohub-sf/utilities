@@ -7,7 +7,7 @@ import sys
 
 ## VIASH START
 par = {
-  'input': [ "resources_test/bs_195891710/bcl_data/SampleSheet.csv" ]
+  'input': [ "resources_test/bs_195891710/bcl/SampleSheet.csv" ]
 }
 ## VIASH END
 
