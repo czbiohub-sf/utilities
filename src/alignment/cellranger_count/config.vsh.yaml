@@ -17,9 +17,10 @@ functionality:
     - type: file
       name: --output
       direction: output
-      required: true
-      example: output_dir
       description: The folder to store the alignment results.
+      example: "/path/to/output"
+      default: counts
+      required: true
     # TODO: implement split component for splitting output into a tuple of files.
 
     # arguments
@@ -63,3 +64,5 @@ functionality:
 platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1
+  - type: nextflow
+    publish: true

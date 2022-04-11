@@ -39,13 +39,9 @@ fi
 
 
 echo "Running cellranger demux"
-orig_pwd=`pwd`
-work_dir="$tmpdir/out"
-mkdir -p "$work_dir"
 
 id=myoutput
 
-cd "$work_dir"
 cellranger mkfastq \
   --id "$id" \
   --csv "$par_sample_sheet" \
@@ -53,7 +49,6 @@ cellranger mkfastq \
   "${extra_params[@]}" \
   --disable-ui \
   --output-dir "$par_output"
-cd "$orig_pwd"
 
 # echo "Copying output"
 # if [ -d "$work_dir/$id/outs/fastq_path/" ]; then

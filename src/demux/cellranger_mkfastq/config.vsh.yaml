@@ -23,6 +23,7 @@ functionality:
       direction: output
       description: The folder to store the demux results
       example: "/path/to/output"
+      default: fastqs
       required: true
     - type: integer
       name: --cores
@@ -40,3 +41,5 @@ functionality:
 platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1
+  - type: nextflow
+    publish: true

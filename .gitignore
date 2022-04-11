@@ -123,3 +123,7 @@ work/
 .nextflow.log
 flowchart.*
 .nextflow*
+
+# Extra
+trash
+cellranger-6.1.2.tar.gz

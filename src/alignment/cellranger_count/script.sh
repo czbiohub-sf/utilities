@@ -36,13 +36,8 @@ if [ ! -z "$par_chemistry" ]; then
 fi
 
 echo "Running cellranger count"
-orig_pwd=`pwd`
-work_dir="$tmpdir/out"
-mkdir -p "$work_dir"
 
 id=myoutput
-
-cd "$work_dir"
 cellranger count \
   --id "$id" \
   --fastqs "$par_input" \
@@ -50,12 +45,11 @@ cellranger count \
   "${extra_params[@]}" \
   --disable-ui \
   --nosecondary
-cd "$orig_pwd"
 
 echo "Copying output"
-if [ -d "$work_dir/$id/outs/" ]; then
+if [ -d "$id/outs/" ]; then
   if [ ! -d "$par_output" ]; then
     mkdir -p "$par_output"
   fi
-  mv "$work_dir/$id/outs/"* "$par_output"
+  mv "$id/outs/"* "$par_output"
 fi
