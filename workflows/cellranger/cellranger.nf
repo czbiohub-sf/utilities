@@ -3,8 +3,8 @@ nextflow.enable.dsl=2
 // workDir = '${params.rootDir}/workflows'
 targetDir = "${params.rootDir}/target/nextflow"
 
-include  { cellranger_mkfastq }       from  targetDir + "/demux/cellranger_mkfastq/main.nf"          params(params)
-include  { cellranger_count }         from  targetDir + "/alignment/cellranger_count/main.nf"        params(params)
+include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
+include { cellranger_count } from targetDir + "/alignment/cellranger_count/main.nf"
 
 
 /* CellRanger - common workflow
