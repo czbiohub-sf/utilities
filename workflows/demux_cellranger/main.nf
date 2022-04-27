@@ -16,12 +16,13 @@ A workflow for running a Cell Ranger Demux workflow.
 This workflow can be run on a single input or in batch, see below.
 
 Parameters (Single input mode):
-  --id         ID of the sample (optional).
-  --input      A BCL directory (required).
-  --output     Path to an output directory (required).
+  --id             ID of the sample (optional).
+  --input          A BCL directory (required).
+  --sample_sheet   Sample sheet (required).
+  --output         Path to an output directory (required).
   
 Parameters (Batch mode):
-  --csv        A csv file containing columns 'id', 'input' (required).
+  --csv        A csv file containing columns 'id', 'input', 'sample_sheet' (required).
   --output     Path to an output directory (required).
 """
     exit 0
@@ -38,7 +39,7 @@ Parameters (Batch mode):
     input_ch = Channel.fromPath(params.csv)
       | splitCsv(header: true, sep: ",")
   } else {
-    input_ch = Channel.value( params.subMap(["id", "input"]) )
+    input_ch = Channel.value( params.subMap(["id", "input", "sample_sheet"]) )
   }
 
   input_ch
@@ -53,6 +54,14 @@ Parameters (Batch mode):
           "ERROR: The provided csv file should contain an 'input' column" : 
           "ERROR: Please specify an '--input' parameter"
       }
+      // process input
+      if (li.containsKey("sample_sheet") && li.sample_sheet) {
+        sample_sheet_path = file(li.sample_sheet)
+      } else {
+        exit 1, has_param("csv") ? 
+          "ERROR: The provided csv file should contain a 'sample_sheet' column" : 
+          "ERROR: Please specify an '--sample_sheet' parameter"
+      }
 
       // process id
       if (li.containsKey("id") && li.id) {
@@ -62,7 +71,7 @@ Parameters (Batch mode):
       } else {
         exit 1, "ERROR: The provided csv file should contain an 'id' column"
       }
-      [ id_value, [ input: input_path ], params ]
+      [ id_value, [ input: input_path, sample_sheet: sample_sheet_path ], params ]
     }
     | view { "before run_wf: ${it[0]} - ${it[1]}" }
     | run_wf
