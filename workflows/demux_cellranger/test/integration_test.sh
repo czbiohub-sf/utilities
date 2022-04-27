@@ -10,9 +10,6 @@ export NXF_VER=21.10.6
 
 bin/nextflow \
   run . \
-  -main-script workflows/1_ingestion/bd_rhapsody_wta/main.nf \
+  -main-script workflows/demux_cellranger/main.nf \
   -entry test_wf \
   -resume
-
-# -c workflows/1_ingestion/bd_rhapsody_wta/nextflow.config \
-
