@@ -56,7 +56,7 @@ if [ ! -f "$bam_dir" ]; then
 
   target/docker/alignment/cellranger_count/cellranger_count \
     --input "$cellranger_tiny_fastq" \
-    --transcriptome "$cellranger_tiny_ref" \
+    --reference "$cellranger_tiny_ref" \
     --output "$bam_dir"
 fi
 

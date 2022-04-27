@@ -57,7 +57,7 @@ fi
 
 #   target/docker/alignment/cellranger_count/cellranger_count \
 #     --input "${OUT}/fastqs" \
-#     --transcriptome "resources_test/reference/refdata-gex-GRCh38-2020-A" \
+#     --reference "resources_test/reference/refdata-gex-GRCh38-2020-A" \
 #     --chemistry "SC5P-PE" \
 #     --output "${OUT}/bam"
 # fi
