@@ -8,15 +8,28 @@ These are instructions on how to launch a pipeline using the published code with
 
 These are instructions on running a utitlities pipeline from within the github reposository. 
 
-### CellRanger Preprocessing
+### CellRanger demultiplexing
 
-Running `cellranger` demultiplexing and alignment.
+Running `cellranger` demultiplexing.
 
 ```
-bin/nextflow run ./cellranger.nf \
+NXF_VER=21.10.6 nextflow run . \
+    -main-script workflows/demux_cellranger/main.nf \
     --id example_run \
     --input ./resources_test/cellranger_tiny_bcl/bcl \
     --sample_sheet ./resources_test/cellranger_tiny_bcl/bcl/sample_sheet.csv \
-    --transcriptome ./resources_test/cellranger_tiny_fastq/cellranger_tiny_ref \
-    --publishDir ./example_run_output
+    --output ./output/demux
+```
+
+### CellRanger alignment
+
+Running `cellranger` alignment.
+
+```
+NXF_VER=21.10.6 nextflow run . \
+    -main-script workflows/mapping_cellranger/main.nf \
+    --id example_run \
+    --input resources_test/cellranger_tiny_fastq/cellranger_tiny_fastq \
+    --reference ./resources_test/cellranger_tiny_fastq/cellranger_tiny_ref \
+    --output ./output/alignment
 ```
