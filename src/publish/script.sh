@@ -16,4 +16,4 @@ else
   f=$par_output
 fi
 
-cp "$par_input" "$par_output"
+cp -r "$par_input" "$par_output"
