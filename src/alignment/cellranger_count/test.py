@@ -16,7 +16,7 @@ output = "test_output"
 cmd_pars = [
     "./" + meta["functionality_name"],
     "--input", input,
-    "--transcriptome", reference,
+    "--reference", reference,
     "--output", output,
 ]
 out = subprocess.check_output(cmd_pars).decode("utf-8")

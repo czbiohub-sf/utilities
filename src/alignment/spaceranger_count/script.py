@@ -7,7 +7,7 @@ par = {
     "input_fastqs": "resources_test/demuxed/fastqs/",
     "input_tif": "resources_test/demuxed/*.tif",
     "output": "aligned",
-    "transcriptome": "resources/refdata-gex-mm10-2020-A.tar.gz",
+    "reference": "resources/refdata-gex-mm10-2020-A.tar.gz",
     "id": "output",
     "sample": None,
     "lanes": None,

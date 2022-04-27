@@ -9,7 +9,7 @@ functionality:
       required: true
       description: The folder with fastq.gz files to align.
     - type: file
-      name: --transcriptome
+      name: --reference
       required: true
       description: The path to reference tar.gz file.
     
@@ -65,4 +65,3 @@ platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1
   - type: nextflow
-    publish: true

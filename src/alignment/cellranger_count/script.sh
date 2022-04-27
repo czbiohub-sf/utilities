@@ -3,10 +3,10 @@
 ## VIASH START
 # par_input='resources_test/pbmc_1k_protein_v3/fastqs/pbmc_1k_protein_v3_gex_fastqs/'
 par_input='resources_test/cellranger_tiny_bcl_1.2.0/fastqs/test_sample'
-par_transcriptome='resources_test/reference/refdata-gex-GRCh38-2020-A'
+par_reference='resources_test/reference/refdata-gex-GRCh38-2020-A'
 par_output='resources_test/cellranger_tiny_bcl_1.2.0/bam'
 par_input=`realpath $par_input`
-par_transcriptome=`realpath $par_transcriptome`
+par_reference=`realpath $par_reference`
 par_output=`realpath $par_output`
 ## VIASH END
 
@@ -41,7 +41,7 @@ id=myoutput
 cellranger count \
   --id "$id" \
   --fastqs "$par_input" \
-  --transcriptome "$par_transcriptome" \
+  --transcriptome "$par_reference" \
   "${extra_params[@]}" \
   --disable-ui \
   --nosecondary
