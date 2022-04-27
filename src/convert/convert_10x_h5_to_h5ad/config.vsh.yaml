@@ -22,3 +22,4 @@ platforms:
     setup:
       - type: python
         pip: scanpy
+  - type: nextflow

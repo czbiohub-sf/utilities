@@ -48,4 +48,6 @@ functionality:
       path: script.sh
 platforms:
   - type: docker
-    image: bash:4.0
+    image: "ubuntu:focal"
+  - type: nextflow
+    variant: neo

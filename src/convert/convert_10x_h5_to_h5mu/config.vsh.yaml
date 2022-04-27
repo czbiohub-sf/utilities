@@ -12,7 +12,7 @@ functionality:
       direction: output
       required: true
       description: Counts in MuData format.
-      example: output.h5ad
+      example: output.h5mu
   resources:
     - type: python_script
       path: script.py
@@ -22,3 +22,4 @@ platforms:
     setup:
       - type: python
         pip: muon
+  - type: nextflow
