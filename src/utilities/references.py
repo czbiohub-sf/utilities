@@ -30,6 +30,7 @@ reference_genomes = {
     "mm10_genome_SNseq_Harwell": "mm10_genome_SNseq_Harwell",
     "gencode_mouse_MTB": "gencode_mouse_MTB",
     "zebrafishChromacode" : "Danio.rerio_Chromacode",
+    "mouse_genome_mcherry": "mouse_genome_mcherry",
 }
 
 
