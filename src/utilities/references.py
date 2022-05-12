@@ -31,6 +31,7 @@ reference_genomes = {
     "gencode_mouse_MTB": "gencode_mouse_MTB",
     "zebrafishChromacode" : "Danio.rerio_Chromacode",
     "mouse_genome_mcherry": "mouse_genome_mcherry",
+    "SARS.GRCh38_genome" : "SARS.GRCh38_genome",
 }
 
 
