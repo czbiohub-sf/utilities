@@ -10,9 +10,11 @@ export NXF_VER=21.10.6
 export NXF_SINGULARITY_CACHEDIR="$HOME/.cache/singularity"
 
 bin/nextflow \
-  run . \
+  run https://github.com/czbiohub/utilities \
+  -r 1.0.0 \
   -main-script workflows/demux_cellranger/main.nf \
   -resume \
+  -latest \
   -with-singularity \
   --id tiny_bcl \
   --input resources_test/cellranger_tiny_bcl/bcl \
