@@ -13,6 +13,7 @@ A collection of scripts for common data management and processing tasks
 | Align using STAR and htseq (fast) | ```aws_star [see --help for input format] --taxon TAXON --num_partitions NUM_PARTITIONS --s3_input_path s3://input-bucket/path/to/sample/folders --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to launch many alignments using `source your_script.sh` |
 | Run Velocyto for smartseq2 data aligned with STAR (slow) | ```evros velocyto.run_velocyto_star [see --help for input format] --taxon [see --help for options] --s3_input_path s3://input-bucket/path/to/one-sample-folder-of-star-alignment-results --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. Very slow! |
 | Run Velocyto for smartseq2 data aligned with STAR (fast) | ```aws_velocyto [see --help for taxon] [# partitions] --s3_input_path s3://input-bucket/path/to/sample-folders-of-star-alignment-results --s3_output_path s3://output-bucket/path/for/results > your_script.sh``` | Creates a shell script locally to run velocyto on STAR output |
+| VDJ 10X | ```evros alignment.run_10x_vdj [see --help for input format] --taxon [see --help for options] --s3_input_path s3://input-bucket/path/to/fastqs --s3_output_path s3://output-bucket/path/for/results``` | Run once for each channel of the run. |
 | Create a download token | `aws_access fastqs/YYMMDD_EXP_ID [optional bucket] > download_instructions.txt` | Defaults to the `czb-seqbot` bucket |
 
 
@@ -178,6 +179,8 @@ The following is the 10X_reference_genomes dictionary used in cellranger alignme
     "gencode.vM19": "gencode.vM19",
     "GRCh38_premrna": "GRCh38_premrna",
     "zebrafish-plus": "danio_rerio_plus_STAR2.6.1d",
+    "GRCh38-VDJ":"refdata-cellranger-vdj-GRCh38-alts-ensembl-4.0.0",
+    "gencode_human_mouse_MTB": "gencode_human_mouse_MTB",
     "SARS.GRCh38_genome": "SARS.GRCh38_genome",
 }
 ```
