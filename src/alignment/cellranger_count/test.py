@@ -9,8 +9,8 @@ meta = {
 ## VIASH END
 
 print("> Running command")
-input = meta["resources_dir"] + "/pbmc_1k_protein_v3/fastqs/pbmc_1k_protein_v3_gex_fastqs"
-reference = meta["resources_dir"] + "/refdata-gex-GRCh38-2020-A"
+input = meta["resources_dir"] + "/cellranger_tiny_fastq/cellranger_tiny_fastq/"
+reference = meta["resources_dir"] + "/cellranger_tiny_fastq/cellranger_tiny_ref/"
 output = "test_output"
 
 cmd_pars = [
