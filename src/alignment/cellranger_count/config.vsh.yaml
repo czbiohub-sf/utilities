@@ -1,7 +1,7 @@
 functionality:
   name: cellranger_count
   namespace: alignment
-  description: Run alignment jobs using 10x
+  description: Align fastq files using Cell Ranger count.
   arguments:
     # inputs
     - type: file
@@ -21,7 +21,6 @@ functionality:
       example: "/path/to/output"
       default: counts
       required: true
-    # TODO: implement split component for splitting output into a tuple of files.
 
     # arguments
     - type: integer
@@ -60,7 +59,6 @@ functionality:
     - type: python_script
       path: test.py
     - path: ../../../resources_test/cellranger_tiny_fastq
-    - path: ../../../resources_test/reference/refdata-gex-GRCh38-2020-A
 platforms:
   - type: docker
     image: ghcr.io/data-intuitive/cellranger:6.1

@@ -55,4 +55,3 @@ platforms:
     image: ghcr.io/data-intuitive/spaceranger:latest
   - type: native
   - type: nextflow
-    publish: true
