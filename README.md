@@ -55,7 +55,7 @@ Run `bin/init` to set up Viash and Nextflow.
 Run `bin/viash_build` to build all components and Docker containers
 locally.
 
-Run `bin/viash_build` to unit test all components.
+Run `bin/viash_test` to unit test all components.
 
 Run any of the following scripts to integration test individual
 pipelines:
