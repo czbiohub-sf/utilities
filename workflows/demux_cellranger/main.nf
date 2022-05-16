@@ -12,7 +12,7 @@ workflow {
   if (paramExists("help")) {
     log.info """Cell Ranger Demux - CLI workflow
 
-A workflow for running a Cell Ranger Demux workflow.
+Use cellranger demux to demultiplex sequencing BCL output to FASTQ.
 This workflow can be run on a single input or in batch, see below.
 
 Parameters (Single input mode):
