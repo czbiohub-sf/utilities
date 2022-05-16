@@ -9,39 +9,39 @@ include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_
 include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
 
 include { publish } from targetDir + "/transfer/publish/main.nf" params(params)
-include { getChild; overrideOptionValue; has_param; check_required_param } from workflowDir + "/utils/utils.nf" params(params)
+include { getChild; paramExists; assertParamExists } from workflowDir + "/utils/utils.nf" params(params)
 
 workflow {
-  if (has_param("help")) {
+  if (paramExists("help")) {
     log.info """Cell Ranger Mapping - CLI workflow
 
 A workflow for running a Cell Ranger Mapping workflow.
 This workflow can be run on a single input or in batch, see below.
 
 Parameters (Single input mode):
-  --id         ID of the sample (optional).
-  --input      One or more fastq paths, separated with semicolons (required).
-               Paths may be globs. Example: path/to/dir/**.fastq
-  --reference  Path to a Cell Ranger reference (required).
-  --output     Path to an output directory (required).
+  --id             ID of the sample (optional).
+  --input          One or more fastq paths, separated with semicolons (required).
+                   Paths may be globs. Example: path/to/dir/**.fastq
+  --reference      Path to a Cell Ranger reference (required).
+  --publishDir     Path to an output directory (required).
   
 Parameters (Batch mode):
-  --csv        A csv file containing columns 'id', 'input' (required).
-  --reference  Path to a Cell Ranger reference (required).
-  --output     Path to an output directory (required).
+  --csv            A csv file containing columns 'id', 'input' (required).
+  --reference      Path to a Cell Ranger reference (required).
+  --publishDir     Path to an output directory (required).
 """
     exit 0
   }
 
 
-  if (has_param("input") == has_param("csv")) {
+  if (paramExists("input") == paramExists("csv")) {
     exit 1, "ERROR: Please provide either an --input parameter or a --csv parameter"
   }
   
-  check_required_param("reference", "a Cell Ranger reference directory")
-  check_required_param("output", "where output files will be published")
+  assertParamExists("reference", "a Cell Ranger reference directory")
+  assertParamExists("publishDir", "where output files will be published")
 
-  if (has_param("csv")) {
+  if (paramExists("csv")) {
     input_ch = Channel.fromPath(params.csv)
       | splitCsv(header: true, sep: ",")
   } else {
@@ -55,10 +55,10 @@ Parameters (Batch mode):
       // process input
       if (li.containsKey("input") && li.input) {
         input_path = li.input.split(";").collect { path -> 
-          file(has_param("csv") ? getChild(params.csv, path) : path)
+          file(paramExists("csv") ? getChild(params.csv, path) : path)
         }.flatten()
       } else {
-        exit 1, has_param("csv") ? 
+        exit 1, paramExists("csv") ? 
           "ERROR: The provided csv file should contain an 'input' column" : 
           "ERROR: Please specify an '--input' parameter"
       }
@@ -66,18 +66,20 @@ Parameters (Batch mode):
       // process id
       if (li.containsKey("id") && li.id) {
         id_value = li.id
-      } else if (!has_param("csv")) {
+      } else if (!paramExists("csv")) {
         id_value = "run"
       } else {
         exit 1, "ERROR: The provided csv file should contain an 'id' column"
       }
-      [ id_value, [ input: input_path, reference: reference], params ]
+      [ id_value, [ input: input_path, reference: reference] ]
     }
-    | view { "before run_wf: ${it[0]} - ${it[1]}" }
+    | view { "Input: $it" }
     | run_wf
-    | view { "after run_wf: ${it[0]} - ${it[1]}" }
-    | map { overrideOptionValue(it, "publish", "output", "${params.output}/${it[0]}.h5ad") }
-    | publish
+    | publish.run(
+      map: { [ it[0], [ input: it[1], output: "${it[0]}.h5mu" ] ] },
+      auto: [ publish: true ]
+    )
+    | view { "Output: ${params.publishDir}/${it[1].name}" }
 }
 
 /* Cell Ranger Mapping - common workflow
@@ -101,8 +103,9 @@ workflow run_wf {
   output_ch = input_ch
     | cellranger_count
     | split_10x_dir
-    | map { [ it[0], it[1].filtered_h5, params ] }
-    | convert_10x_h5_to_h5mu
+    | convert_10x_h5_to_h5mu.run(
+      mapData: { it.filtered_h5 }
+    )
 
   emit:
   output_ch

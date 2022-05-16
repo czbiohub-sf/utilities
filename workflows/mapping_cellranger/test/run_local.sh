@@ -11,6 +11,9 @@ export NXF_VER=21.10.6
 bin/nextflow \
   run . \
   -main-script workflows/mapping_cellranger/main.nf \
-  -entry test_wf \
   -resume \
-  -with-docker
+  -with-docker \
+  --id tiny_fastq \
+  --input resources_test/cellranger_tiny_fastq/cellranger_tiny_fastq \
+  --reference resources_test/cellranger_tiny_fastq/cellranger_tiny_ref \
+  --publishDir temp

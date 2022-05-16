@@ -6,10 +6,10 @@ targetDir = params.rootDir + "/target/nextflow"
 include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
 
 include { publish } from targetDir + "/transfer/publish/main.nf" params(params)
-include { getChild; overrideOptionValue; has_param; check_required_param } from workflowDir + "/utils/utils.nf" params(params)
+include { getChild; paramExists; assertParamExists } from workflowDir + "/utils/utils.nf" params(params)
 
 workflow {
-  if (has_param("help")) {
+  if (paramExists("help")) {
     log.info """Cell Ranger Demux - CLI workflow
 
 A workflow for running a Cell Ranger Demux workflow.
@@ -19,23 +19,22 @@ Parameters (Single input mode):
   --id             ID of the sample (optional).
   --input          A BCL directory (required).
   --sample_sheet   Sample sheet (required).
-  --output         Path to an output directory (required).
+  --publishDir     Path to an output directory (required).
   
 Parameters (Batch mode):
-  --csv        A csv file containing columns 'id', 'input', 'sample_sheet' (required).
-  --output     Path to an output directory (required).
+  --csv            A csv file containing columns 'id', 'input', 'sample_sheet' (required).
+  --publishDir     Path to an output directory (required).
 """
     exit 0
   }
 
-
-  if (has_param("input") == has_param("csv")) {
+  if (paramExists("input") == paramExists("csv")) {
     exit 1, "ERROR: Please provide either an --input parameter or a --csv parameter"
   }
   
-  check_required_param("output", "where output files will be published")
+  assertParamExists("publishDir", "where output files will be published")
 
-  if (has_param("csv")) {
+  if (paramExists("csv")) {
     input_ch = Channel.fromPath(params.csv)
       | splitCsv(header: true, sep: ",")
   } else {
@@ -47,10 +46,10 @@ Parameters (Batch mode):
       // process input
       if (li.containsKey("input") && li.input) {
         input_path = li.input.split(";").collect { path -> 
-          file(has_param("csv") ? getChild(params.csv, path) : path)
+          file(paramExists("csv") ? getChild(params.csv, path) : path)
         }.flatten()
       } else {
-        exit 1, has_param("csv") ? 
+        exit 1, paramExists("csv") ? 
           "ERROR: The provided csv file should contain an 'input' column" : 
           "ERROR: Please specify an '--input' parameter"
       }
@@ -58,7 +57,7 @@ Parameters (Batch mode):
       if (li.containsKey("sample_sheet") && li.sample_sheet) {
         sample_sheet_path = file(li.sample_sheet)
       } else {
-        exit 1, has_param("csv") ? 
+        exit 1, paramExists("csv") ? 
           "ERROR: The provided csv file should contain a 'sample_sheet' column" : 
           "ERROR: Please specify an '--sample_sheet' parameter"
       }
@@ -66,18 +65,20 @@ Parameters (Batch mode):
       // process id
       if (li.containsKey("id") && li.id) {
         id_value = li.id
-      } else if (!has_param("csv")) {
+      } else if (!paramExists("csv")) {
         id_value = "run"
       } else {
         exit 1, "ERROR: The provided csv file should contain an 'id' column"
       }
-      [ id_value, [ input: input_path, sample_sheet: sample_sheet_path ], params ]
+      [ id_value, [ input: input_path, sample_sheet: sample_sheet_path ] ]
     }
-    | view { "before run_wf: ${it[0]} - ${it[1]}" }
+    | view { "Input: $it" }
     | run_wf
-    | view { "after run_wf: ${it[0]} - ${it[1]}" }
-    | map { overrideOptionValue(it, "publish", "output", "${params.output}/${it[0]}") }
-    | publish
+    | publish.run(
+      map: { [ it[0], [ input: it[1], output: it[0] ] ] },
+      auto: [ publish: true ]
+    )
+    | view { "Output: ${params.publishDir}/${it[1]}" }
 }
 
 /* Cell Ranger Demux - common workflow
