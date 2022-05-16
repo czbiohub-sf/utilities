@@ -21,11 +21,12 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 curl -fsSL get.viash.io | bash -s -- \
-  --tag 0.5.10.1 \
+  --tag 0.5.11 \
   --viash bin/viash \
   --registry ghcr.io \
   --organization czbiohub/utilities \
-  --target_image_source https://github.com/czbiohub/utilities
+  --target_image_source https://github.com/czbiohub/utilities \
+  --nextflow_variant vdsl3
  
 cd bin
 
