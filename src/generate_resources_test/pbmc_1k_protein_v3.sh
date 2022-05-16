@@ -10,7 +10,7 @@ cd "$REPO_ROOT"
 ID=pbmc_1k_protein_v3
 OUT="resources_test/$ID/"
 DIR="$OUT"
-S3DIR="s3://czbiohub-pipelines/$DIR"
+S3DIR="s3://czbiohub-pipelines/utilities/$ID"
 
 # create tempdir
 MY_TEMP="${VIASH_TEMP:-/tmp}"

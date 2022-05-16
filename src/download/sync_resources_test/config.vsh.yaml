@@ -2,10 +2,10 @@ functionality:
   name: "sync_resources_test"
   namespace: "download"
   version: "dev"
-  description: Synchronise the test resources from s3://czbiohub-pipelines/resources_test to resources_test
+  description: Synchronise the test resources from s3://czbiohub-pipelines/utilities to resources_test
   usage: |
     sync_resources_test
-    sync_resources_test --input s3://czbiohub-pipelines/resources_test --output resources_test
+    sync_resources_test --input s3://czbiohub-pipelines/utilities --output resources_test
   authors:
     - name: Robrecht Cannoodt
       email: rcannood@gmail.com
@@ -16,7 +16,7 @@ functionality:
       alternatives: ["-i"]
       type: string
       description: "Path to the S3 bucket to sync from."
-      default: "s3://czbiohub-pipelines/resources_test"
+      default: "s3://czbiohub-pipelines/utilities"
     - name: "--output"
       alternatives: ["-o"]
       type: file

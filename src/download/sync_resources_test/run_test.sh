@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ./$meta_functionality_name \
-  --input s3://czbiohub-pipelines/resources_test \
+  --input s3://czbiohub-pipelines/utilities \
   --output my_output \
   --dryrun > \
   output.txt

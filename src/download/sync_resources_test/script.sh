@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 ## VIASH START
-par_input='s3://czbiohub-pipelines/resources_test'
+par_input='s3://czbiohub-pipelines/utilities'
 par_output='resources_test'
 par_dryrun='false'
 ## VIASH END
