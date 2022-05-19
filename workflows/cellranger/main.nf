@@ -5,9 +5,9 @@ targetDir = params.rootDir + "/target/nextflow"
 
 include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
 include { cellranger_count } from targetDir + "/alignment/cellranger_count/main.nf"
-// include { split_10x_dir } from targetDir + "/convert/split_10x_dir/main.nf"
-// include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
-// include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
+include { split_10x_dir } from targetDir + "/convert/split_10x_dir/main.nf"
+include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
+include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
 
 include { publish } from targetDir + "/transfer/publish/main.nf" params(params)
 include { getChild; paramExists; assertParamExists } from workflowDir + "/utils/utils.nf" params(params)
@@ -110,11 +110,33 @@ workflow run_wf {
   take:
   input_ch
 
+  auto = [ publish: paramExists("publishDir"), transcript: paramExists("publishDir") ]
+  auto_nopub = [ transcript: paramExists("publishDir") ]
+
   main:
   output_ch = input_ch
-    | cellranger_mkfastq
-    | map { id, data, params -> [ id, [ input: file(data), reference: file(params.reference) ], params ]}
-    | cellranger_count
+
+    // run mkfastq
+    | map { id, data -> [ id, data.subMap(["input", "sample_sheet"]), data ]}
+    | cellranger_mkfastq.run(auto: auto)
+
+    // run count
+    | map { id, fastq, data -> [ id, data.subMap("reference") + [ input: fastq ], [ fastq: fastq ] }
+    | cellranger_count.run(auto: auto)
+
+    // split output dir into map
+    | split_10x_dir.run(auto: auto_nopub)
+
+    // convert to h5ad
+    | map { id, cellranger_outs, data -> [ id, cellranger_outs.filtered_h5, data + cellranger_outs ] }
+    | convert_10x_h5_to_h5ad.run(auto: auto)
+
+    // convert to h5mu
+    | map { id, h5ad, data -> [ id, data.filtered_h5, data + [h5ad: h5ad] ] }
+    | convert_10x_h5_to_h5mu.run(auto: auto)
+
+    // return output map
+    | map { id, h5mu, data -> [ id, data + [h5mu: h5mu] ] }
 
   emit:
   output_ch
