@@ -22,7 +22,7 @@ the docs page](https://www.nextflow.io/docs/latest/index.html).
 nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/cellranger_demux/main.nf \
+  -main-script workflows/1_ingestion/cellranger_demux/main.nf \
   -resume \
   -latest \
   -with-docker \
@@ -38,7 +38,7 @@ nextflow \
 bin/nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/cellranger_mapping/main.nf \
+  -main-script workflows/1_ingestion/cellranger_mapping/main.nf \
   -resume \
   -latest \
   -with-docker \
@@ -60,8 +60,8 @@ Run `bin/viash_test` to unit test all components.
 Run any of the following scripts to integration test individual
 pipelines:
 
--   `workflows/cellranger_demux/test/integration_test.sh`
--   `workflows/cellranger_mapping/test/integration_test.sh`
+-   `workflows/1_ingestion/cellranger_demux/test/integration_test.sh`
+-   `workflows/1_ingestion/cellranger_mapping/test/integration_test.sh`
 
 ## List of components
 

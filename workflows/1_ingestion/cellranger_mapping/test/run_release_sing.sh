@@ -12,11 +12,11 @@ export NXF_SINGULARITY_CACHEDIR="$HOME/.cache/singularity"
 bin/nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/cellranger_demux/main.nf \
+  -main-script workflows/1_ingestion/cellranger_mapping/main.nf \
   -resume \
   -latest \
   -with-singularity \
-  --id tiny_bcl \
-  --input resources_test/cellranger_tiny_bcl/bcl \
-  --sample_sheet resources_test/cellranger_tiny_bcl/bcl/sample_sheet.csv \
+  --id tiny_fastq \
+  --input resources_test/cellranger_tiny_fastq/cellranger_tiny_fastq \
+  --reference resources_test/cellranger_tiny_fastq/cellranger_tiny_ref \
   --publishDir temp

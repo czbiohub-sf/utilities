@@ -9,9 +9,11 @@ cd "$REPO_ROOT"
 export NXF_VER=21.10.6
 
 bin/nextflow \
-  run . \
-  -main-script workflows/cellranger_demux/main.nf \
+  run https://github.com/czbiohub/utilities \
+  -r 1.0.0 \
+  -main-script workflows/1_ingestion/cellranger_demux/main.nf \
   -resume \
+  -latest \
   -with-docker \
   --id tiny_bcl \
   --input resources_test/cellranger_tiny_bcl/bcl \

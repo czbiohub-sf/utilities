@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/czbiohub/utilities/main/workflows/cellranger_demux/main.nf",
+    "$id": "https://raw.githubusercontent.com/czbiohub/utilities/main/workflows/1_ingestion/cellranger_demux/main.nf",
     "title": "Cell Ranger Demux",
     "description": "Use cellranger demux to demultiplex sequencing BCL output to FASTQ.",
     "type": "object",
