@@ -62,7 +62,7 @@ fi
 
 filtered_h5="${OUT}/filtered.h5"
 if [ ! -f "$filtered_h5" ]; then
-  target/docker/convert/split_10x_dir/split_10x_dir \
+  target/docker/mapping/cellranger_count_split/cellranger_count_split \
     --input "$bam_dir" \
     --filtered_h5 "$filtered_h5"
 fi

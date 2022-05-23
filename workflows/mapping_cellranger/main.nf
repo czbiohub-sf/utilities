@@ -4,7 +4,7 @@ workflowDir = params.rootDir + "/workflows"
 targetDir = params.rootDir + "/target/nextflow"
 
 include { cellranger_count } from targetDir + "/mapping/cellranger_count/main.nf"
-include { split_10x_dir } from targetDir + "/convert/split_10x_dir/main.nf"
+include { cellranger_count_split } from targetDir + "/mapping/cellranger_count_split/main.nf"
 include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
 include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
 
@@ -102,7 +102,7 @@ workflow run_wf {
   main:
   output_ch = input_ch
     | cellranger_count
-    | split_10x_dir
+    | cellranger_count_split
     | convert_10x_h5_to_h5mu.run(
       mapData: { it.filtered_h5 }
     )

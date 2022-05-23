@@ -34,7 +34,7 @@ These are instructions on how to launch a pipeline using the published code with
 nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/demux_cellranger/main.nf \
+  -main-script workflows/cellranger_demux/main.nf \
   -resume \
   -latest \
   -with-docker \
@@ -50,7 +50,7 @@ nextflow \
 bin/nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/mapping_cellranger/main.nf \
+  -main-script workflows/cellranger_mapping/main.nf \
   -resume \
   -latest \
   -with-docker \
@@ -70,8 +70,8 @@ Run `bin/viash_build` to unit test all components.
 
 Run any of the following scripts to integration test individual pipelines:
 
-- `workflows/demux_cellranger/test/integration_test.sh`
-- `workflows/mapping_cellranger/test/integration_test.sh`
+- `workflows/cellranger_demux/test/integration_test.sh`
+- `workflows/cellranger_mapping/test/integration_test.sh`
 
 ## List of components
 

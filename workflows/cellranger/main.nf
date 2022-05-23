@@ -5,7 +5,7 @@ targetDir = params.rootDir + "/target/nextflow"
 
 include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
 include { cellranger_count } from targetDir + "/mapping/cellranger_count/main.nf"
-include { split_10x_dir } from targetDir + "/convert/split_10x_dir/main.nf"
+include { cellranger_count_split } from targetDir + "/mapping/cellranger_count_split/main.nf"
 include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
 include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
 
@@ -125,7 +125,7 @@ workflow run_wf {
     | cellranger_count.run(auto: auto)
 
     // split output dir into map
-    | split_10x_dir.run(auto: auto_nopub)
+    | cellranger_count_split.run(auto: auto_nopub)
 
     // convert to h5ad
     | map { id, cellranger_outs, data -> [ id, cellranger_outs.filtered_h5, data + cellranger_outs ] }

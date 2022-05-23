@@ -11,7 +11,7 @@ export NXF_VER=21.10.6
 bin/nextflow \
   run https://github.com/czbiohub/utilities \
   -r 1.0.0 \
-  -main-script workflows/mapping_cellranger/main.nf \
+  -main-script workflows/cellranger_mapping/main.nf \
   -resume \
   -latest \
   -with-docker \
