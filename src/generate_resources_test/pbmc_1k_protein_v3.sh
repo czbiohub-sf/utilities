@@ -37,14 +37,14 @@ fi
 
 H5AD="${OUT}/filtered_feature_bc_matrix.h5ad"
 if [ ! -f "$H5AD" ]; then
-  target/docker/convert/convert_10x_h5_to_h5ad/convert_10x_h5_to_h5ad \
+  target/docker/convert/from_10xh5_to_h5ad/from_10xh5_to_h5ad \
     --input "${OUT}/bam/filtered_feature_bc_matrix.h5" \
     --output "$H5AD"
 fi
 
 H5MU="${OUT}/filtered_feature_bc_matrix.h5mu"
 if [ ! -f "$H5MU" ]; then
-  target/docker/convert/convert_10x_h5_to_h5mu/convert_10x_h5_to_h5mu \
+  target/docker/convert/from_10xh5_to_h5mu/from_10xh5_to_h5mu \
     --input "${OUT}/bam/filtered_feature_bc_matrix.h5" \
     --output "$H5MU"
 fi

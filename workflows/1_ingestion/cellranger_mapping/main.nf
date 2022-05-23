@@ -5,8 +5,8 @@ targetDir = params.rootDir + "/target/nextflow"
 
 include { cellranger_count } from targetDir + "/mapping/cellranger_count/main.nf"
 include { cellranger_count_split } from targetDir + "/mapping/cellranger_count_split/main.nf"
-include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
-include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
+include { from_10xh5_to_h5mu } from targetDir + "/convert/from_10xh5_to_h5mu/main.nf"
+include { from_10xh5_to_h5ad } from targetDir + "/convert/from_10xh5_to_h5ad/main.nf"
 
 include { publish } from targetDir + "/transfer/publish/main.nf" params(params)
 include { getChild; paramExists; assertParamExists } from workflowDir + "/utils/utils.nf" params(params)
@@ -103,7 +103,7 @@ workflow run_wf {
   output_ch = input_ch
     | cellranger_count
     | cellranger_count_split
-    | convert_10x_h5_to_h5mu.run(
+    | from_10xh5_to_h5mu.run(
       mapData: { it.filtered_h5 }
     )
 
