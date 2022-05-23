@@ -55,7 +55,7 @@ fi
 # if [ ! -f "${OUT}/bam" ]; then
 #   mkdir -p "$OUT/bam"
 
-#   target/docker/alignment/cellranger_count/cellranger_count \
+#   target/docker/mapping/cellranger_count/cellranger_count \
 #     --input "${OUT}/fastqs" \
 #     --reference "resources_test/reference/refdata-gex-GRCh38-2020-A" \
 #     --chemistry "SC5P-PE" \

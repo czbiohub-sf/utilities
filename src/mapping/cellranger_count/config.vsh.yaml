@@ -1,6 +1,6 @@
 functionality:
   name: cellranger_count
-  namespace: alignment
+  namespace: mapping
   description: Align fastq files using Cell Ranger count.
   arguments:
     # inputs
@@ -17,7 +17,7 @@ functionality:
     - type: file
       name: --output
       direction: output
-      description: The folder to store the alignment results.
+      description: The folder to store the mapping results.
       example: "/path/to/output"
       default: counts
       required: true

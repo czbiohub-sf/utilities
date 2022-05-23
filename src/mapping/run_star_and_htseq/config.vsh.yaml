@@ -1,6 +1,6 @@
 functionality:
   name: run_star_and_htseq
-  namespace: alignment
+  namespace: mapping
   description: Align sequencing data
   usage: UNK
   arguments:
@@ -9,7 +9,7 @@ functionality:
     #   description: The experiment ID
     - type: string
       name: --taxon
-      description: Reference genome for alignment fun
+      description: Reference genome for mapping fun
       example: homo
       required: true
     - type: file

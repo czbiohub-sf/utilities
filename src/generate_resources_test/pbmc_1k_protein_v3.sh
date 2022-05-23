@@ -29,7 +29,7 @@ wget https://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_protein_v3/pbmc_1
 if [ ! -f "${OUT}/bam" ]; then
   mkdir -p "$OUT/bam"
 
-  target/docker/alignment/cellranger_count/cellranger_count \
+  target/docker/mapping/cellranger_count/cellranger_count \
     --input "${OUT}/fastqs" \
     --reference "resources_test/reference/refdata-gex-GRCh38-2020-A" \
     --output "${OUT}/bam"

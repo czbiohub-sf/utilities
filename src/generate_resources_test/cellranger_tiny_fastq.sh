@@ -54,7 +54,7 @@ bam_dir="${OUT}/bam"
 if [ ! -f "$bam_dir" ]; then
   mkdir -p "$bam_dir"
 
-  target/docker/alignment/cellranger_count/cellranger_count \
+  target/docker/mapping/cellranger_count/cellranger_count \
     --input "$cellranger_tiny_fastq" \
     --reference "$cellranger_tiny_ref" \
     --output "$bam_dir"

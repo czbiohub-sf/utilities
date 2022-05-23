@@ -4,7 +4,7 @@ workflowDir = params.rootDir + "/workflows"
 targetDir = params.rootDir + "/target/nextflow"
 
 include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
-include { cellranger_count } from targetDir + "/alignment/cellranger_count/main.nf"
+include { cellranger_count } from targetDir + "/mapping/cellranger_count/main.nf"
 include { split_10x_dir } from targetDir + "/convert/split_10x_dir/main.nf"
 include { convert_10x_h5_to_h5mu } from targetDir + "/convert/convert_10x_h5_to_h5mu/main.nf"
 include { convert_10x_h5_to_h5ad } from targetDir + "/convert/convert_10x_h5_to_h5ad/main.nf"
