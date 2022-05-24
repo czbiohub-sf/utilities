@@ -62,4 +62,5 @@ platforms:
   - type: docker
     image: "ubuntu:focal"
   - type: nextflow
+    variant: vdsl3
     variant: neo

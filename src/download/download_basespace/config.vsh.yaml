@@ -61,3 +61,4 @@ platforms:
         run: 
           - wget "https://launch.basespace.illumina.com/CLI/latest/amd64-linux/bs" -O /usr/bin/bs && chmod +x /usr/bin/bs
   - type: nextflow
+    variant: vdsl3

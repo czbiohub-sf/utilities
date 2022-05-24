@@ -28,3 +28,4 @@ platforms:
   - type: docker
     image: ubuntu:bionic
   - type: nextflow
+    variant: vdsl3

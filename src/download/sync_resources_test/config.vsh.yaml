@@ -35,3 +35,4 @@ platforms:
   - type: docker
     image: "amazon/aws-cli:2.4.15"
   - type: nextflow
+    variant: vdsl3
