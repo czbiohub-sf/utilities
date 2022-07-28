@@ -3,7 +3,7 @@
 import argparse
 import warnings
 
-from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
+from utilities.alignment.run_star_and_htseq import reference_genomes #, deprecated
 
 
 def main():
@@ -57,7 +57,7 @@ def main():
     # check if the input genome is valid
     if args.taxon not in reference_genomes:
         raise ValueError(f"{args.taxon} is currently unavailable for velocyto run")
-        
+
     # if args.taxon in reference_genomes:
     #     if args.taxon in deprecated:
     #         warnings.warn(
