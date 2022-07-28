@@ -3,7 +3,7 @@
 import argparse
 import warnings
 
-from utilities.alignment.run_star_and_htseq import reference_genomes #, deprecated
+from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
 
 
 def main():
@@ -55,14 +55,17 @@ def main():
     args = parser.parse_args()
 
     # check if the input genome is valid
-    if args.taxon in reference_genomes:
-        if args.taxon in deprecated:
-            warnings.warn(
-                f"The name '{args.taxon}' will be removed in the future,"
-                f" start using '{deprecated[args.taxon]}'"
-            )
-    else:
-        raise ValueError(f"unknown taxon {args.taxon}")
+    if args.taxon not in reference_genomes:
+        raise ValueError(f"{args.taxon} is currently unavailable for velocyto run")
+        
+    # if args.taxon in reference_genomes:
+    #     if args.taxon in deprecated:
+    #         warnings.warn(
+    #             f"The name '{args.taxon}' will be removed in the future,"
+    #             f" start using '{deprecated[args.taxon]}'"
+    #         )
+    # else:
+    #     raise ValueError(f"unknown taxon {args.taxon}")
 
     # print input arguments for running alignment.run_star_and_htseq for each group of sample
     for i in range(args.num_partitions):
