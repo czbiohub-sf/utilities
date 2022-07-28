@@ -3,7 +3,7 @@
 import argparse
 import warnings
 
-from utilities.alignment.run_star_and_htseq import reference_genomes, deprecated
+from utilities.alignment.run_star_and_htseq import reference_genomes #, deprecated
 
 
 def main():
