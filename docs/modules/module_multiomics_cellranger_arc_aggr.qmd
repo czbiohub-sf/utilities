@@ -1,0 +1,70 @@
+---
+title: "Cellranger arc aggr"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `cellranger_arc_aggr`  
+Namespace: `multiomics`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/multiomics/cellranger_arc_aggr){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Aggregate
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -profile docker \
+  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                 |Description                                  |Attributes                                               |
+|:--------------------|:--------------------------------------------|:--------------------------------------------------------|
+|`--data`             |Path to the data                             |`file`, required, example: `"/path/to/data"`             |
+|`--reference_genome` |Path to the reference genome                 |`file`, required, example: `"/path/to/reference_genome"` |
+|`--output`           |Path to the output directory                 |`file`, required, example: `"/path/to/directory"`        |
+|`--run_id`           |The run ID                                   |`string`, required                                       |
+|`--peaks`            |Path to the bed file to use for peak calling |`file`, example: `"/path/to/bed"`                        |
+|`--neurips`          |Unknown                                      |`boolean`, default: `FALSE`                              |
+
+## Authors
+

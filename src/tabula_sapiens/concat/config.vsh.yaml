@@ -37,7 +37,5 @@ functionality:
   resources:
     - type: nextflow_script
       path: main.nf
-  # disabled because viash doesn't render nextflow pipelines yet
-  status: disabled 
 platforms:
   - type: nextflow

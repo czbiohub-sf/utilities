@@ -46,7 +46,5 @@ functionality:
     - type: nextflow_script
       path: main.nf
       entrypoint: test_wf
-  # disabled because viash doesn't render nextflow pipelines yet
-  status: disabled 
 platforms:
   - type: nextflow
