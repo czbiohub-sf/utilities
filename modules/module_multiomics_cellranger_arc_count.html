@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>CZBiohub/utilities - Join uns to obs</title>
+<title>CZBiohub/utilities - Cellranger arc count</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -150,10 +150,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../modules/index.html">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../about.html">
- <span class="menu-text">About</span></a>
-  </li>  
+  <li class="dropdown-header">
+ <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -171,7 +169,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Join uns to obs</h1>
+<h1 class="title">Cellranger arc count</h1>
 </div>
 
 
@@ -190,23 +188,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>join_uns_to_obs</code><br>
-Namespace: <code>metadata</code></p>
+<p>ID: <code>cellranger_arc_count</code><br>
+Namespace: <code>multiomics</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/module_openpipeline/src/metadata/join_uns_to_obs" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/multiomics/cellranger_arc_count" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><p>Join a data frame in .uns containing metadata to the .obs of a mudata file.</p>
+</div></div><p>Count</p>
 <section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/metadata/join_uns_to_obs/main.nf <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> 0.5.1 <span class="at">-latest</span> <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_arc_count/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -217,10 +215,10 @@ Example of <code>params.yaml</code>
 </summary>
 <div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> 0.5.1 <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/metadata/join_uns_to_obs/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_arc_count/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -243,9 +241,9 @@ Note
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table class="table">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 25%">
-<col style="width: 59%">
+<col style="width: 17%">
+<col style="width: 36%">
+<col style="width: 46%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -256,14 +254,34 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--input</code></td>
-<td style="text-align: left;">Input h5mu file</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
+<td style="text-align: left;"><code>--libraries_path</code></td>
+<td style="text-align: left;">Path to the libraries</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
 </tr>
 <tr class="even">
+<td style="text-align: left;"><code>--reference_genome</code></td>
+<td style="text-align: left;">Path to the reference genome</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Output h5mu file.</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"output.h5mu"</code></td>
+<td style="text-align: left;">Path to the output directory</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--run_id</code></td>
+<td style="text-align: left;">The run ID</td>
+<td style="text-align: left;"><code>string</code>, required</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--peaks</code></td>
+<td style="text-align: left;">Path to the bed file to use for peak calling</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--neurips</code></td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
 </tr>
 </tbody>
 </table>

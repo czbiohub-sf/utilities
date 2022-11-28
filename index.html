@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>CZBiohub/utilities - utilities</title>
+<title>CZBiohub/utilities - Components</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,8 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./modules/index.html">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html">
- <span class="menu-text">About</span></a>
-  </li>  
+  <li class="dropdown-header">
+ <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -102,14 +100,21 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#workflows" id="toc-workflows" class="nav-link active" data-scroll-target="#workflows">Workflows</a></li>
+  <li><a href="#modules" id="toc-modules" class="nav-link" data-scroll-target="#modules">Modules</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">utilities</h1>
+<h1 class="title">Components</h1>
 </div>
 
 
@@ -124,10 +129,80 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>A collection of scripts for common data management and processing tasks.</p>
-<p>The provided pipelines are built using the <a href="http://www.viash.io">Viash framework</a> on top of the Nextflow workflow system. For more information on Nextflow please visit the <a href="https://github.com/nextflow-io/nextflow">Nextflow github page</a> and the <a href="https://www.nextflow.io/docs/latest/index.html">Nextflow read the docs page</a>.</p>
+<section id="workflows" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
+<div class="column-body-outset">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Namespace</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tabula sapiens</td>
+<td style="text-align: left;"><a href="workflow_tabula_sapiens_concat.qmd">Concat</a></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tabula sapiens</td>
+<td style="text-align: left;"><a href="workflow_tabula_sapiens_process.qmd">Process</a></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="modules" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="modules">Modules</h2>
+<div class="column-body-outset">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Namespace</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Demux</td>
+<td style="text-align: left;"><a href="module_demux_spaceranger_mkfastq.qmd">Spaceranger mkfastq</a></td>
+<td style="text-align: left;">Demultiplex raw sequencing data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mapping</td>
+<td style="text-align: left;"><a href="module_mapping_run_star_and_htseq.qmd">Run star and htseq</a></td>
+<td style="text-align: left;">Align sequencing data</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mapping</td>
+<td style="text-align: left;"><a href="module_mapping_spaceranger_count.qmd">Spaceranger count</a></td>
+<td style="text-align: left;">Align fastqs and detect tissues</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="module_multiomics_cellranger_arc_aggr.qmd">Cellranger arc aggr</a></td>
+<td style="text-align: left;">Aggregate</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="module_multiomics_cellranger_arc_count.qmd">Cellranger arc count</a></td>
+<td style="text-align: left;">Count</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="module_multiomics_cellranger_cite_seq.qmd">Cellranger cite seq</a></td>
+<td style="text-align: left;">Run cite-seq using cellranger count</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -1,3 +1,0 @@
-[submodule "module_openpipeline"]
-	path = module_openpipeline
-	url = https://github.com/openpipelines-bio/openpipeline.git

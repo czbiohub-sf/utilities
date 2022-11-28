@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>CZBiohub/utilities - Cellbender remove background</title>
+<title>CZBiohub/utilities - Run star and htseq</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -150,10 +150,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../modules/index.html">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../about.html">
- <span class="menu-text">About</span></a>
-  </li>  
+  <li class="dropdown-header">
+ <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -171,7 +169,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellbender remove background</h1>
+<h1 class="title">Run star and htseq</h1>
 </div>
 
 
@@ -190,25 +188,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellbender_remove_background</code><br>
-Namespace: <code>correction</code></p>
+<p>ID: <code>run_star_and_htseq</code><br>
+Namespace: <code>mapping</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/module_openpipeline/src/correction/cellbender_remove_background" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/mapping/run_star_and_htseq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><p>Eliminating technical artifacts from high-throughput single-cell RNA sequencing data.</p>
-<p>This module removes counts due to ambient RNA molecules and random barcode swapping from (raw) UMI-based scRNA-seq count matrices. At the moment, only the count matrices produced by the CellRanger count pipeline is supported. Support for additional tools and protocols will be added in the future. A quick start tutorial can be found here.</p>
-<p>Fleming et al.&nbsp;2022, bioRxiv.</p>
+</div></div><p>Align sequencing data</p>
 <section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/correction/cellbender_remove_background/main.nf <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> 0.5.1 <span class="at">-latest</span> <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/mapping/run_star_and_htseq/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -219,10 +215,10 @@ Example of <code>params.yaml</code>
 </summary>
 <div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> 0.5.1 <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/correction/cellbender_remove_background/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/mapping/run_star_and_htseq/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -239,73 +235,15 @@ Note
 </div>
 </section>
 </section>
-<section id="argument-groups" class="level2">
-<h2 class="anchored" data-anchor-id="argument-groups">Argument groups</h2>
-<section id="inputs" class="level3">
-<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
-<table class="table">
-<colgroup>
-<col style="width: 15%">
-<col style="width: 36%">
-<col style="width: 47%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: left;">Attributes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><code>--input</code></td>
-<td style="text-align: left;">Input file.</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5"</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--modality</code></td>
-<td style="text-align: left;">List of modalities to process.</td>
-<td style="text-align: left;"><code>string</code>, default: <code>"rna"</code></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="outputs" class="level3">
-<h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
-<table class="table">
-<colgroup>
-<col style="width: 9%">
-<col style="width: 67%">
-<col style="width: 23%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: left;">Attributes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Full count matrix as an h5mu file, with background RNA removed. This file contains all the original droplet barcodes.</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"output.h5"</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--layer_output</code></td>
-<td style="text-align: left;">Output layer</td>
-<td style="text-align: left;"><code>string</code>, default: <code>"corrected"</code></td>
-</tr>
-</tbody>
-</table>
-</section>
+<section id="argument-group" class="level2">
+<h2 class="anchored" data-anchor-id="argument-group">Argument group</h2>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table class="table">
 <colgroup>
-<col style="width: 8%">
-<col style="width: 84%">
-<col style="width: 6%">
+<col style="width: 15%">
+<col style="width: 48%">
+<col style="width: 36%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -316,74 +254,39 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--expected_cells</code></td>
-<td style="text-align: left;">Number of cells expected in the dataset (a rough estimate within a factor of 2 is sufficient).</td>
-<td style="text-align: left;"><code>integer</code>, example: <code>1000</code></td>
+<td style="text-align: left;"><code>--taxon</code></td>
+<td style="text-align: left;">Reference genome for mapping fun</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"homo"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--total_droplets_included</code></td>
-<td style="text-align: left;">The number of droplets from the rank-ordered UMI plot that will be analyzed. The largest ‘total_droplets’ droplets will have their cell probabilities inferred as an output.</td>
-<td style="text-align: left;"><code>integer</code>, example: <code>25000</code></td>
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Path to the directory containing the fastq.gz files to align</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"path/to/fastqs"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--expected_cells_from_qc</code></td>
-<td style="text-align: left;">Will use the Cell Ranger QC to determine the estimated number of cells</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>TRUE</code></td>
+<td style="text-align: left;"><code>--output</code></td>
+<td style="text-align: left;">Output folder</td>
+<td style="text-align: left;"><code>file</code>, required</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--model</code></td>
-<td style="text-align: left;">Which model is being used for count data. ‘simple’ does not model either ambient RNA or random barcode swapping (for debugging purposes – not recommended). ‘ambient’ assumes background RNA is incorporated into droplets. ‘swapping’ assumes background RNA comes from random barcode swapping. ‘full’ uses a combined ambient and swapping model.</td>
-<td style="text-align: left;"><code>string</code>, default: <code>"full"</code></td>
+<td style="text-align: left;"><code>--star_proc</code></td>
+<td style="text-align: left;">Number of processes to give to each STAR run</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>16</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--epochs</code></td>
-<td style="text-align: left;">Number of epochs to train.</td>
-<td style="text-align: left;"><code>integer</code>, default: <code>150</code></td>
+<td style="text-align: left;"><code>--num_partitions</code></td>
+<td style="text-align: left;">Number of groups to divide samples into</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>10</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--low_count_threshold</code></td>
-<td style="text-align: left;">Droplets with UMI counts below this number are completely excluded from the analysis. This can help identify the correct prior for empty droplet counts in the rare case where empty counts are extremely high (over 200).</td>
-<td style="text-align: left;"><code>integer</code>, default: <code>15</code></td>
+<td style="text-align: left;"><code>--partition_id</code></td>
+<td style="text-align: left;">Index of sample group.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>0</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--z_dim</code></td>
-<td style="text-align: left;">Dimension of latent variable z.</td>
-<td style="text-align: left;"><code>integer</code>, default: <code>100</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--z_layers</code></td>
-<td style="text-align: left;">Dimension of hidden layers in the encoder for z.</td>
-<td style="text-align: left;"><code>integer</code>, default: <code>500</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>--training_fraction</code></td>
-<td style="text-align: left;">Training detail: the fraction of the data used for training. The rest is never seen by the inference algorithm. Speeds up learning.</td>
-<td style="text-align: left;"><code>double</code>, default: <code>0.9</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--empty_drop_training_fraction</code></td>
-<td style="text-align: left;">Training detail: the fraction of the training data each epoch that is drawn (randomly sampled) from surely empty droplets.</td>
-<td style="text-align: left;"><code>double</code>, default: <code>0.5</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>--fpr</code></td>
-<td style="text-align: left;">Target false positive rate in (0, 1). A false positive is a true signal count that is erroneously removed. More background removal is accompanied by more signal removal at high values of FPR. You can specify multiple values, which will create multiple output files.</td>
-<td style="text-align: left;"><code>double</code>, default: <code>0.01</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--exclude_antibody_capture</code></td>
-<td style="text-align: left;">Including the flag –exclude-antibody-capture will cause remove-background to operate on gene counts only, ignoring other features.</td>
-<td style="text-align: left;"><code>boolean_true</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>--learning_rate</code></td>
-<td style="text-align: left;">Training detail: lower learning rate for inference. A OneCycle learning rate schedule is used, where the upper learning rate is ten times this value. (For this value, probably do not exceed 1e-3).</td>
-<td style="text-align: left;"><code>double</code>, example: <code>1e-04</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--cuda</code></td>
-<td style="text-align: left;">Including the flag –cuda will run the inference on a GPU.</td>
-<td style="text-align: left;"><code>boolean_true</code></td>
+<td style="text-align: left;"><code>--min_size</code></td>
+<td style="text-align: left;">Minimum file syze in bytes for a file to be realigned</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>50000</code></td>
 </tr>
 </tbody>
 </table>

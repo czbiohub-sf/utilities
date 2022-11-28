@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -87,10 +87,8 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link active" href="../modules/index.html" aria-current="page">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../about.html">
- <span class="menu-text">About</span></a>
-  </li>  
+  <li class="dropdown-header">
+ <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -134,7 +132,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="workflows" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
 <div class="column-body-outset">
-<table>
+<table class="table">
 <thead>
 <tr class="header">
 <th style="text-align: left;">Namespace</th>
@@ -143,6 +141,16 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td style="text-align: left;">Tabula sapiens</td>
+<td style="text-align: left;"><a href="../modules/workflow_tabula_sapiens_concat.html">Concat</a></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tabula sapiens</td>
+<td style="text-align: left;"><a href="../modules/workflow_tabula_sapiens_process.html">Process</a></td>
+<td style="text-align: left;"></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -160,14 +168,14 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Correction</td>
-<td style="text-align: left;"><a href="../modules/module_correction_cellbender_remove_background.html">Cellbender remove background</a></td>
-<td style="text-align: left;">Eliminating technical artifacts from high-throughput single-cell RNA sequencing data</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">Demux</td>
 <td style="text-align: left;"><a href="../modules/module_demux_spaceranger_mkfastq.html">Spaceranger mkfastq</a></td>
 <td style="text-align: left;">Demultiplex raw sequencing data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mapping</td>
+<td style="text-align: left;"><a href="../modules/module_mapping_run_star_and_htseq.html">Run star and htseq</a></td>
+<td style="text-align: left;">Align sequencing data</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Mapping</td>
@@ -175,19 +183,19 @@ ul.task-list li input[type="checkbox"] {
 <td style="text-align: left;">Align fastqs and detect tissues</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Metadata</td>
-<td style="text-align: left;"><a href="../modules/module_metadata_join_uns_to_obs.html">Join uns to obs</a></td>
-<td style="text-align: left;">Join a data frame in</td>
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_arc_aggr.html">Cellranger arc aggr</a></td>
+<td style="text-align: left;">Aggregate</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Qc</td>
-<td style="text-align: left;"><a href="../modules/module_qc_fastqc.html">Fastqc</a></td>
-<td style="text-align: left;">Fastqc component, please see https://www</td>
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_arc_count.html">Cellranger arc count</a></td>
+<td style="text-align: left;">Count</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Qc</td>
-<td style="text-align: left;"><a href="../modules/module_qc_multiqc.html">MultiQC</a></td>
-<td style="text-align: left;">Component for multiqc (https://multiqc.info/)</td>
+<td style="text-align: left;">Multiomics</td>
+<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_cite_seq.html">Cellranger cite seq</a></td>
+<td style="text-align: left;">Run cite-seq using cellranger count</td>
 </tr>
 </tbody>
 </table>

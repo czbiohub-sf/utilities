@@ -1,87 +1,17 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site"
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "utilities",
-    "section": "",
-    "text": "A collection of scripts for common data management and processing tasks.\nThe provided pipelines are built using the Viash framework on top of the Nextflow workflow system. For more information on Nextflow please visit the Nextflow github page and the Nextflow read the docs page."
-  },
-  {
-    "objectID": "modules/index.html",
-    "href": "modules/index.html",
     "title": "Components",
     "section": "",
-    "text": "Namespace\nName\nDescription"
+    "text": "Namespace\nName\nDescription\n\n\n\n\nTabula sapiens\nConcat\n\n\n\nTabula sapiens\nProcess"
   },
   {
-    "objectID": "modules/index.html#modules",
-    "href": "modules/index.html#modules",
+    "objectID": "index.html#modules",
+    "href": "index.html#modules",
     "title": "Components",
     "section": "Modules",
-    "text": "Modules\n\n\n\n\nNamespace\nName\nDescription\n\n\n\n\nCorrection\nCellbender remove background\nEliminating technical artifacts from high-throughput single-cell RNA sequencing data\n\n\nDemux\nSpaceranger mkfastq\nDemultiplex raw sequencing data\n\n\nMapping\nSpaceranger count\nAlign fastqs and detect tissues\n\n\nMetadata\nJoin uns to obs\nJoin a data frame in\n\n\nQc\nFastqc\nFastqc component, please see https://www\n\n\nQc\nMultiQC\nComponent for multiqc (https://multiqc.info/)"
-  },
-  {
-    "objectID": "modules/module_correction_cellbender_remove_background.html",
-    "href": "modules/module_correction_cellbender_remove_background.html",
-    "title": "Cellbender remove background",
-    "section": "",
-    "text": "ID: cellbender_remove_background\nNamespace: correction\n\n\n\nSource\nEliminating technical artifacts from high-throughput single-cell RNA sequencing data.\nThis module removes counts due to ambient RNA molecules and random barcode swapping from (raw) UMI-based scRNA-seq count matrices. At the moment, only the count matrices produced by the CellRanger count pipeline is supported. Support for additional tools and protocols will be added in the future. A quick start tutorial can be found here.\nFleming et al. 2022, bioRxiv."
-  },
-  {
-    "objectID": "modules/module_correction_cellbender_remove_background.html#example-commands",
-    "href": "modules/module_correction_cellbender_remove_background.html#example-commands",
-    "title": "Cellbender remove background",
-    "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/correction/cellbender_remove_background/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/correction/cellbender_remove_background/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
-  },
-  {
-    "objectID": "modules/module_correction_cellbender_remove_background.html#argument-groups",
-    "href": "modules/module_correction_cellbender_remove_background.html#argument-groups",
-    "title": "Cellbender remove background",
-    "section": "Argument groups",
-    "text": "Argument groups\n\nInputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--input\nInput file.\nfile, required, example: \"input.h5\"\n\n\n--modality\nList of modalities to process.\nstring, default: \"rna\"\n\n\n\n\n\nOutputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--output\nFull count matrix as an h5mu file, with background RNA removed. This file contains all the original droplet barcodes.\nfile, required, example: \"output.h5\"\n\n\n--layer_output\nOutput layer\nstring, default: \"corrected\"\n\n\n\n\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--expected_cells\nNumber of cells expected in the dataset (a rough estimate within a factor of 2 is sufficient).\ninteger, example: 1000\n\n\n--total_droplets_included\nThe number of droplets from the rank-ordered UMI plot that will be analyzed. The largest ‘total_droplets’ droplets will have their cell probabilities inferred as an output.\ninteger, example: 25000\n\n\n--expected_cells_from_qc\nWill use the Cell Ranger QC to determine the estimated number of cells\nboolean, default: TRUE\n\n\n--model\nWhich model is being used for count data. ‘simple’ does not model either ambient RNA or random barcode swapping (for debugging purposes – not recommended). ‘ambient’ assumes background RNA is incorporated into droplets. ‘swapping’ assumes background RNA comes from random barcode swapping. ‘full’ uses a combined ambient and swapping model.\nstring, default: \"full\"\n\n\n--epochs\nNumber of epochs to train.\ninteger, default: 150\n\n\n--low_count_threshold\nDroplets with UMI counts below this number are completely excluded from the analysis. This can help identify the correct prior for empty droplet counts in the rare case where empty counts are extremely high (over 200).\ninteger, default: 15\n\n\n--z_dim\nDimension of latent variable z.\ninteger, default: 100\n\n\n--z_layers\nDimension of hidden layers in the encoder for z.\ninteger, default: 500\n\n\n--training_fraction\nTraining detail: the fraction of the data used for training. The rest is never seen by the inference algorithm. Speeds up learning.\ndouble, default: 0.9\n\n\n--empty_drop_training_fraction\nTraining detail: the fraction of the training data each epoch that is drawn (randomly sampled) from surely empty droplets.\ndouble, default: 0.5\n\n\n--fpr\nTarget false positive rate in (0, 1). A false positive is a true signal count that is erroneously removed. More background removal is accompanied by more signal removal at high values of FPR. You can specify multiple values, which will create multiple output files.\ndouble, default: 0.01\n\n\n--exclude_antibody_capture\nIncluding the flag –exclude-antibody-capture will cause remove-background to operate on gene counts only, ignoring other features.\nboolean_true\n\n\n--learning_rate\nTraining detail: lower learning rate for inference. A OneCycle learning rate schedule is used, where the upper learning rate is ten times this value. (For this value, probably do not exceed 1e-3).\ndouble, example: 1e-04\n\n\n--cuda\nIncluding the flag –cuda will run the inference on a GPU.\nboolean_true"
-  },
-  {
-    "objectID": "modules/module_correction_cellbender_remove_background.html#authors",
-    "href": "modules/module_correction_cellbender_remove_background.html#authors",
-    "title": "Cellbender remove background",
-    "section": "Authors",
-    "text": "Authors"
-  },
-  {
-    "objectID": "modules/module_demux_spaceranger_mkfastq.html",
-    "href": "modules/module_demux_spaceranger_mkfastq.html",
-    "title": "Spaceranger mkfastq",
-    "section": "",
-    "text": "ID: spaceranger_mkfastq\nNamespace: demux\n\n\n\nSource\nDemultiplex raw sequencing data"
-  },
-  {
-    "objectID": "modules/module_demux_spaceranger_mkfastq.html#example-commands",
-    "href": "modules/module_demux_spaceranger_mkfastq.html#example-commands",
-    "title": "Spaceranger mkfastq",
-    "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
-  },
-  {
-    "objectID": "modules/module_demux_spaceranger_mkfastq.html#argument-group",
-    "href": "modules/module_demux_spaceranger_mkfastq.html#argument-group",
-    "title": "Spaceranger mkfastq",
-    "section": "Argument group",
-    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--input\nPath to the untarred BCL files.\nfile, required, example: \"/path/to/bcl\"\n\n\n--sample_sheet\nThe path to the sample sheet.\nfile, example: \"SampleSheet.csv\"\n\n\n--output\nThe folder to store the demux results\nfile, required, example: \"/path/to/output\""
-  },
-  {
-    "objectID": "modules/module_demux_spaceranger_mkfastq.html#authors",
-    "href": "modules/module_demux_spaceranger_mkfastq.html#authors",
-    "title": "Spaceranger mkfastq",
-    "section": "Authors",
-    "text": "Authors"
+    "text": "Modules\n\n\n\n\nNamespace\nName\nDescription\n\n\n\n\nDemux\nSpaceranger mkfastq\nDemultiplex raw sequencing data\n\n\nMapping\nRun star and htseq\nAlign sequencing data\n\n\nMapping\nSpaceranger count\nAlign fastqs and detect tissues\n\n\nMultiomics\nCellranger arc aggr\nAggregate\n\n\nMultiomics\nCellranger arc count\nCount\n\n\nMultiomics\nCellranger cite seq\nRun cite-seq using cellranger count"
   },
   {
     "objectID": "modules/module_mapping_spaceranger_count.html",
@@ -95,7 +25,7 @@
     "href": "modules/module_mapping_spaceranger_count.html#example-commands",
     "title": "Spaceranger count",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_mapping_spaceranger_count.html#argument-group",
@@ -112,87 +42,213 @@
     "text": "Authors"
   },
   {
-    "objectID": "modules/module_metadata_join_uns_to_obs.html",
-    "href": "modules/module_metadata_join_uns_to_obs.html",
-    "title": "Join uns to obs",
+    "objectID": "modules/module_multiomics_cellranger_arc_count.html",
+    "href": "modules/module_multiomics_cellranger_arc_count.html",
+    "title": "Cellranger arc count",
     "section": "",
-    "text": "ID: join_uns_to_obs\nNamespace: metadata\n\n\n\nSource\nJoin a data frame in .uns containing metadata to the .obs of a mudata file."
+    "text": "ID: cellranger_arc_count\nNamespace: multiomics\n\n\n\nSource\nCount"
   },
   {
-    "objectID": "modules/module_metadata_join_uns_to_obs.html#example-commands",
-    "href": "modules/module_metadata_join_uns_to_obs.html#example-commands",
-    "title": "Join uns to obs",
+    "objectID": "modules/module_multiomics_cellranger_arc_count.html#example-commands",
+    "href": "modules/module_multiomics_cellranger_arc_count.html#example-commands",
+    "title": "Cellranger arc count",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/metadata/join_uns_to_obs/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/metadata/join_uns_to_obs/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
-    "objectID": "modules/module_metadata_join_uns_to_obs.html#argument-group",
-    "href": "modules/module_metadata_join_uns_to_obs.html#argument-group",
-    "title": "Join uns to obs",
+    "objectID": "modules/module_multiomics_cellranger_arc_count.html#argument-group",
+    "href": "modules/module_multiomics_cellranger_arc_count.html#argument-group",
+    "title": "Cellranger arc count",
     "section": "Argument group",
-    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--input\nInput h5mu file\nfile, required, example: \"input.h5mu\"\n\n\n--output\nOutput h5mu file.\nfile, required, example: \"output.h5mu\""
+    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--libraries_path\nPath to the libraries\nfile, required, example: \"/path/to/libraries\"\n\n\n--reference_genome\nPath to the reference genome\nfile, required, example: \"/path/to/reference_genome\"\n\n\n--output\nPath to the output directory\nfile, required, example: \"/path/to/directory\"\n\n\n--run_id\nThe run ID\nstring, required\n\n\n--peaks\nPath to the bed file to use for peak calling\nfile, example: \"/path/to/bed\"\n\n\n--neurips\nUnknown\nboolean, default: FALSE"
   },
   {
-    "objectID": "modules/module_metadata_join_uns_to_obs.html#authors",
-    "href": "modules/module_metadata_join_uns_to_obs.html#authors",
-    "title": "Join uns to obs",
+    "objectID": "modules/module_multiomics_cellranger_arc_count.html#authors",
+    "href": "modules/module_multiomics_cellranger_arc_count.html#authors",
+    "title": "Cellranger arc count",
     "section": "Authors",
     "text": "Authors"
   },
   {
-    "objectID": "modules/module_qc_fastqc.html",
-    "href": "modules/module_qc_fastqc.html",
-    "title": "Fastqc",
+    "objectID": "modules/module_mapping_run_star_and_htseq.html",
+    "href": "modules/module_mapping_run_star_and_htseq.html",
+    "title": "Run star and htseq",
     "section": "",
-    "text": "ID: fastqc\nNamespace: qc\n\n\n\nSource\nFastqc component, please see https://www.bioinformatics.babraham.ac.uk/projects/fastqc/. This component can take one or more files (by means of shell globbing) or a complete directory."
+    "text": "ID: run_star_and_htseq\nNamespace: mapping\n\n\n\nSource\nAlign sequencing data"
   },
   {
-    "objectID": "modules/module_qc_fastqc.html#example-commands",
-    "href": "modules/module_qc_fastqc.html#example-commands",
-    "title": "Fastqc",
+    "objectID": "modules/module_mapping_run_star_and_htseq.html#example-commands",
+    "href": "modules/module_mapping_run_star_and_htseq.html#example-commands",
+    "title": "Run star and htseq",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/qc/fastqc/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/qc/fastqc/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
-    "objectID": "modules/module_qc_fastqc.html#argument-group",
-    "href": "modules/module_qc_fastqc.html#argument-group",
-    "title": "Fastqc",
+    "objectID": "modules/module_mapping_run_star_and_htseq.html#argument-group",
+    "href": "modules/module_mapping_run_star_and_htseq.html#argument-group",
+    "title": "Run star and htseq",
     "section": "Argument group",
-    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--mode\nThe mode in which the component works. Can be either files or dir.\nstring, default: \"files\"\n\n\n--input\nDirectory containing input fastq files.\nfile, required, example: \"fastq_dir\"\n\n\n--output\nOutput directory to write reports to.\nfile, required, example: \"qc\""
+    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--taxon\nReference genome for mapping fun\nstring, required, example: \"homo\"\n\n\n--input\nPath to the directory containing the fastq.gz files to align\nfile, required, example: \"path/to/fastqs\"\n\n\n--output\nOutput folder\nfile, required\n\n\n--star_proc\nNumber of processes to give to each STAR run\ninteger, default: 16\n\n\n--num_partitions\nNumber of groups to divide samples into\ninteger, default: 10\n\n\n--partition_id\nIndex of sample group.\ninteger, default: 0\n\n\n--min_size\nMinimum file syze in bytes for a file to be realigned\ninteger, default: 50000"
   },
   {
-    "objectID": "modules/module_qc_fastqc.html#authors",
-    "href": "modules/module_qc_fastqc.html#authors",
-    "title": "Fastqc",
+    "objectID": "modules/module_mapping_run_star_and_htseq.html#authors",
+    "href": "modules/module_mapping_run_star_and_htseq.html#authors",
+    "title": "Run star and htseq",
     "section": "Authors",
     "text": "Authors"
   },
   {
-    "objectID": "modules/module_qc_multiqc.html",
-    "href": "modules/module_qc_multiqc.html",
-    "title": "MultiQC",
+    "objectID": "modules/module_demux_spaceranger_mkfastq.html",
+    "href": "modules/module_demux_spaceranger_mkfastq.html",
+    "title": "Spaceranger mkfastq",
     "section": "",
-    "text": "ID: multiqc\nNamespace: qc\n\n\n\nSource\nComponent for multiqc (https://multiqc.info/)"
+    "text": "ID: spaceranger_mkfastq\nNamespace: demux\n\n\n\nSource\nDemultiplex raw sequencing data"
   },
   {
-    "objectID": "modules/module_qc_multiqc.html#example-commands",
-    "href": "modules/module_qc_multiqc.html#example-commands",
-    "title": "MultiQC",
+    "objectID": "modules/module_demux_spaceranger_mkfastq.html#example-commands",
+    "href": "modules/module_demux_spaceranger_mkfastq.html#example-commands",
+    "title": "Spaceranger mkfastq",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -main-script target/nextflow/qc/multiqc/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run czbiohub/utilities \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/qc/multiqc/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
-    "objectID": "modules/module_qc_multiqc.html#argument-group",
-    "href": "modules/module_qc_multiqc.html#argument-group",
-    "title": "MultiQC",
+    "objectID": "modules/module_demux_spaceranger_mkfastq.html#argument-group",
+    "href": "modules/module_demux_spaceranger_mkfastq.html#argument-group",
+    "title": "Spaceranger mkfastq",
     "section": "Argument group",
-    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--input\nDescribe the input file.\nfile, required, example: \"input.txt\"\n\n\n--output\nDescribe the output file.\nfile, required, example: \"report\""
+    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--input\nPath to the untarred BCL files.\nfile, required, example: \"/path/to/bcl\"\n\n\n--sample_sheet\nThe path to the sample sheet.\nfile, example: \"SampleSheet.csv\"\n\n\n--output\nThe folder to store the demux results\nfile, required, example: \"/path/to/output\""
   },
   {
-    "objectID": "modules/module_qc_multiqc.html#authors",
-    "href": "modules/module_qc_multiqc.html#authors",
-    "title": "MultiQC",
+    "objectID": "modules/module_demux_spaceranger_mkfastq.html#authors",
+    "href": "modules/module_demux_spaceranger_mkfastq.html#authors",
+    "title": "Spaceranger mkfastq",
     "section": "Authors",
     "text": "Authors"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_cite_seq.html",
+    "href": "modules/module_multiomics_cellranger_cite_seq.html",
+    "title": "Cellranger cite seq",
+    "section": "",
+    "text": "ID: cellranger_cite_seq\nNamespace: multiomics\n\n\n\nSource\nRun cite-seq using cellranger count"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_cite_seq.html#example-commands",
+    "href": "modules/module_multiomics_cellranger_cite_seq.html#example-commands",
+    "title": "Cellranger cite seq",
+    "section": "Example commands",
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_cite_seq.html#argument-group",
+    "href": "modules/module_multiomics_cellranger_cite_seq.html#argument-group",
+    "title": "Cellranger cite seq",
+    "section": "Argument group",
+    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--libraries_path\nPath to the libraries\nfile, required, example: \"/path/to/libraries\"\n\n\n--reference_genome\nPath to the reference genome\nfile, required, example: \"/path/to/reference_genome\"\n\n\n--output\nPath to the output directory\nfile, required, example: \"/path/to/directory\"\n\n\n--run_id\nThe run ID\nstring, required\n\n\n--peaks\nPath to the bed file to use for peak calling\nfile, example: \"/path/to/bed\"\n\n\n--neurips\nUnknown\nboolean, default: FALSE"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_cite_seq.html#authors",
+    "href": "modules/module_multiomics_cellranger_cite_seq.html#authors",
+    "title": "Cellranger cite seq",
+    "section": "Authors",
+    "text": "Authors"
+  },
+  {
+    "objectID": "modules/index.html",
+    "href": "modules/index.html",
+    "title": "Components",
+    "section": "",
+    "text": "Namespace\nName\nDescription\n\n\n\n\nTabula sapiens\nConcat\n\n\n\nTabula sapiens\nProcess"
+  },
+  {
+    "objectID": "modules/index.html#modules",
+    "href": "modules/index.html#modules",
+    "title": "Components",
+    "section": "Modules",
+    "text": "Modules\n\n\n\n\nNamespace\nName\nDescription\n\n\n\n\nDemux\nSpaceranger mkfastq\nDemultiplex raw sequencing data\n\n\nMapping\nRun star and htseq\nAlign sequencing data\n\n\nMapping\nSpaceranger count\nAlign fastqs and detect tissues\n\n\nMultiomics\nCellranger arc aggr\nAggregate\n\n\nMultiomics\nCellranger arc count\nCount\n\n\nMultiomics\nCellranger cite seq\nRun cite-seq using cellranger count"
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_concat.html",
+    "href": "modules/workflow_tabula_sapiens_concat.html",
+    "title": "Concat",
+    "section": "",
+    "text": "ID: concat\nNamespace: tabula_sapiens\n\n\n\nSource"
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_concat.html#example-commands",
+    "href": "modules/workflow_tabula_sapiens_concat.html#example-commands",
+    "title": "Concat",
+    "section": "Example commands",
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script tabula_sapiens/concat/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script tabula_sapiens/concat/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_concat.html#argument-groups",
+    "href": "modules/workflow_tabula_sapiens_concat.html#argument-groups",
+    "title": "Concat",
+    "section": "Argument groups",
+    "text": "Argument groups\n\nInputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--id\nID of the sample.\nstring, required, example: \"sample\"\n\n\n--input_metadata\nMetadata to be joined to the .obs.\nfile, required, example: \"metadata.csv\"\n\n\n\n\n\nOutput parameters\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--output\nThe path to the combined h5mu output file.\nfile, required, default: \"$id.output.h5mu\""
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_concat.html#authors",
+    "href": "modules/workflow_tabula_sapiens_concat.html#authors",
+    "title": "Concat",
+    "section": "Authors",
+    "text": "Authors\n\nAngela Pisco   (author)\nRobrecht Cannoodt   (author, maintainer)"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_arc_aggr.html",
+    "href": "modules/module_multiomics_cellranger_arc_aggr.html",
+    "title": "Cellranger arc aggr",
+    "section": "",
+    "text": "ID: cellranger_arc_aggr\nNamespace: multiomics\n\n\n\nSource\nAggregate"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_arc_aggr.html#example-commands",
+    "href": "modules/module_multiomics_cellranger_arc_aggr.html#example-commands",
+    "title": "Cellranger arc aggr",
+    "section": "Example commands",
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_arc_aggr.html#argument-group",
+    "href": "modules/module_multiomics_cellranger_arc_aggr.html#argument-group",
+    "title": "Cellranger arc aggr",
+    "section": "Argument group",
+    "text": "Argument group\n\nArguments\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--data\nPath to the data\nfile, required, example: \"/path/to/data\"\n\n\n--reference_genome\nPath to the reference genome\nfile, required, example: \"/path/to/reference_genome\"\n\n\n--output\nPath to the output directory\nfile, required, example: \"/path/to/directory\"\n\n\n--run_id\nThe run ID\nstring, required\n\n\n--peaks\nPath to the bed file to use for peak calling\nfile, example: \"/path/to/bed\"\n\n\n--neurips\nUnknown\nboolean, default: FALSE"
+  },
+  {
+    "objectID": "modules/module_multiomics_cellranger_arc_aggr.html#authors",
+    "href": "modules/module_multiomics_cellranger_arc_aggr.html#authors",
+    "title": "Cellranger arc aggr",
+    "section": "Authors",
+    "text": "Authors"
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_process.html",
+    "href": "modules/workflow_tabula_sapiens_process.html",
+    "title": "Process",
+    "section": "",
+    "text": "ID: process\nNamespace: tabula_sapiens\n\n\n\nSource"
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_process.html#example-commands",
+    "href": "modules/workflow_tabula_sapiens_process.html#example-commands",
+    "title": "Process",
+    "section": "Example commands",
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script tabula_sapiens/process/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script tabula_sapiens/process/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_process.html#argument-group",
+    "href": "modules/workflow_tabula_sapiens_process.html#argument-group",
+    "title": "Process",
+    "section": "Argument group",
+    "text": "Argument group\n\nInputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--id\nID of the sample.\nstring, required, example: \"foo\"\n\n\n--input\nThe fastq.gz files to align. Can also be a single directory containing fastq.gz files.\nfile, required, example: \"sample_S1_L001_R1_001.fastq.gz\", example: \"sample_S1_L001_R2_001.fastq.gz\"\n\n\n--reference\nThe path to Cell Ranger reference tar.gz file.\nfile, required, example: \"reference.tar.gz\"\n\n\n--output_raw\nThe output h5mu.\nfile, default: \"$id.output_raw\"\n\n\n--output_h5mu\nThe output h5mu.\nfile, default: \"$id.output_h5mu.h5mu\""
+  },
+  {
+    "objectID": "modules/workflow_tabula_sapiens_process.html#authors",
+    "href": "modules/workflow_tabula_sapiens_process.html#authors",
+    "title": "Process",
+    "section": "Authors",
+    "text": "Authors\n\nAngela Pisco   (author)\nRobrecht Cannoodt   (author, maintainer)"
   }
 ]
