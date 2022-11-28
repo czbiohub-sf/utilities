@@ -21,12 +21,14 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 curl -fsSL get.viash.io | bash -s -- \
-  --tag 0.5.12 \
-  --viash bin/viash \
-  --registry ghcr.io \
-  --organization czbiohub/utilities \
-  --target_image_source https://github.com/czbiohub/utilities \
-  --nextflow_variant vdsl3
+  --tag develop \
+  --viash bin/viash
+
+# download additional Nxf workflow files
+[[ -d workflows/utils ]] || mkdir -p workflows/utils
+bin/viash export resource platforms/nextflow/ProfilesHelper.config > workflows/utils/ProfilesHelper.config
+bin/viash export resource platforms/nextflow/WorkflowHelper.nf > workflows/utils/WorkflowHelper.nf
+bin/viash export resource platforms/nextflow/DataflowHelper.nf > workflows/utils/DataflowHelper.nf
  
 cd bin
 
