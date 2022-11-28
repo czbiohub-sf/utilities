@@ -25,10 +25,10 @@ curl -fsSL get.viash.io | bash -s -- \
   --viash bin/viash
 
 # download additional Nxf workflow files
-[[ -d workflows/utils ]] || mkdir -p workflows/utils
-bin/viash export resource platforms/nextflow/ProfilesHelper.config > workflows/utils/ProfilesHelper.config
-bin/viash export resource platforms/nextflow/WorkflowHelper.nf > workflows/utils/WorkflowHelper.nf
-bin/viash export resource platforms/nextflow/DataflowHelper.nf > workflows/utils/DataflowHelper.nf
+[[ -d src/wf_utils ]] || mkdir -p src/wf_utils
+bin/viash export resource platforms/nextflow/ProfilesHelper.config > src/wf_utils/ProfilesHelper.config
+bin/viash export resource platforms/nextflow/WorkflowHelper.nf > src/wf_utils/WorkflowHelper.nf
+bin/viash export resource platforms/nextflow/DataflowHelper.nf > src/wf_utils/DataflowHelper.nf
  
 cd bin
 
