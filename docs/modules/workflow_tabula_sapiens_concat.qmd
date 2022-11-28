@@ -1,0 +1,75 @@
+---
+title: "Concat"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `concat`  
+Namespace: `tabula_sapiens`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/tabula_sapiens/concat){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -main-script tabula_sapiens/concat/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -profile docker \
+  -main-script tabula_sapiens/concat/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Inputs
+
+|Name               |Description                        |Attributes                                  |
+|:------------------|:----------------------------------|:-------------------------------------------|
+|`--id`             |ID of the sample.                  |`string`, required, example: `"sample"`     |
+|`--input_metadata` |Metadata to be joined to the .obs. |`file`, required, example: `"metadata.csv"` |
+
+
+### Output parameters
+
+|Name       |Description                                |Attributes                                     |
+|:----------|:------------------------------------------|:----------------------------------------------|
+|`--output` |The path to the combined h5mu output file. |`file`, required, default: `"$id.output.h5mu"` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)

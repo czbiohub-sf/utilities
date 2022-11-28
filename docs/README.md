@@ -17,7 +17,7 @@ The directory `modules/` was generated using:
 
 ```bash
 bin/tools/docker/quarto/generate_documentation_qmd/generate_documentation_qmd \
-  --input "." \
+  --input "src" \
   --output "docs/modules" \
   --git_repo "czbiohub/utilities" \
   --git_tag "main_build" \

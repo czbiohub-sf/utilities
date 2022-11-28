@@ -1,0 +1,71 @@
+---
+title: "Run star and htseq"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `run_star_and_htseq`  
+Namespace: `mapping`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/mapping/run_star_and_htseq){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Align sequencing data
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
+  -profile docker \
+  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name               |Description                                                  |Attributes                                    |
+|:------------------|:------------------------------------------------------------|:---------------------------------------------|
+|`--taxon`          |Reference genome for mapping fun                             |`string`, required, example: `"homo"`         |
+|`--input`          |Path to the directory containing the fastq.gz files to align |`file`, required, example: `"path/to/fastqs"` |
+|`--output`         |Output folder                                                |`file`, required                              |
+|`--star_proc`      |Number of processes to give to each STAR run                 |`integer`, default: `16`                      |
+|`--num_partitions` |Number of groups to divide samples into                      |`integer`, default: `10`                      |
+|`--partition_id`   |Index of sample group.                                       |`integer`, default: `0`                       |
+|`--min_size`       |Minimum file syze in bytes for a file to be realigned        |`integer`, default: `50000`                   |
+
+## Authors
+

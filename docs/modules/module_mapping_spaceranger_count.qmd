@@ -11,7 +11,7 @@ ID: `spaceranger_count`
 Namespace: `mapping`
 
 ### Links
-[Source](https://github.com/czbiohub/utilities/blob/main/src/mapping/spaceranger_count){.btn-action .btn-sm .btn-info .btn role="button"}
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/mapping/spaceranger_count){.btn-action .btn-sm .btn-info .btn role="button"}
 
 :::
 
@@ -26,8 +26,8 @@ You can run the pipeline using `nextflow run`.
 You can use `--help` as a parameter to get an overview of the possible parameters.
 
 ```bash
-nextflow run czbiohub/utilities \
-  -r main_build -latest \
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
   -main-script target/nextflow/mapping/spaceranger_count/main.nf \
   --help
 ```
@@ -42,8 +42,8 @@ nextflow run czbiohub/utilities \
 </details>
 
 ```bash
-nextflow run czbiohub/utilities \
-  -r main_build -latest \
+nextflow run openpipelines-bio/openpipeline \
+  -r 0.5.1 -latest \
   -profile docker \
   -main-script target/nextflow/mapping/spaceranger_count/main.nf \
   -params-file params.yaml
