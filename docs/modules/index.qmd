@@ -1,0 +1,23 @@
+---
+title: "Components"
+---
+
+## Workflows
+
+:::{.column-body-outset}
+|Namespace |Name |Description |
+|:---------|:----|:-----------|
+:::
+
+## Modules
+
+:::{.column-body-outset}
+|Namespace  |Name                                                                               |Description                                                                          |
+|:----------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
+|Correction |[Cellbender remove background](module_correction_cellbender_remove_background.qmd) |Eliminating technical artifacts from high-throughput single-cell RNA sequencing data |
+|Demux      |[Spaceranger mkfastq](module_demux_spaceranger_mkfastq.qmd)                        |Demultiplex raw sequencing data                                                      |
+|Mapping    |[Spaceranger count](module_mapping_spaceranger_count.qmd)                          |Align fastqs and detect tissues                                                      |
+|Metadata   |[Join uns to obs](module_metadata_join_uns_to_obs.qmd)                             |Join a data frame in                                                                 |
+|Qc         |[Fastqc](module_qc_fastqc.qmd)                                                     |Fastqc component, please see https://www                                             |
+|Qc         |[MultiQC](module_qc_multiqc.qmd)                                                   |Component for multiqc (https://multiqc.info/)                                        |
+:::

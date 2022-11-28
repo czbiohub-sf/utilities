@@ -1,0 +1,67 @@
+---
+title: "Spaceranger mkfastq"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `spaceranger_mkfastq`  
+Namespace: `demux`
+
+### Links
+[Source](https://github.com/czbiohub/utilities/blob/main/src/demux/spaceranger_mkfastq){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Demultiplex raw sequencing data
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name             |Description                           |Attributes                                     |
+|:----------------|:-------------------------------------|:----------------------------------------------|
+|`--input`        |Path to the untarred BCL files.       |`file`, required, example: `"/path/to/bcl"`    |
+|`--sample_sheet` |The path to the sample sheet.         |`file`, example: `"SampleSheet.csv"`           |
+|`--output`       |The folder to store the demux results |`file`, required, example: `"/path/to/output"` |
+
+## Authors
+

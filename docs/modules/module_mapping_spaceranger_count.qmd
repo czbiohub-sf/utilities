@@ -1,0 +1,72 @@
+---
+title: "Spaceranger count"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `spaceranger_count`  
+Namespace: `mapping`
+
+### Links
+[Source](https://github.com/czbiohub/utilities/blob/main/src/mapping/spaceranger_count){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Align fastqs and detect tissues
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -main-script target/nextflow/mapping/spaceranger_count/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/mapping/spaceranger_count/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                 |Description                                    |Attributes                                        |
+|:--------------------|:----------------------------------------------|:-------------------------------------------------|
+|`--input_fastqs`     |Path to the fastq files.                       |`file`, required, example: `"/path/to/bcl"`       |
+|`--input_tif`        |Path to the tif file                           |`file`, required, example: `"path/to/tif"`        |
+|`--reference_genome` |Path to the reference genome                   |`file`, required, example: `"path/to/ref_genome"` |
+|`--output`           |The name of the folder to store the results in |`file`, required, default: `"outs"`               |
+|`--id`               |ID name for temporary output directory.        |`string`, default: `"output"`                     |
+|`--sample`           |Sample name to analyze.                        |`string`, example: `"test_sample"`                |
+|`--lanes`            |Lanes associated with this sample.             |`integer`, example: `1`                           |
+|`--slide`            |Slide associated with this sample.             |`string`                                          |
+
+## Authors
+
