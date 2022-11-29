@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="Compute a neighborhood graph of observations [McInnes18].">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Find neighbors</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -168,12 +168,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Find neighbors</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    Compute a neighborhood graph of observations [McInnes18].
   </div>
 </div>
 
@@ -192,22 +192,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
-Namespace: <code>multiomics</code></p>
+<p>ID: <code>find_neighbors</code><br>
+Namespace: <code>neighbors</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/src/neighbors/find_neighbors" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><section id="example-commands" class="level2">
+</div></div><p>The neighbor search efficiency of this heavily relies on UMAP [McInnes18], which also provides a method for estimating connectivities of data points - the connectivity of the manifold (method==‘umap’). If method==‘gauss’, connectivities are computed according to [Coifman05], in the adaption of [Haghverdi16].</p>
+<section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/neighbors/find_neighbors/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +217,26 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Arguments</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: "input.h5mu"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">modality</span><span class="kw">:</span><span class="at"> </span><span class="st">"rna"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">obsm_input</span><span class="kw">:</span><span class="at"> </span><span class="st">"X_pca"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output: "$id.$key.output.h5mu"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">uns_output</span><span class="kw">:</span><span class="at"> </span><span class="st">"neighbors"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">obsp_distances</span><span class="kw">:</span><span class="at"> </span><span class="st">"distances"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">obsp_connectivities</span><span class="kw">:</span><span class="at"> </span><span class="st">"connectivities"</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">metric</span><span class="kw">:</span><span class="at"> </span><span class="st">"euclidean"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">num_neighbors</span><span class="kw">:</span><span class="at"> </span><span class="dv">15</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">seed</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/neighbors/find_neighbors/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -244,9 +259,9 @@ Note
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 4%">
+<col style="width: 86%">
+<col style="width: 8%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -257,34 +272,49 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Input h5mu file</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+<td style="text-align: left;"><code>--obsm_input</code></td>
+<td style="text-align: left;">Which .obsm slot to use as a starting PCA embedding.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"X_pca"</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+<td style="text-align: left;">Output h5mu file containing the found neighbors.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"output.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
+<td style="text-align: left;"><code>--uns_output</code></td>
+<td style="text-align: left;">Mandatory .uns slot to store various neighbor output objects.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"neighbors"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+<td style="text-align: left;"><code>--obsp_distances</code></td>
+<td style="text-align: left;">In which .obsp slot to store the distance matrix between the resulting neighbors.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"distances"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+<td style="text-align: left;"><code>--obsp_connectivities</code></td>
+<td style="text-align: left;">In which .obsp slot to store the connectivities matrix between the resulting neighbors.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"connectivities"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--metric</code></td>
+<td style="text-align: left;">The distance metric to be used in the generation of the nearest neighborhood network.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"euclidean"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--num_neighbors</code></td>
+<td style="text-align: left;">The size of local neighborhood (in terms of number of neighboring data points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100. If knn is True, number of nearest neighbors to be searched. If knn is False, a Gaussian kernel width is set to the distance of the n_neighbors neighbor.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>15</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--seed</code></td>
+<td style="text-align: left;">A random seed.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>0</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +322,10 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Dries De Maeyer <a href="https://github.com/ddemaeyer"></a> (maintainer)</li>
+<li>Robrecht Cannoodt <a href="https://github.com/rcannood"></a> <a href="https://orcid.org/0000-0003-3641-729X"></a> (contributor)</li>
+</ul>
 
 
 </section>

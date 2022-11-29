@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="Annotate highly variable genes [Satija15] [Zheng17] [Stuart19].">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Filter with hvg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -168,12 +168,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Filter with hvg</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    Annotate highly variable genes [Satija15] [Zheng17] [Stuart19].
   </div>
 </div>
 
@@ -192,22 +192,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
-Namespace: <code>multiomics</code></p>
+<p>ID: <code>filter_with_hvg</code><br>
+Namespace: <code>filter</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/src/filter/filter_with_hvg" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><section id="example-commands" class="level2">
+</div></div><p>Expects logarithmized data, except when flavor=‘seurat_v3’ in which count data is expected.</p>
+<p>Depending on flavor, this reproduces the R-implementations of Seurat [Satija15], Cell Ranger [Zheng17], and Seurat v3 [Stuart19].</p>
+<p>For the dispersion-based methods ([Satija15] and [Zheng17]), the normalized dispersion is obtained by scaling with the mean and standard deviation of the dispersions for genes falling into a given bin for mean expression of genes. This means that for each bin of mean expression, highly variable genes are selected.</p>
+<p>For [Stuart19], a normalized variance for each gene is computed. First, the data are standardized (i.e., z-score normalization per feature) with a regularized standard deviation. Next, the normalized variance is computed as the variance of each gene after the transformation. Genes are ranked by the normalized variance.</p>
+<section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/filter/filter_with_hvg/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +220,32 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Arguments</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: "input.h5mu"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">modality</span><span class="kw">:</span><span class="at"> </span><span class="st">"rna"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># layer: "foo"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output: "$id.$key.output.h5mu"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">var_name_filter</span><span class="kw">:</span><span class="at"> </span><span class="st">"filter_with_hvg"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">varm_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"hvg"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">do_subset</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">flavor</span><span class="kw">:</span><span class="at"> </span><span class="st">"seurat"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># n_top_genes: 123</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">min_mean</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.0125</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">max_mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">min_disp</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># max_disp: 123.0</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">span</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.3</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">n_bins</span><span class="kw">:</span><span class="at"> </span><span class="dv">20</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># obs_batch_key: "foo"</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/filter/filter_with_hvg/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -244,9 +268,9 @@ Note
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 3%">
+<col style="width: 88%">
+<col style="width: 7%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -257,34 +281,79 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Input h5mu file</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+<td style="text-align: left;"><code>--layer</code></td>
+<td style="text-align: left;">use adata.layers[layer] for expression values instead of adata.X.</td>
+<td style="text-align: left;"><code>string</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+<td style="text-align: left;">Output h5mu file.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"output.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
+<td style="text-align: left;"><code>--var_name_filter</code></td>
+<td style="text-align: left;">In which .var slot to store a boolean array corresponding to which observations should be filtered out.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"filter_with_hvg"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+<td style="text-align: left;"><code>--varm_name</code></td>
+<td style="text-align: left;">In which .varm slot to store additional metadata.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"hvg"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+<td style="text-align: left;"><code>--do_subset</code></td>
+<td style="text-align: left;">Whether to subset before storing the output.</td>
+<td style="text-align: left;"><code>boolean_true</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--flavor</code></td>
+<td style="text-align: left;">Choose the flavor for identifying highly variable genes. For the dispersion based methods in their default workflows, Seurat passes the cutoffs whereas Cell Ranger passes n_top_genes.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"seurat"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--n_top_genes</code></td>
+<td style="text-align: left;">Number of highly-variable genes to keep. Mandatory if flavor=‘seurat_v3’.</td>
+<td style="text-align: left;"><code>integer</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_mean</code></td>
+<td style="text-align: left;">If n_top_genes is defined, this and all other cutoffs for the means and the normalized dispersions are ignored. Ignored if flavor=‘seurat_v3’.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>0.0125</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max_mean</code></td>
+<td style="text-align: left;">If n_top_genes is defined, this and all other cutoffs for the means and the normalized dispersions are ignored. Ignored if flavor=‘seurat_v3’.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>3</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_disp</code></td>
+<td style="text-align: left;">If n_top_genes is defined, this and all other cutoffs for the means and the normalized dispersions are ignored. Ignored if flavor=‘seurat_v3’.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>0.5</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max_disp</code></td>
+<td style="text-align: left;">If n_top_genes is defined, this and all other cutoffs for the means and the normalized dispersions are ignored. Ignored if flavor=‘seurat_v3’. Default is +inf.</td>
+<td style="text-align: left;"><code>double</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--span</code></td>
+<td style="text-align: left;">The fraction of the data (cells) used when estimating the variance in the loess model fit if flavor=‘seurat_v3’.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>0.3</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--n_bins</code></td>
+<td style="text-align: left;">Number of bins for binning the mean gene expression. Normalization is done with respect to each bin. If just a single gene falls into a bin, the normalized dispersion is artificially set to 1.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>20</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--obs_batch_key</code></td>
+<td style="text-align: left;">If specified, highly-variable genes are selected within each batch separately and merged. This simple process avoids the selection of batch-specific genes and acts as a lightweight batch correction method. For all flavors, genes are first sorted by how many batches they are a HVG. For dispersion-based flavors ties are broken by normalized dispersion. If flavor = ‘seurat_v3’, ties are broken by the median (across batches) rank based on within-batch normalized variance.</td>
+<td style="text-align: left;"><code>string</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +361,10 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Dries De Maeyer <a href="https://github.com/ddemaeyer"></a> (contributor)</li>
+<li>Robrecht Cannoodt <a href="https://github.com/rcannood"></a> <a href="https://orcid.org/0000-0003-3641-729X"></a> (maintainer, contributor)</li>
+</ul>
 
 
 </section>

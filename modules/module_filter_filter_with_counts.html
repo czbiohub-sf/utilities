@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="Filter scRNA-seq data based on the primary QC metrics.">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Filter with counts</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -168,12 +168,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Filter with counts</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    Filter scRNA-seq data based on the primary QC metrics.
   </div>
 </div>
 
@@ -192,22 +192,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
-Namespace: <code>multiomics</code></p>
+<p>ID: <code>filter_with_counts</code><br>
+Namespace: <code>filter</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/src/filter/filter_with_counts" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><section id="example-commands" class="level2">
+</div></div><p>This is based on both the UMI counts, the gene counts and the mitochondrial genes (genes starting with mt/MT)</p>
+<section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/filter/filter_with_counts/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +217,34 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: "input.h5mu"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">modality</span><span class="kw">:</span><span class="at"> </span><span class="st">"rna"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># layer: "raw_counts"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Outputs</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># output: "$id.$key.output.h5mu"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">do_subset</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">obs_name_filter</span><span class="kw">:</span><span class="at"> </span><span class="st">"filter_with_counts"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">var_name_filter</span><span class="kw">:</span><span class="at"> </span><span class="st">"filter_with_counts"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Arguments</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># min_counts: 200</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># max_counts: 5000000</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># min_genes_per_cell: 200</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># max_genes_per_cell: 1500000</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># min_cells_per_gene: 3</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># min_fraction_mito: 0</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># max_fraction_mito: 0.2</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/filter/filter_with_counts/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -238,15 +261,34 @@ Note
 </div>
 </section>
 </section>
-<section id="argument-group" class="level2">
-<h2 class="anchored" data-anchor-id="argument-group">Argument group</h2>
-<section id="arguments" class="level3">
-<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<section id="argument-groups" class="level2">
+<h2 class="anchored" data-anchor-id="argument-groups">Argument groups</h2>
+<section id="inputs" class="level3">
+<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Input h5mu file</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outputs" class="level3">
+<h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 12%">
+<col style="width: 61%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -257,34 +299,78 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+<td style="text-align: left;">Output h5mu file.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"output.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
+<td style="text-align: left;"><code>--do_subset</code></td>
+<td style="text-align: left;">Whether to subset before storing the output.</td>
+<td style="text-align: left;"><code>boolean_true</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+<td style="text-align: left;"><code>--obs_name_filter</code></td>
+<td style="text-align: left;">In which .obs slot to store a boolean array corresponding to which observations should be removed.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"filter_with_counts"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+<td style="text-align: left;"><code>--var_name_filter</code></td>
+<td style="text-align: left;">In which .var slot to store a boolean array corresponding to which variables should be removed.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"filter_with_counts"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="arguments" class="level3">
+<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 48%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_counts</code></td>
+<td style="text-align: left;">Minimum number of counts captured per cell.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>200</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max_counts</code></td>
+<td style="text-align: left;">Maximum number of counts captured per cell.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>5000000</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_genes_per_cell</code></td>
+<td style="text-align: left;">Minimum of non-zero values per cell.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>200</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max_genes_per_cell</code></td>
+<td style="text-align: left;">Maximum of non-zero values per cell.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>1500000</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_cells_per_gene</code></td>
+<td style="text-align: left;">Minimum of non-zero values per gene.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>3</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--min_fraction_mito</code></td>
+<td style="text-align: left;">Minimum fraction of UMIs that are mitochondrial.</td>
+<td style="text-align: left;"><code>double</code>, example: <code>0</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--max_fraction_mito</code></td>
+<td style="text-align: left;">Maximum fraction of UMIs that are mitochondrial.</td>
+<td style="text-align: left;"><code>double</code>, example: <code>0.2</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +378,10 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Dries De Maeyer <a href="https://github.com/ddemaeyer"></a> (author)</li>
+<li>Robrecht Cannoodt <a href="https://github.com/rcannood"></a> <a href="https://orcid.org/0000-0003-3641-729X"></a> (maintainer, author)</li>
+</ul>
 
 
 </section>

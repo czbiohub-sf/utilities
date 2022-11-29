@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="UMAP (Uniform Manifold Approximation and Projection) is a manifold learning technique suitable for visualizing high-dimensional data.">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Umap</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -168,12 +168,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Umap</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    UMAP (Uniform Manifold Approximation and Projection) is a manifold learning technique suitable for visualizing high-dimensional data.
   </div>
 </div>
 
@@ -192,22 +192,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
-Namespace: <code>multiomics</code></p>
+<p>ID: <code>umap</code><br>
+Namespace: <code>dimred</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/src/dimred/umap" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><section id="example-commands" class="level2">
+</div></div><p>Besides tending to be faster than tSNE, it optimizes the embedding such that it best reflects the topology of the data, which we represent throughout Scanpy using a neighborhood graph. tSNE, by contrast, optimizes the distribution of nearest-neighbor distances in the embedding such that these best match the distribution of distances in the high-dimensional space. We use the implementation of umap-learn [McInnes18]. For a few comparisons of UMAP with tSNE, see this preprint</p>
+<section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/dimred/umap/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +217,33 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: "input.h5mu"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">modality</span><span class="kw">:</span><span class="at"> </span><span class="st">"rna"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">uns_neighbors</span><span class="kw">:</span><span class="at"> </span><span class="st">"neighbors"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Outputs</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># output: "$id.$key.output.h5mu"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">obsm_output</span><span class="kw">:</span><span class="at"> </span><span class="st">"umap"</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Arguments</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">min_dist</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">spread</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">num_components</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># max_iter: 123</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">alpha</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">gamma</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">negative_sample_rate</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">init_pos</span><span class="kw">:</span><span class="at"> </span><span class="st">"spectral"</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/dimred/umap/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -238,15 +260,15 @@ Note
 </div>
 </section>
 </section>
-<section id="argument-group" class="level2">
-<h2 class="anchored" data-anchor-id="argument-group">Argument group</h2>
-<section id="arguments" class="level3">
-<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<section id="argument-groups" class="level2">
+<h2 class="anchored" data-anchor-id="argument-groups">Argument groups</h2>
+<section id="inputs" class="level3">
+<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 13%">
+<col style="width: 54%">
+<col style="width: 32%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -257,34 +279,102 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Input h5mu file</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+<td style="text-align: left;"><code>--uns_neighbors</code></td>
+<td style="text-align: left;">The <code>.uns</code> neighbors slot as output by the <code>find_neighbors</code> component.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"neighbors"</code></td>
 </tr>
+</tbody>
+</table>
+</section>
+<section id="outputs" class="level3">
+<h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
+<table class="table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 48%">
+<col style="width: 37%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
 <td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+<td style="text-align: left;">Output h5mu file.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"output.h5mu"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
+<td style="text-align: left;"><code>--obsm_output</code></td>
+<td style="text-align: left;">The pre/postfix under which to store the UMAP results.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"umap"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="arguments" class="level3">
+<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 86%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--min_dist</code></td>
+<td style="text-align: left;">The effective minimum distance between embedded points. Smaller values will result in a more clustered/clumped embedding where nearby points on the manifold are drawn closer together, while larger values will result on a more even dispersal of points. The value should be set relative to the spread value, which determines the scale at which embedded points will be spread out.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>0.5</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--spread</code></td>
+<td style="text-align: left;">The effective scale of embedded points. In combination with <code>min_dist</code> this determines how clustered/clumped the embedded points are.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>1</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+<td style="text-align: left;"><code>--num_components</code></td>
+<td style="text-align: left;">The number of dimensions of the embedding.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>2</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+<td style="text-align: left;"><code>--max_iter</code></td>
+<td style="text-align: left;">The number of iterations (epochs) of the optimization. Called <code>n_epochs</code> in the original UMAP. Default is set to 500 if neighbors[‘connectivities’].shape[0] &lt;= 10000, else 200.</td>
+<td style="text-align: left;"><code>integer</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--alpha</code></td>
+<td style="text-align: left;">The initial learning rate for the embedding optimization.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>1</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--gamma</code></td>
+<td style="text-align: left;">Weighting applied to negative samples in low dimensional embedding optimization. Values higher than one will result in greater weight being given to negative samples.</td>
+<td style="text-align: left;"><code>double</code>, default: <code>1</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--negative_sample_rate</code></td>
+<td style="text-align: left;">The number of negative edge/1-simplex samples to use per positive edge/1-simplex sample in optimizing the low dimensional embedding.</td>
+<td style="text-align: left;"><code>integer</code>, default: <code>5</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--init_pos</code></td>
+<td style="text-align: left;">How to initialize the low dimensional embedding. Called <code>init</code> in the original UMAP. Options are: * Any key from <code>.obsm</code> * <code>'paga'</code>: positions from <code>paga()</code> * <code>'spectral'</code>: use a spectral embedding of the graph * <code>'random'</code>: assign initial embedding positions at random.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"spectral"</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +382,9 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Dries De Maeyer <a href="https://github.com/ddemaeyer"></a> (maintainer)</li>
+</ul>
 
 
 </section>

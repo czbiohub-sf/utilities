@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A generic pipeline for running BD Rhapsody WTA or Targeted mapping, with support for AbSeq, VDJ and/or SMK.">
+
+<title>CZBiohub/utilities - BD Rhapsody</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">CZBiohub/utilities</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/index.html">
+ <span class="menu-text">Components</span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">BD Rhapsody</h1>
+</div>
+
+<div>
+  <div class="description">
+    A generic pipeline for running BD Rhapsody WTA or Targeted mapping, with support for AbSeq, VDJ and/or SMK.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+
+<div class="no-row-height column-margin column-container"><div class="">
+<section id="info" class="level3">
+<h3 class="anchored" data-anchor-id="info">Info</h3>
+<p>ID: <code>bd_rhapsody</code><br>
+Namespace: <code>ingestion</code></p>
+</section>
+<section id="links" class="level3">
+<h3 class="anchored" data-anchor-id="links">Links</h3>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/ingestion/bd_rhapsody" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+</section>
+</div></div><p>A wrapper for the BD Rhapsody Analysis CWL v1.10.1 pipeline.</p>
+<p>This pipeline can be used for a targeted analysis (with <code>--mode targeted</code>) or for a whole transcriptome analysis (with <code>--mode wta</code>).</p>
+<ul>
+<li>If mode is <code>"targeted"</code>, then either the <code>--reference</code> or <code>--abseq_reference</code> parameters must be defined.</li>
+<li>If mode is <code>"wta"</code>, then <code>--reference</code> and <code>--transcriptome_annotation</code> must be defined, <code>--abseq_reference</code> and <code>--supplemental_reference</code> is optional.</li>
+</ul>
+<p>The reference_genome and transcriptome_annotation files can be generated with the make_reference pipeline. Alternatively, BD also provides standard references which can be downloaded from these locations:</p>
+<ul>
+<li>Human: http://bd-rhapsody-public.s3-website-us-east-1.amazonaws.com/Rhapsody-WTA/GRCh38-PhiX-gencodev29/</li>
+<li>Mouse: http://bd-rhapsody-public.s3-website-us-east-1.amazonaws.com/Rhapsody-WTA/GRCm38-PhiX-gencodevM19/</li>
+</ul>
+<section id="example-commands" class="level2">
+<h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
+<p>You can run the pipeline using <code>nextflow run</code>.</p>
+<section id="view-help" class="level3">
+<h3 class="anchored" data-anchor-id="view-help">View help</h3>
+<p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/ingestion/bd_rhapsody/main.nf <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="run-command" class="level3">
+<h3 class="anchored" data-anchor-id="run-command">Run command</h3>
+<details>
+<summary>
+Example of <code>params.yaml</code>
+</summary>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mode</span><span class="kw">:</span><span class="co"> # please fill in - example: "wta"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span><span class="kw">:</span><span class="co"> # please fill in - example: "foo"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: ["input.fastq.gz"]</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">reference</span><span class="kw">:</span><span class="co"> # please fill in - example: ["reference_genome.tar.gz|reference.fasta"]</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># transcriptome_annotation: "transcriptome.gtf"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># abseq_reference: ["abseq_reference.fasta"]</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># supplemental_reference: ["supplemental_reference.fasta"]</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_prefix</span><span class="kw">:</span><span class="at"> </span><span class="st">"sample"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Outputs</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># output_raw: "$id.$key.output_raw.output_raw"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># output_h5mu: "$id.$key.output_h5mu.h5mu"</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Putative cell calling settings</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># putative_cell_call: "mRNA"</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># exact_cell_count: 10000</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">disable_putative_calling</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsample arguments</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># subsample: 0.01</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># subsample_seed: 3445</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplex arguments</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_tags_version: "human"</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># tag_names: ["4-mySample", "9-myOtherSample", "6-alsoThisSample"]</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># VDJ arguments</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># vdj_version: "human"</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># CWL-runner arguments</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="fu">parallel</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">timestamps</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/ingestion/bd_rhapsody/main.nf <span class="dt">\</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Replace <code>-profile docker</code> with <code>-profile podman</code> or <code>-profile singularity</code> depending on the desired backend.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="argument-groups" class="level2">
+<h2 class="anchored" data-anchor-id="argument-groups">Argument groups</h2>
+<section id="inputs" class="level3">
+<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 67%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--mode</code></td>
+<td style="text-align: left;">Whether to run a whole transcriptome analysis (WTA) or a targeted analysis.</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"wta"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--id</code></td>
+<td style="text-align: left;">ID of the sample.</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"foo"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Path to your read files in the FASTQ.GZ format. You may specify as many R1/R2 read pairs as you want.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.fastq.gz"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--reference</code></td>
+<td style="text-align: left;">Refence to map to. For <code>--mode wta</code>, this is the path to STAR index as a tar.gz file. For <code>--mode targeted</code>, this is the path to mRNA reference file for pre-designed, supplemental, or custom panel, in FASTA format</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"reference_genome.tar.gz&amp;#124;reference.fasta"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--transcriptome_annotation</code></td>
+<td style="text-align: left;">Path to GTF annotation file (only for <code>--mode wta</code>).</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"transcriptome.gtf"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--abseq_reference</code></td>
+<td style="text-align: left;">Path to the AbSeq reference file in FASTA format. Only needed if BD AbSeq Ab-Oligos are used.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"abseq_reference.fasta"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--supplemental_reference</code></td>
+<td style="text-align: left;">Path to the supplemental reference file in FASTA format. Only needed if there are additional transgene sequences used in the experiment (only for <code>--mode wta</code>).</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"supplemental_reference.fasta"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--sample_prefix</code></td>
+<td style="text-align: left;">Specify a run name to use as the output file base name. Use only letters, numbers, or hyphens. Do not use special characters or spaces.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"sample"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outputs" class="level3">
+<h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
+<table class="table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 55%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--output_raw</code></td>
+<td style="text-align: left;">The BD Rhapsody output folder as it comes out of the BD Rhapsody pipeline</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"output_dir"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--output_h5mu</code></td>
+<td style="text-align: left;">The converted h5mu file.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"output.h5mu"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="putative-cell-calling-settings" class="level3">
+<h3 class="anchored" data-anchor-id="putative-cell-calling-settings">Putative cell calling settings</h3>
+<table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 86%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--putative_cell_call</code></td>
+<td style="text-align: left;">Specify the dataset to be used for putative cell calling. For putative cell calling using an AbSeq dataset, please provide an AbSeq_Reference fasta file above.</td>
+<td style="text-align: left;"><code>string</code>, example: <code>"mRNA"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--exact_cell_count</code></td>
+<td style="text-align: left;">Exact cell count - Set a specific number (&gt;=1) of cells as putative, based on those with the highest error-corrected read count</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>10000</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--disable_putative_calling</code></td>
+<td style="text-align: left;">Disable Refined Putative Cell Calling - Determine putative cells using only the basic algorithm (minimum second derivative along the cumulative reads curve). The refined algorithm attempts to remove false positives and recover false negatives, but may not be ideal for certain complex mixtures of cell types. Does not apply if Exact Cell Count is set.</td>
+<td style="text-align: left;"><code>boolean_true</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="subsample-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="subsample-arguments">Subsample arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 67%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--subsample</code></td>
+<td style="text-align: left;">A number &gt;1 or fraction (0 &lt; n &lt; 1) to indicate the number or percentage of reads to subsample.</td>
+<td style="text-align: left;"><code>double</code>, example: <code>0.01</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--subsample_seed</code></td>
+<td style="text-align: left;">A seed for replicating a previous subsampled run.</td>
+<td style="text-align: left;"><code>integer</code>, example: <code>3445</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="multiplex-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="multiplex-arguments">Multiplex arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 61%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--sample_tags_version</code></td>
+<td style="text-align: left;">Specify if multiplexed run.</td>
+<td style="text-align: left;"><code>string</code>, example: <code>"human"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--tag_names</code></td>
+<td style="text-align: left;">Tag_Names (optional) - Specify the tag number followed by ‘-’ and the desired sample name to appear in Sample_Tag_Metrics.csv. Do not use the special characters: &amp;, (), [], {}, &lt;&gt;, ?, |</td>
+<td style="text-align: left;"><code>string</code>, example: <code>"4-mySample"</code>, example: <code>"9-myOtherSample"</code>, example: <code>"6-alsoThisSample"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="vdj-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="vdj-arguments">VDJ arguments</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--vdj_version</code></td>
+<td style="text-align: left;">Specify if VDJ run.</td>
+<td style="text-align: left;"><code>string</code>, example: <code>"human"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cwl-runner-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="cwl-runner-arguments">CWL-runner arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 73%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--parallel</code></td>
+<td style="text-align: left;">Run jobs in parallel.</td>
+<td style="text-align: left;"><code>boolean</code>, default: <code>TRUE</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--timestamps</code></td>
+<td style="text-align: left;">Add timestamps to the errors, warnings, and notifications.</td>
+<td style="text-align: left;"><code>boolean_true</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--dryrun</code></td>
+<td style="text-align: left;">If true, the output directory will only contain the CWL input files, but the pipeline itself will not be executed.</td>
+<td style="text-align: left;"><code>boolean_true</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="authors" class="level2">
+<h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Robrecht Cannoodt <a href="https://github.com/rcannood"></a> <a href="https://orcid.org/0000-0003-3641-729X"></a> (maintainer)</li>
+</ul>
+</section>
+<section id="visualisation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="visualisation">Visualisation</h2>
+<div class="cell page-columns page-full">
+<div class="cell-output-display column-screen-inset-shaded">
+<div>
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+    p0(Input)
+    p8(bd_rhapsody)
+    p16(from_bdrhap_to_h5mu)
+    p22(Output)
+    p0--&gt;p8
+    p8--&gt;p16
+    p16--&gt;p22
+
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

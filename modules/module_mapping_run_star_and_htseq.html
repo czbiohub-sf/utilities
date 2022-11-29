@@ -151,8 +151,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../modules/index.html">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="dropdown-header">
- <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -199,16 +197,15 @@ Namespace: <code>mapping</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/src/mapping/run_star_and_htseq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/czbiohub/utilities/blob/main/mapping/run_star_and_htseq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
-</div></div><p>Align sequencing data</p>
-<section id="example-commands" class="level2">
+</div></div><section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
 <p>You can run the pipeline using <code>nextflow run</code>.</p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/mapping/run_star_and_htseq/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -221,7 +218,7 @@ Example of <code>params.yaml</code>
 </summary>
 <div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/mapping/run_star_and_htseq/main.nf <span class="dt">\</span></span>

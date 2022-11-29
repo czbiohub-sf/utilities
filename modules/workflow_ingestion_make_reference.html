@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="Build a transcriptomics reference into one of many formats">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Make reference</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -122,6 +122,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-submit-button-title": "Submit"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -168,12 +171,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Make reference</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    Build a transcriptomics reference into one of many formats
   </div>
 </div>
 
@@ -192,12 +195,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
-Namespace: <code>multiomics</code></p>
+<p>ID: <code>make_reference</code><br>
+Namespace: <code>ingestion</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/ingestion/make_reference" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
 </div></div><section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
@@ -205,9 +208,9 @@ Namespace: <code>multiomics</code></p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/ingestion/make_reference/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +219,30 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span><span class="kw">:</span><span class="co"> # please fill in - example: "foo"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">genome_fasta</span><span class="kw">:</span><span class="co"> # please fill in - example: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/GRCh38.primary_assembly.genome.fa.gz"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">transcriptome_gtf</span><span class="kw">:</span><span class="co"> # please fill in - example: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.annotation.gtf.gz"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ercc: "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/ERCC92.zip"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Outputs</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">target</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"raw"</span><span class="kw">]</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># output_fasta: "$id.$key.output_fasta.gz"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># output_gtf: "$id.$key.output_gtf.gz"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># output_cellranger: "$id.$key.output_cellranger.gz"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># output_bd_rhapsody: "$id.$key.output_bd_rhapsody.gz"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Arguments</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># subset_regex: "(ERCC-00002|chr1)"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/ingestion/make_reference/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -238,14 +259,53 @@ Note
 </div>
 </section>
 </section>
-<section id="argument-group" class="level2">
-<h2 class="anchored" data-anchor-id="argument-group">Argument group</h2>
-<section id="arguments" class="level3">
-<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<section id="argument-groups" class="level2">
+<h2 class="anchored" data-anchor-id="argument-groups">Argument groups</h2>
+<section id="inputs" class="level3">
+<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
+<col style="width: 11%">
+<col style="width: 18%">
+<col style="width: 70%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--id</code></td>
+<td style="text-align: left;">ID of the reference.</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"foo"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--genome_fasta</code></td>
+<td style="text-align: left;">Reference genome fasta.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"https:/ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/GRCh38.primary_assembly.genome.fa.gz"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--transcriptome_gtf</code></td>
+<td style="text-align: left;">Reference transcriptome annotation.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"https:/ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.annotation.gtf.gz"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--ercc</code></td>
+<td style="text-align: left;">ERCC sequence and annotation file.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"https:/assets.thermofisher.com/TFS-Assets/LSG/manuals/ERCC92.zip"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outputs" class="level3">
+<h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 32%">
 <col style="width: 46%">
 </colgroup>
 <thead>
@@ -257,34 +317,53 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
+<td style="text-align: left;"><code>--target</code></td>
+<td style="text-align: left;">Which reference indices to generate.</td>
+<td style="text-align: left;"><code>string</code>, default: <code>"raw"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+<td style="text-align: left;"><code>--output_fasta</code></td>
+<td style="text-align: left;">Output genome sequence fasta.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"genome_sequence.fa.gz"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
+<td style="text-align: left;"><code>--output_gtf</code></td>
+<td style="text-align: left;">Output transcriptome annotation gtf.</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"transcriptome_annotation.gtf.gz"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
+<td style="text-align: left;"><code>--output_cellranger</code></td>
+<td style="text-align: left;">Output index</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"index.tar.gz"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
+<td style="text-align: left;"><code>--output_bd_rhapsody</code></td>
+<td style="text-align: left;">Output index</td>
+<td style="text-align: left;"><code>file</code>, example: <code>"index.tar.gz"</code></td>
 </tr>
-<tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+</tbody>
+</table>
+</section>
+<section id="arguments" class="level3">
+<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<table class="table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 49%">
+<col style="width: 37%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--subset_regex</code></td>
+<td style="text-align: left;">Will subset the reference chromosomes using the given regex.</td>
+<td style="text-align: left;"><code>string</code>, example: <code>"(ERCC-00002&amp;#124;chr1)"</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +371,49 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Angela Pisco <a href="https://github.com/aopisco"></a> <a href="https://orcid.org/0000-0003-0142-2355"></a> (author)</li>
+<li>Robrecht Cannoodt <a href="https://github.com/rcannood"></a> <a href="https://orcid.org/0000-0003-3641-729X"></a> (author, maintainer)</li>
+</ul>
+</section>
+<section id="visualisation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="visualisation">Visualisation</h2>
+<div class="cell page-columns page-full">
+<div class="cell-output-display column-screen-inset-shaded">
+<div>
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+    p0(Input)
+    p9(make_reference)
+    p13(filter)
+    p18(build_cellranger_reference)
+    p34(join)
+    p23(filter)
+    p28(build_bdrhap_reference)
+    p35(join)
+    p36(join)
+    p41(Output)
+    p34--&gt;p35
+    p35--&gt;p36
+    p0--&gt;p9
+    p9--&gt;p13
+    p13--&gt;p18
+    p18--&gt;p34
+    p9--&gt;p23
+    p23--&gt;p28
+    p28--&gt;p35
+    p0--&gt;p36
+    p9--&gt;p34
+    p36--&gt;p41
+
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
+</div>
+</div>
+</div>
 
 
 </section>

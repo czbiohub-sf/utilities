@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Run cite-seq using cellranger count">
+<meta name="description" content="A pipeline to analyse multiple multiomics samples.">
 
-<title>CZBiohub/utilities - Cellranger cite seq</title>
+<title>CZBiohub/utilities - Full pipeline</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -122,6 +122,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-submit-button-title": "Submit"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -168,12 +171,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cellranger cite seq</h1>
+<h1 class="title">Full pipeline</h1>
 </div>
 
 <div>
   <div class="description">
-    Run cite-seq using cellranger count
+    A pipeline to analyse multiple multiomics samples.
   </div>
 </div>
 
@@ -192,12 +195,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="no-row-height column-margin column-container"><div class="">
 <section id="info" class="level3">
 <h3 class="anchored" data-anchor-id="info">Info</h3>
-<p>ID: <code>cellranger_cite_seq</code><br>
+<p>ID: <code>full_pipeline</code><br>
 Namespace: <code>multiomics</code></p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
-<p><a href="https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_cite_seq" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
+<p><a href="https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/multiomics/full_pipeline" class="btn-action btn-sm btn-info btn" role="button">Source</a></p>
 </section>
 </div></div><section id="example-commands" class="level2">
 <h2 class="anchored" data-anchor-id="example-commands">Example commands</h2>
@@ -205,9 +208,9 @@ Namespace: <code>multiomics</code></p>
 <section id="view-help" class="level3">
 <h3 class="anchored" data-anchor-id="view-help">View help</h3>
 <p>You can use <code>--help</code> as a parameter to get an overview of the possible parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/multiomics/full_pipeline/main.nf <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="run-command" class="level3">
@@ -216,12 +219,19 @@ Namespace: <code>multiomics</code></p>
 <summary>
 Example of <code>params.yaml</code>
 </summary>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span><span class="kw">:</span><span class="co"> # please fill in - example: "foo"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span><span class="kw">:</span><span class="co"> # please fill in - example: "input.h5mu"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">obs_covariates</span><span class="kw">:</span><span class="co"> # please fill in - example: ["batch", "sample"]</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Nextflow input-output arguments</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">publish_dir</span><span class="kw">:</span><span class="co"> # please fill in - example: "output/"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># param_list: "my_params.yaml"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run czbiohub/utilities <span class="dt">\</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nextflow</span> run openpipelines-bio/openpipeline <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-r</span> main_build <span class="at">-latest</span> <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-profile</span> docker <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> target/nextflow/multiomics/cellranger_cite_seq/main.nf <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-main-script</span> workflows/multiomics/full_pipeline/main.nf <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-params-file</span> params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -240,13 +250,13 @@ Note
 </section>
 <section id="argument-group" class="level2">
 <h2 class="anchored" data-anchor-id="argument-group">Argument group</h2>
-<section id="arguments" class="level3">
-<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<section id="inputs" class="level3">
+<h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
 <table class="table">
 <colgroup>
-<col style="width: 17%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 13%">
+<col style="width: 44%">
+<col style="width: 42%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -257,34 +267,19 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>--libraries_path</code></td>
-<td style="text-align: left;">Path to the libraries</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/libraries"</code></td>
+<td style="text-align: left;"><code>--id</code></td>
+<td style="text-align: left;">ID of the sample.</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"foo"</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>--reference_genome</code></td>
-<td style="text-align: left;">Path to the reference genome</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/reference_genome"</code></td>
+<td style="text-align: left;"><code>--input</code></td>
+<td style="text-align: left;">Path to the sample.</td>
+<td style="text-align: left;"><code>file</code>, required, example: <code>"input.h5mu"</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: left;">Path to the output directory</td>
-<td style="text-align: left;"><code>file</code>, required, example: <code>"/path/to/directory"</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--run_id</code></td>
-<td style="text-align: left;">The run ID</td>
-<td style="text-align: left;"><code>string</code>, required</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>--peaks</code></td>
-<td style="text-align: left;">Path to the bed file to use for peak calling</td>
-<td style="text-align: left;"><code>file</code>, example: <code>"/path/to/bed"</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>--neurips</code></td>
-<td style="text-align: left;">Unknown</td>
-<td style="text-align: left;"><code>boolean</code>, default: <code>FALSE</code></td>
+<td style="text-align: left;"><code>--obs_covariates</code></td>
+<td style="text-align: left;">The .obs field(s) that define the covariate(s) to regress out.</td>
+<td style="text-align: left;"><code>string</code>, required, example: <code>"batch"</code>, example: <code>"sample"</code></td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +287,93 @@ Note
 </section>
 <section id="authors" class="level2">
 <h2 class="anchored" data-anchor-id="authors">Authors</h2>
+<ul>
+<li>Dries Schaumont <a href="https://github.com/DriesSchaumont"></a> <a href="https://orcid.org/0000-0002-4389-0440"></a> (author, maintainer)</li>
+</ul>
+</section>
+<section id="visualisation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="visualisation">Visualisation</h2>
+<div class="cell page-columns page-full">
+<div class="cell-output-display column-screen-inset-shaded">
+<div>
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+    p0(Input)
+    p8(add_id)
+    p15(split_modalities)
+    p18(flatMap)
+    p19(filter)
+    p25(filter_with_counts)
+    p32(do_filter)
+    p40(filter_with_scrublet)
+    p43(toSortedList)
+    p44(filter)
+    p51(concat)
+    p58(normalize_total)
+    p65(log1p)
+    p72(delete_layer)
+    p80(filter_with_hvg)
+    p105(concat)
+    p83(filter)
+    p84(toSortedList)
+    p85(filter)
+    p91(concat)
+    p94(filter)
+    p95(toSortedList)
+    p96(filter)
+    p102(test_wf:run_wf:concat:concat_process1)
+    p106(toSortedList)
+    p112(merge)
+    p122(pca)
+    p130(harmonypy)
+    p138(find_neighbors)
+    p146(leiden)
+    p154(umap)
+    p159(toSortedList)
+    p161(Output)
+    p18--&gt;p19
+    p43--&gt;p44
+    p18--&gt;p83
+    p83--&gt;p84
+    p84--&gt;p85
+    p18--&gt;p94
+    p94--&gt;p95
+    p95--&gt;p96
+    p105--&gt;p106
+    p0--&gt;p8
+    p8--&gt;p15
+    p15--&gt;p18
+    p19--&gt;p25
+    p25--&gt;p32
+    p32--&gt;p40
+    p40--&gt;p43
+    p44--&gt;p51
+    p51--&gt;p58
+    p58--&gt;p65
+    p65--&gt;p72
+    p72--&gt;p80
+    p80--&gt;p105
+    p85--&gt;p91
+    p91--&gt;p105
+    p96--&gt;p102
+    p102--&gt;p105
+    p106--&gt;p112
+    p112--&gt;p122
+    p122--&gt;p130
+    p130--&gt;p138
+    p138--&gt;p146
+    p146--&gt;p154
+    p154--&gt;p159
+    p159--&gt;p161
+
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
+</div>
+</div>
+</div>
 
 
 </section>

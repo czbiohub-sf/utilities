@@ -70,9 +70,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-namespace','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] }],
+      valueNames: ['listing-title','listing-namespace','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
       
-      searchColumns: [],
+      searchColumns: ["listing-title","listing-author"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -98,8 +98,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-namespace','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
+      valueNames: ['listing-title','listing-namespace','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      page: 30,
+    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
       searchColumns: ["listing-title","listing-author"],
     };
 
@@ -147,8 +148,6 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link active" href="../modules/index.html" aria-current="page">
  <span class="menu-text">Components</span></a>
   </li>  
-  <li class="dropdown-header">
- <span class="menu-text">about.qmd</span></li>
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -193,6 +192,16 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
 <div id="listing-workflows" class="quarto-listing quarto-listing-container-table">
 <div class="listing-actions-group">
+   <div class="input-group input-group-sm quarto-listing-sort">
+     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+     <select id="listing-workflows-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-workflows'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+       <option value="" disabled="" selected="" hidden="">Order By</option>
+       <option value="index" data-direction="asc">Default</option>
+         <option value="listing-title-sort" data-direction="asc">
+          Name
+        </option>
+     </select>
+  </div>
     <div class="input-group input-group-sm quarto-listing-filter">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input type="text" class="search form-control" placeholder="Filter">
@@ -203,10 +212,10 @@ ul.task-list li input[type="checkbox"] {
 <thead>
 <tr>
 <th>
-Namespace
+<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Name</a>
 </th>
 <th>
-Name
+Namespace
 </th>
 <th>
 Description
@@ -214,6 +223,140 @@ Description
 </tr>
 </thead>
 <tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="21.58" data-listing-title-sort="BD Rhapsody" data-listing-filename-sort="workflow_ingestion_bd_rhapsody.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_bd_rhapsody.html" class="title">BD Rhapsody</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+A generic pipeline for running BD Rhapsody WTA or Targeted mapping, with support for AbSeq, VDJ and/or SMK.
+</td>
+</tr>
+<tr data-index="1" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="16.525" data-listing-title-sort="Cell Ranger mapping" data-listing-filename-sort="workflow_ingestion_cellranger_mapping.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_cellranger_mapping.html" class="title">Cell Ranger mapping</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+A pipeline for running Cell Ranger mapping.
+</td>
+</tr>
+<tr data-index="2" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.685" data-listing-title-sort="Cell Ranger post-processing" data-listing-filename-sort="workflow_ingestion_cellranger_postprocessing.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_cellranger_postprocessing.html" class="title">Cell Ranger post-processing</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+Post-processing Cell Ranger datasets.
+</td>
+</tr>
+<tr data-index="3" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.015" data-listing-title-sort="Concat" data-listing-filename-sort="workflow_tabula_sapiens_concat.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_tabula_sapiens_concat.html" class="title">Concat</a>
+</td>
+<td class="listing-namespace">
+Tabula sapiens
+</td>
+<td class="listing-description">
+ID: <code>concat</code><br>
+Namespace: <code>tabula_sapiens</code>
+</td>
+</tr>
+<tr data-index="4" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.66" data-listing-title-sort="Conversion" data-listing-filename-sort="workflow_ingestion_conversion.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_conversion.html" class="title">Conversion</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+A pipeline to convert different file formats to .h5mu.
+</td>
+</tr>
+<tr data-index="5" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.305" data-listing-title-sort="Demux" data-listing-filename-sort="workflow_ingestion_demux.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_demux.html" class="title">Demux</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+A generic pipeline for running bcl2fastq, bcl-convert or Cell Ranger mkfastq.
+</td>
+</tr>
+<tr data-index="6" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.575" data-listing-title-sort="Full pipeline" data-listing-filename-sort="workflow_multiomics_full_pipeline.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_multiomics_full_pipeline.html" class="title">Full pipeline</a>
+</td>
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-description">
+A pipeline to analyse multiple multiomics samples.
+</td>
+</tr>
+<tr data-index="7" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="6.545" data-listing-title-sort="Integration" data-listing-filename-sort="workflow_multiomics_integration.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_multiomics_integration.html" class="title">Integration</a>
+</td>
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-description">
+A pipeline for demultiplexing multimodal multi-sample RNA transcriptomics data.
+</td>
+</tr>
+<tr data-index="8" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="5.385" data-listing-title-sort="Make reference" data-listing-filename-sort="workflow_ingestion_make_reference.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_ingestion_make_reference.html" class="title">Make reference</a>
+</td>
+<td class="listing-namespace">
+Ingestion
+</td>
+<td class="listing-description">
+Build a transcriptomics reference into one of many formats
+</td>
+</tr>
+<tr data-index="9" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.755" data-listing-title-sort="Process" data-listing-filename-sort="workflow_tabula_sapiens_process.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_tabula_sapiens_process.html" class="title">Process</a>
+</td>
+<td class="listing-namespace">
+Tabula sapiens
+</td>
+<td class="listing-description">
+ID: <code>process</code><br>
+Namespace: <code>tabula_sapiens</code>
+</td>
+</tr>
+<tr data-index="10" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.755" data-listing-title-sort="Rna multisample" data-listing-filename-sort="workflow_multiomics_rna_multisample.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_multiomics_rna_multisample.html" class="title">Rna multisample</a>
+</td>
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-description">
+Processing unimodal multi-sample RNA transcriptomics data.
+</td>
+</tr>
+<tr data-index="11" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.65" data-listing-title-sort="Rna singlesample" data-listing-filename-sort="workflow_multiomics_rna_singlesample.qmd">
+<td class="listing-title">
+<a href="../modules/workflow_multiomics_rna_singlesample.html" class="title">Rna singlesample</a>
+</td>
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-description">
+Processing unimodal single-sample RNA transcriptomics data.
+</td>
+</tr>
 </tbody>
 
 </table>
@@ -246,10 +389,10 @@ No matching items
 <thead>
 <tr>
 <th>
-Namespace
+<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Name</a>
 </th>
 <th>
-<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Name</a>
+Namespace
 </th>
 <th>
 Description
@@ -257,70 +400,689 @@ Description
 </tr>
 </thead>
 <tbody class="list">
-<tr data-index="0" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.67" data-listing-title-sort="Cellranger arc aggr" data-listing-filename-sort="module_multiomics_cellranger_arc_aggr.qmd">
-<td class="listing-namespace">
-Multiomics
+<tr data-index="0" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.37" data-listing-title-sort="Add id" data-listing-filename-sort="module_metadata_add_id.qmd">
+<td class="listing-title">
+<a href="../modules/module_metadata_add_id.html" class="title">Add id</a>
 </td>
+<td class="listing-namespace">
+Metadata
+</td>
+<td class="listing-description">
+Add id of .obs.
+</td>
+</tr>
+<tr data-index="1" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="19.705" data-listing-title-sort="BD Rhapsody" data-listing-filename-sort="module_mapping_bd_rhapsody.qmd">
+<td class="listing-title">
+<a href="../modules/module_mapping_bd_rhapsody.html" class="title">BD Rhapsody</a>
+</td>
+<td class="listing-namespace">
+Mapping
+</td>
+<td class="listing-description">
+A wrapper for the BD Rhapsody Analysis CWL v1.10.1 pipeline
+</td>
+</tr>
+<tr data-index="2" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="20.01" data-listing-title-sort="Bbknn" data-listing-filename-sort="module_neighbors_bbknn.qmd">
+<td class="listing-title">
+<a href="../modules/module_neighbors_bbknn.html" class="title">Bbknn</a>
+</td>
+<td class="listing-namespace">
+Neighbors
+</td>
+<td class="listing-description">
+BBKNN network generation
+</td>
+</tr>
+<tr data-index="3" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.895" data-listing-title-sort="Bcl convert" data-listing-filename-sort="module_demux_bcl_convert.qmd">
+<td class="listing-title">
+<a href="../modules/module_demux_bcl_convert.html" class="title">Bcl convert</a>
+</td>
+<td class="listing-namespace">
+Demux
+</td>
+<td class="listing-description">
+Convert bcl files to fastq files using bcl-convert.
+</td>
+</tr>
+<tr data-index="4" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.425" data-listing-title-sort="Bcl2fastq" data-listing-filename-sort="module_demux_bcl2fastq.qmd">
+<td class="listing-title">
+<a href="../modules/module_demux_bcl2fastq.html" class="title">Bcl2fastq</a>
+</td>
+<td class="listing-namespace">
+Demux
+</td>
+<td class="listing-description">
+Convert bcl files to fastq files using bcl2fastq
+</td>
+</tr>
+<tr data-index="5" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.73" data-listing-title-sort="Build bdrhap reference" data-listing-filename-sort="module_reference_build_bdrhap_reference.qmd">
+<td class="listing-title">
+<a href="../modules/module_reference_build_bdrhap_reference.html" class="title">Build bdrhap reference</a>
+</td>
+<td class="listing-namespace">
+Reference
+</td>
+<td class="listing-description">
+Compile a reference into a STAR index compatible with the BD Rhapsody pipeline.
+</td>
+</tr>
+<tr data-index="6" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.735" data-listing-title-sort="Build cellranger reference" data-listing-filename-sort="module_reference_build_cellranger_reference.qmd">
+<td class="listing-title">
+<a href="../modules/module_reference_build_cellranger_reference.html" class="title">Build cellranger reference</a>
+</td>
+<td class="listing-namespace">
+Reference
+</td>
+<td class="listing-description">
+Build a Cell Ranger-compatible reference folder from user-supplied genome FASTA and gene GTF files.
+</td>
+</tr>
+<tr data-index="7" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="22.295" data-listing-title-sort="Cellbender remove background" data-listing-filename-sort="module_correction_cellbender_remove_background.qmd">
+<td class="listing-title">
+<a href="../modules/module_correction_cellbender_remove_background.html" class="title">Cellbender remove background</a>
+</td>
+<td class="listing-namespace">
+Correction
+</td>
+<td class="listing-description">
+Eliminating technical artifacts from high-throughput single-cell RNA sequencing data.
+</td>
+</tr>
+<tr data-index="8" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.67" data-listing-title-sort="Cellranger arc aggr" data-listing-filename-sort="module_multiomics_cellranger_arc_aggr.qmd">
 <td class="listing-title">
 <a href="../modules/module_multiomics_cellranger_arc_aggr.html" class="title">Cellranger arc aggr</a>
+</td>
+<td class="listing-namespace">
+Multiomics
 </td>
 <td class="listing-description">
 Aggregate
 </td>
 </tr>
-<tr data-index="1" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.57" data-listing-title-sort="Cellranger arc count" data-listing-filename-sort="module_multiomics_cellranger_arc_count.qmd">
-<td class="listing-namespace">
-Multiomics
-</td>
+<tr data-index="9" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.57" data-listing-title-sort="Cellranger arc count" data-listing-filename-sort="module_multiomics_cellranger_arc_count.qmd">
 <td class="listing-title">
 <a href="../modules/module_multiomics_cellranger_arc_count.html" class="title">Cellranger arc count</a>
+</td>
+<td class="listing-namespace">
+Multiomics
 </td>
 <td class="listing-description">
 Count
 </td>
 </tr>
-<tr data-index="2" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.59" data-listing-title-sort="Cellranger cite seq" data-listing-filename-sort="module_multiomics_cellranger_cite_seq.qmd">
-<td class="listing-namespace">
-Multiomics
-</td>
+<tr data-index="10" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.57" data-listing-title-sort="Cellranger cite seq" data-listing-filename-sort="module_multiomics_cellranger_cite_seq.qmd">
 <td class="listing-title">
 <a href="../modules/module_multiomics_cellranger_cite_seq.html" class="title">Cellranger cite seq</a>
+</td>
+<td class="listing-namespace">
+Multiomics
 </td>
 <td class="listing-description">
 Run cite-seq using cellranger count
 </td>
 </tr>
-<tr data-index="3" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.925" data-listing-title-sort="Run star and htseq" data-listing-filename-sort="module_mapping_run_star_and_htseq.qmd">
+<tr data-index="11" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="14.885" data-listing-title-sort="Cellranger count" data-listing-filename-sort="module_mapping_cellranger_count.qmd">
+<td class="listing-title">
+<a href="../modules/module_mapping_cellranger_count.html" class="title">Cellranger count</a>
+</td>
 <td class="listing-namespace">
 Mapping
 </td>
+<td class="listing-description">
+Align fastq files using Cell Ranger count.
+</td>
+</tr>
+<tr data-index="12" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.245" data-listing-title-sort="Cellranger count split" data-listing-filename-sort="module_mapping_cellranger_count_split.qmd">
+<td class="listing-title">
+<a href="../modules/module_mapping_cellranger_count_split.html" class="title">Cellranger count split</a>
+</td>
+<td class="listing-namespace">
+Mapping
+</td>
+<td class="listing-description">
+Split 10x Cell Ranger output directory into separate output fields.
+</td>
+</tr>
+<tr data-index="13" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.675" data-listing-title-sort="Cellranger mkfastq" data-listing-filename-sort="module_demux_cellranger_mkfastq.qmd">
+<td class="listing-title">
+<a href="../modules/module_demux_cellranger_mkfastq.html" class="title">Cellranger mkfastq</a>
+</td>
+<td class="listing-namespace">
+Demux
+</td>
+<td class="listing-description">
+Demultiplex raw sequencing data
+</td>
+</tr>
+<tr data-index="14" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="26.645" data-listing-title-sort="Cellranger multi" data-listing-filename-sort="module_mapping_cellranger_multi.qmd">
+<td class="listing-title">
+<a href="../modules/module_mapping_cellranger_multi.html" class="title">Cellranger multi</a>
+</td>
+<td class="listing-namespace">
+Mapping
+</td>
+<td class="listing-description">
+Align fastq files using Cell Ranger multi.
+</td>
+</tr>
+<tr data-index="15" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="13.065" data-listing-title-sort="Concat" data-listing-filename-sort="module_dataflow_concat.qmd">
+<td class="listing-title">
+<a href="../modules/module_dataflow_concat.html" class="title">Concat</a>
+</td>
+<td class="listing-namespace">
+Dataflow
+</td>
+<td class="listing-description">
+Concatenates several uni-modal samples in .h5mu files into a single file
+</td>
+</tr>
+<tr data-index="16" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.495" data-listing-title-sort="Delete layer" data-listing-filename-sort="module_transform_delete_layer.qmd">
+<td class="listing-title">
+<a href="../modules/module_transform_delete_layer.html" class="title">Delete layer</a>
+</td>
+<td class="listing-namespace">
+Transform
+</td>
+<td class="listing-description">
+Delete an anndata layer from one or more modalities
+</td>
+</tr>
+<tr data-index="17" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.86" data-listing-title-sort="Do filter" data-listing-filename-sort="module_filter_do_filter.qmd">
+<td class="listing-title">
+<a href="../modules/module_filter_do_filter.html" class="title">Do filter</a>
+</td>
+<td class="listing-namespace">
+Filter
+</td>
+<td class="listing-description">
+Remove observations and variables based on specified .obs and .var columns
+</td>
+</tr>
+<tr data-index="18" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.645" data-listing-title-sort="Download file" data-listing-filename-sort="module_download_download_file.qmd">
+<td class="listing-title">
+<a href="../modules/module_download_download_file.html" class="title">Download file</a>
+</td>
+<td class="listing-namespace">
+Download
+</td>
+<td class="listing-description">
+Download a file
+</td>
+</tr>
+<tr data-index="19" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.695" data-listing-title-sort="Fastqc" data-listing-filename-sort="module_qc_fastqc.qmd">
+<td class="listing-title">
+<a href="../modules/module_qc_fastqc.html" class="title">Fastqc</a>
+</td>
+<td class="listing-namespace">
+Qc
+</td>
+<td class="listing-description">
+Fastqc component, please see https://www.bioinformatics.babraham.ac.uk/projects/fastqc/.
+</td>
+</tr>
+<tr data-index="20" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.74" data-listing-title-sort="Filter 10xh5" data-listing-filename-sort="module_process_10xh5_filter_10xh5.qmd">
+<td class="listing-title">
+<a href="../modules/module_process_10xh5_filter_10xh5.html" class="title">Filter 10xh5</a>
+</td>
+<td class="listing-namespace">
+Process 10xh5
+</td>
+<td class="listing-description">
+Filter a 10x h5 dataset
+</td>
+</tr>
+<tr data-index="21" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.27" data-listing-title-sort="Filter with counts" data-listing-filename-sort="module_filter_filter_with_counts.qmd">
+<td class="listing-title">
+<a href="../modules/module_filter_filter_with_counts.html" class="title">Filter with counts</a>
+</td>
+<td class="listing-namespace">
+Filter
+</td>
+<td class="listing-description">
+Filter scRNA-seq data based on the primary QC metrics.
+</td>
+</tr>
+<tr data-index="22" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="33.665" data-listing-title-sort="Filter with hvg" data-listing-filename-sort="module_filter_filter_with_hvg.qmd">
+<td class="listing-title">
+<a href="../modules/module_filter_filter_with_hvg.html" class="title">Filter with hvg</a>
+</td>
+<td class="listing-namespace">
+Filter
+</td>
+<td class="listing-description">
+Annotate highly variable genes [Satija15] [Zheng17] [Stuart19].
+</td>
+</tr>
+<tr data-index="23" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="10.195" data-listing-title-sort="Filter with scrublet" data-listing-filename-sort="module_filter_filter_with_scrublet.qmd">
+<td class="listing-title">
+<a href="../modules/module_filter_filter_with_scrublet.html" class="title">Filter with scrublet</a>
+</td>
+<td class="listing-namespace">
+Filter
+</td>
+<td class="listing-description">
+Doublet detection using the Scrublet method (Wolock, Lopez and Klein, 2019).
+</td>
+</tr>
+<tr data-index="24" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="20.425" data-listing-title-sort="Find neighbors" data-listing-filename-sort="module_neighbors_find_neighbors.qmd">
+<td class="listing-title">
+<a href="../modules/module_neighbors_find_neighbors.html" class="title">Find neighbors</a>
+</td>
+<td class="listing-namespace">
+Neighbors
+</td>
+<td class="listing-description">
+Compute a neighborhood graph of observations [McInnes18].
+</td>
+</tr>
+<tr data-index="25" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.105" data-listing-title-sort="From 10xh5 to h5mu" data-listing-filename-sort="module_convert_from_10xh5_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_10xh5_to_h5mu.html" class="title">From 10xh5 to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Converts a 10x h5 into an h5mu file
+</td>
+</tr>
+<tr data-index="26" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.185" data-listing-title-sort="From 10xmtx to h5mu" data-listing-filename-sort="module_convert_from_10xmtx_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_10xmtx_to_h5mu.html" class="title">From 10xmtx to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Converts a 10x mtx into an h5mu file
+</td>
+</tr>
+<tr data-index="27" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.455" data-listing-title-sort="From bd to 10x molecular barcode tags" data-listing-filename-sort="module_convert_from_bd_to_10x_molecular_barcode_tags.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_bd_to_10x_molecular_barcode_tags.html" class="title">From bd to 10x molecular barcode tags</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Convert the molecular barcode sequence SAM tag from BD format (MA) to 10X format (UB)
+</td>
+</tr>
+<tr data-index="28" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.525" data-listing-title-sort="From bdrhap to h5mu" data-listing-filename-sort="module_convert_from_bdrhap_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_bdrhap_to_h5mu.html" class="title">From bdrhap to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Convert the output of a BD Rhapsody WTA pipeline to a MuData h5 file
+</td>
+</tr>
+<tr data-index="29" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.09" data-listing-title-sort="From cellranger multi to h5mu" data-listing-filename-sort="module_convert_from_cellranger_multi_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_cellranger_multi_to_h5mu.html" class="title">From cellranger multi to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Converts the output from cellranger multi to a single .h5mu file.
+</td>
+</tr>
+<tr data-index="30" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.98" data-listing-title-sort="From h5ad to h5mu" data-listing-filename-sort="module_convert_from_h5ad_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_h5ad_to_h5mu.html" class="title">From h5ad to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Converts a single layer h5ad file into a single muon object
+</td>
+</tr>
+<tr data-index="31" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.835" data-listing-title-sort="From h5mu to h5ad" data-listing-filename-sort="module_convert_from_h5mu_to_h5ad.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_h5mu_to_h5ad.html" class="title">From h5mu to h5ad</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Converts a h5mu file into a h5ad file
+</td>
+</tr>
+<tr data-index="32" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.085" data-listing-title-sort="From velocyto to h5mu" data-listing-filename-sort="module_convert_from_velocyto_to_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_convert_from_velocyto_to_h5mu.html" class="title">From velocyto to h5mu</a>
+</td>
+<td class="listing-namespace">
+Convert
+</td>
+<td class="listing-description">
+Convert a velocyto .loom file to h5mu
+</td>
+</tr>
+<tr data-index="33" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="6.925" data-listing-title-sort="Harmonypy" data-listing-filename-sort="module_integrate_harmonypy.qmd">
+<td class="listing-title">
+<a href="../modules/module_integrate_harmonypy.html" class="title">Harmonypy</a>
+</td>
+<td class="listing-namespace">
+Integrate
+</td>
+<td class="listing-description">
+Performs Harmony integration based as described in https://github.com/immunogenomics/harmony.
+</td>
+</tr>
+<tr data-index="34" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.46" data-listing-title-sort="Join csv" data-listing-filename-sort="module_metadata_join_csv.qmd">
+<td class="listing-title">
+<a href="../modules/module_metadata_join_csv.html" class="title">Join csv</a>
+</td>
+<td class="listing-namespace">
+Metadata
+</td>
+<td class="listing-description">
+Join a csv containing metadata to the .obs or .var field of a mudata file.
+</td>
+</tr>
+<tr data-index="35" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.935" data-listing-title-sort="Join uns to obs" data-listing-filename-sort="module_metadata_join_uns_to_obs.qmd">
+<td class="listing-title">
+<a href="../modules/module_metadata_join_uns_to_obs.html" class="title">Join uns to obs</a>
+</td>
+<td class="listing-namespace">
+Metadata
+</td>
+<td class="listing-description">
+Join a data frame in .uns containing metadata to the .obs of a mudata file.
+</td>
+</tr>
+<tr data-index="36" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.83" data-listing-title-sort="Leiden" data-listing-filename-sort="module_cluster_leiden.qmd">
+<td class="listing-title">
+<a href="../modules/module_cluster_leiden.html" class="title">Leiden</a>
+</td>
+<td class="listing-namespace">
+Cluster
+</td>
+<td class="listing-description">
+Cluster cells using the Leiden algorithm [Traag18] implemented in the Scanpy framework [Wolf18].
+</td>
+</tr>
+<tr data-index="37" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.115" data-listing-title-sort="Log1p" data-listing-filename-sort="module_transform_log1p.qmd">
+<td class="listing-title">
+<a href="../modules/module_transform_log1p.html" class="title">Log1p</a>
+</td>
+<td class="listing-namespace">
+Transform
+</td>
+<td class="listing-description">
+Logarithmize the data matrix.
+</td>
+</tr>
+<tr data-index="38" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.465" data-listing-title-sort="Make params" data-listing-filename-sort="module_files_make_params.qmd">
+<td class="listing-title">
+<a href="../modules/module_files_make_params.html" class="title">Make params</a>
+</td>
+<td class="listing-namespace">
+Files
+</td>
+<td class="listing-description">
+Looks for files in a directory and turn it in a params file.
+</td>
+</tr>
+<tr data-index="39" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.01" data-listing-title-sort="Make reference" data-listing-filename-sort="module_reference_make_reference.qmd">
+<td class="listing-title">
+<a href="../modules/module_reference_make_reference.html" class="title">Make reference</a>
+</td>
+<td class="listing-namespace">
+Reference
+</td>
+<td class="listing-description">
+Preprocess and build a transcriptome reference.
+</td>
+</tr>
+<tr data-index="40" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.77" data-listing-title-sort="Merge" data-listing-filename-sort="module_dataflow_merge.qmd">
+<td class="listing-title">
+<a href="../modules/module_dataflow_merge.html" class="title">Merge</a>
+</td>
+<td class="listing-namespace">
+Dataflow
+</td>
+<td class="listing-description">
+Combine one or more single-modality .h5mu files together into one .h5mu file
+</td>
+</tr>
+<tr data-index="41" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.21" data-listing-title-sort="Mermaid" data-listing-filename-sort="module_report_mermaid.qmd">
+<td class="listing-title">
+<a href="../modules/module_report_mermaid.html" class="title">Mermaid</a>
+</td>
+<td class="listing-namespace">
+Report
+</td>
+<td class="listing-description">
+Generates a network from mermaid code.
+</td>
+</tr>
+<tr data-index="42" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.94" data-listing-title-sort="Multiqc" data-listing-filename-sort="module_qc_multiqc.qmd">
+<td class="listing-title">
+<a href="../modules/module_qc_multiqc.html" class="title">Multiqc</a>
+</td>
+<td class="listing-namespace">
+Qc
+</td>
+<td class="listing-description">
+Component for multiqc (https://multiqc.info/)
+</td>
+</tr>
+<tr data-index="43" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="9.755" data-listing-title-sort="Normalize total" data-listing-filename-sort="module_transform_normalize_total.qmd">
+<td class="listing-title">
+<a href="../modules/module_transform_normalize_total.html" class="title">Normalize total</a>
+</td>
+<td class="listing-namespace">
+Transform
+</td>
+<td class="listing-description">
+Normalize counts per cell.
+</td>
+</tr>
+<tr data-index="44" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="4.55" data-listing-title-sort="Pca" data-listing-filename-sort="module_dimred_pca.qmd">
+<td class="listing-title">
+<a href="../modules/module_dimred_pca.html" class="title">Pca</a>
+</td>
+<td class="listing-namespace">
+Dimred
+</td>
+<td class="listing-description">
+Computes PCA coordinates, loadings and variance decomposition.
+</td>
+</tr>
+<tr data-index="45" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.765" data-listing-title-sort="Publish" data-listing-filename-sort="module_transfer_publish.qmd">
+<td class="listing-title">
+<a href="../modules/module_transfer_publish.html" class="title">Publish</a>
+</td>
+<td class="listing-namespace">
+Transfer
+</td>
+<td class="listing-description">
+Publish an artifact and optionally rename with parameters
+</td>
+</tr>
+<tr data-index="46" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.205" data-listing-title-sort="Regress out" data-listing-filename-sort="module_transform_regress_out.qmd">
+<td class="listing-title">
+<a href="../modules/module_transform_regress_out.html" class="title">Regress out</a>
+</td>
+<td class="listing-namespace">
+Transform
+</td>
+<td class="listing-description">
+Regress out (mostly) unwanted sources of variation.
+</td>
+</tr>
+<tr data-index="47" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.82" data-listing-title-sort="Run cellxgene" data-listing-filename-sort="module_interactive_run_cellxgene.qmd">
+<td class="listing-title">
+<a href="../modules/module_interactive_run_cellxgene.html" class="title">Run cellxgene</a>
+</td>
+<td class="listing-namespace">
+Interactive
+</td>
+<td class="listing-description">
+ID: <code>run_cellxgene</code><br>
+Namespace: <code>interactive</code>
+</td>
+</tr>
+<tr data-index="48" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="0.82" data-listing-title-sort="Run cirrocumulus" data-listing-filename-sort="module_interactive_run_cirrocumulus.qmd">
+<td class="listing-title">
+<a href="../modules/module_interactive_run_cirrocumulus.html" class="title">Run cirrocumulus</a>
+</td>
+<td class="listing-namespace">
+Interactive
+</td>
+<td class="listing-description">
+ID: <code>run_cirrocumulus</code><br>
+Namespace: <code>interactive</code>
+</td>
+</tr>
+<tr data-index="49" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.915" data-listing-title-sort="Run star and htseq" data-listing-filename-sort="module_mapping_run_star_and_htseq.qmd">
 <td class="listing-title">
 <a href="../modules/module_mapping_run_star_and_htseq.html" class="title">Run star and htseq</a>
+</td>
+<td class="listing-namespace">
+Mapping
 </td>
 <td class="listing-description">
 Align sequencing data
 </td>
 </tr>
-<tr data-index="4" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.91" data-listing-title-sort="Spaceranger count" data-listing-filename-sort="module_mapping_spaceranger_count.qmd">
-<td class="listing-namespace">
-Mapping
+<tr data-index="50" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.08" data-listing-title-sort="Scale" data-listing-filename-sort="module_transform_scale.qmd">
+<td class="listing-title">
+<a href="../modules/module_transform_scale.html" class="title">Scale</a>
 </td>
+<td class="listing-namespace">
+Transform
+</td>
+<td class="listing-description">
+Scale data to unit variance and zero mean
+</td>
+</tr>
+<tr data-index="51" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="8.745" data-listing-title-sort="Scanorama" data-listing-filename-sort="module_integrate_scanorama.qmd">
+<td class="listing-title">
+<a href="../modules/module_integrate_scanorama.html" class="title">Scanorama</a>
+</td>
+<td class="listing-namespace">
+Integrate
+</td>
+<td class="listing-description">
+Use Scanorama to integrate different experiments
+</td>
+</tr>
+<tr data-index="52" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="5.815" data-listing-title-sort="Scvelo" data-listing-filename-sort="module_velocity_scvelo.qmd">
+<td class="listing-title">
+<a href="../modules/module_velocity_scvelo.html" class="title">Scvelo</a>
+</td>
+<td class="listing-namespace">
+Velocity
+</td>
+<td class="listing-description">
+ID: <code>scvelo</code><br>
+Namespace: <code>velocity</code>
+</td>
+</tr>
+<tr data-index="53" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="8.325" data-listing-title-sort="Scvi" data-listing-filename-sort="module_integrate_scvi.qmd">
+<td class="listing-title">
+<a href="../modules/module_integrate_scvi.html" class="title">Scvi</a>
+</td>
+<td class="listing-namespace">
+Integrate
+</td>
+<td class="listing-description">
+Performs scvi integration as done in the human lung cell atlas https://github.com/LungCellAtlas/HLCA
+</td>
+</tr>
+<tr data-index="54" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.89" data-listing-title-sort="Spaceranger count" data-listing-filename-sort="module_mapping_spaceranger_count.qmd">
 <td class="listing-title">
 <a href="../modules/module_mapping_spaceranger_count.html" class="title">Spaceranger count</a>
+</td>
+<td class="listing-namespace">
+Mapping
 </td>
 <td class="listing-description">
 Align fastqs and detect tissues
 </td>
 </tr>
-<tr data-index="5" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="1.215" data-listing-title-sort="Spaceranger mkfastq" data-listing-filename-sort="module_demux_spaceranger_mkfastq.qmd">
-<td class="listing-namespace">
-Demux
-</td>
+<tr data-index="55" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="1.2" data-listing-title-sort="Spaceranger mkfastq" data-listing-filename-sort="module_demux_spaceranger_mkfastq.qmd">
 <td class="listing-title">
 <a href="../modules/module_demux_spaceranger_mkfastq.html" class="title">Spaceranger mkfastq</a>
 </td>
+<td class="listing-namespace">
+Demux
+</td>
 <td class="listing-description">
 Demultiplex raw sequencing data
+</td>
+</tr>
+<tr data-index="56" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.115" data-listing-title-sort="Split modalities" data-listing-filename-sort="module_dataflow_split_modalities.qmd">
+<td class="listing-title">
+<a href="../modules/module_dataflow_split_modalities.html" class="title">Split modalities</a>
+</td>
+<td class="listing-namespace">
+Dataflow
+</td>
+<td class="listing-description">
+Split the modalities from a single .h5mu multimodal sample into seperate .h5mu files.
+</td>
+</tr>
+<tr data-index="57" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="2.015" data-listing-title-sort="Subset h5mu" data-listing-filename-sort="module_filter_subset_h5mu.qmd">
+<td class="listing-title">
+<a href="../modules/module_filter_subset_h5mu.html" class="title">Subset h5mu</a>
+</td>
+<td class="listing-namespace">
+Filter
+</td>
+<td class="listing-description">
+Create a subset of a mudata file by selecting the first number of observations
+</td>
+</tr>
+<tr data-index="58" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="3.645" data-listing-title-sort="Sync test resources" data-listing-filename-sort="module_download_sync_test_resources.qmd">
+<td class="listing-title">
+<a href="../modules/module_download_sync_test_resources.html" class="title">Sync test resources</a>
+</td>
+<td class="listing-namespace">
+Download
+</td>
+<td class="listing-description">
+Synchronise the test resources from s3://openpipelines-data to resources_test
+</td>
+</tr>
+<tr data-index="59" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="5.08" data-listing-title-sort="Tar extract" data-listing-filename-sort="module_compression_tar_extract.qmd">
+<td class="listing-title">
+<a href="../modules/module_compression_tar_extract.html" class="title">Tar extract</a>
+</td>
+<td class="listing-namespace">
+Compression
+</td>
+<td class="listing-description">
+Extract files from a tar archive
+</td>
+</tr>
+<tr data-index="60" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="15.205" data-listing-title-sort="Umap" data-listing-filename-sort="module_dimred_umap.qmd">
+<td class="listing-title">
+<a href="../modules/module_dimred_umap.html" class="title">Umap</a>
+</td>
+<td class="listing-namespace">
+Dimred
+</td>
+<td class="listing-description">
+UMAP (Uniform Manifold Approximation and Projection) is a manifold learning technique suitable for visualizing high-dimensional data.
+</td>
+</tr>
+<tr data-index="61" data-listing-file-modified-sort="1669762900107" data-listing-reading-time-sort="6.87" data-listing-title-sort="Velocyto" data-listing-filename-sort="module_velocity_velocyto.qmd">
+<td class="listing-title">
+<a href="../modules/module_velocity_velocyto.html" class="title">Velocyto</a>
+</td>
+<td class="listing-namespace">
+Velocity
+</td>
+<td class="listing-description">
+Runs the velocity analysis on a BAM file, outputting a loom file.
 </td>
 </tr>
 </tbody>
@@ -329,6 +1091,9 @@ Demultiplex raw sequencing data
 <div class="listing-no-matching d-none">
 No matching items
 </div>
+<nav id="modules-pagination" class="listing-pagination" aria-label="Page Navigation">
+  <ul class="pagination"></ul>
+</nav>
 </div>
 
 
