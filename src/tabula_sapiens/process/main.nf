@@ -10,7 +10,7 @@ include { cellbender_remove_background } from targetDir + "/correction/cellbende
 include { filter_with_counts } from targetDir + "/filter/filter_with_counts/main.nf"
 
 include { readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
-include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataFlowHelper.nf"
+include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
 
 config = readConfig("$projectDir/config.vsh.yaml")
 
