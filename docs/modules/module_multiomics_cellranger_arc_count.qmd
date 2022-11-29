@@ -13,11 +13,11 @@ ID: `cellranger_arc_count`
 Namespace: `multiomics`
 
 ### Links
-[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/multiomics/cellranger_arc_count){.btn-action .btn-sm .btn-info .btn role="button"}
+[Source](https://github.com/czbiohub/utilities/blob/main/multiomics/cellranger_arc_count){.btn-action .btn-sm .btn-info .btn role="button"}
 
 :::
 
-Count
+
 
 ## Example commands
 
@@ -28,7 +28,7 @@ You can run the pipeline using `nextflow run`.
 You can use `--help` as a parameter to get an overview of the possible parameters.
 
 ```bash
-nextflow run openpipelines-bio/openpipeline \
+nextflow run czbiohub/utilities \
   -r main_build -latest \
   -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \
   --help
@@ -44,7 +44,7 @@ nextflow run openpipelines-bio/openpipeline \
 </details>
 
 ```bash
-nextflow run openpipelines-bio/openpipeline \
+nextflow run czbiohub/utilities \
   -r main_build -latest \
   -profile docker \
   -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \

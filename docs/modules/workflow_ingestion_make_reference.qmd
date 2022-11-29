@@ -1,0 +1,138 @@
+---
+title: "Make reference"
+namespace: "Ingestion"
+description: "Build a transcriptomics reference into one of many formats"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `make_reference`  
+Namespace: `ingestion`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/ingestion/make_reference){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script workflows/ingestion/make_reference/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Inputs
+id: # please fill in - example: "foo"
+genome_fasta: # please fill in - example: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/GRCh38.primary_assembly.genome.fa.gz"
+transcriptome_gtf: # please fill in - example: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.annotation.gtf.gz"
+# ercc: "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/ERCC92.zip"
+
+# Outputs
+target: ["raw"]
+# output_fasta: "$id.$key.output_fasta.gz"
+# output_gtf: "$id.$key.output_gtf.gz"
+# output_cellranger: "$id.$key.output_cellranger.gz"
+# output_bd_rhapsody: "$id.$key.output_bd_rhapsody.gz"
+
+# Arguments
+# subset_regex: "(ERCC-00002|chr1)"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script workflows/ingestion/make_reference/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Inputs
+
+|Name                  |Description                         |Attributes                                                                                                                              |
+|:---------------------|:-----------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
+|`--id`                |ID of the reference.                |`string`, required, example: `"foo"`                                                                                                    |
+|`--genome_fasta`      |Reference genome fasta.             |`file`, required, example: `"https:/ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/GRCh38.primary_assembly.genome.fa.gz"` |
+|`--transcriptome_gtf` |Reference transcriptome annotation. |`file`, required, example: `"https:/ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.annotation.gtf.gz"`        |
+|`--ercc`              |ERCC sequence and annotation file.  |`file`, example: `"https:/assets.thermofisher.com/TFS-Assets/LSG/manuals/ERCC92.zip"`                                                   |
+
+
+### Outputs
+
+|Name                   |Description                          |Attributes                                           |
+|:----------------------|:------------------------------------|:----------------------------------------------------|
+|`--target`             |Which reference indices to generate. |`string`, default: `"raw"`                           |
+|`--output_fasta`       |Output genome sequence fasta.        |`file`, example: `"genome_sequence.fa.gz"`           |
+|`--output_gtf`         |Output transcriptome annotation gtf. |`file`, example: `"transcriptome_annotation.gtf.gz"` |
+|`--output_cellranger`  |Output index                         |`file`, example: `"index.tar.gz"`                    |
+|`--output_bd_rhapsody` |Output index                         |`file`, example: `"index.tar.gz"`                    |
+
+
+### Arguments
+
+|Name             |Description                                                  |Attributes                                    |
+|:----------------|:------------------------------------------------------------|:---------------------------------------------|
+|`--subset_regex` |Will subset the reference chromosomes using the given regex. |`string`, example: `"(ERCC-00002&#124;chr1)"` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)
+
+## Visualisation
+
+```{mermaid}
+%%| column: screen-inset-shaded
+flowchart LR
+    p0(Input)
+    p9(make_reference)
+    p13(filter)
+    p18(build_cellranger_reference)
+    p34(join)
+    p23(filter)
+    p28(build_bdrhap_reference)
+    p35(join)
+    p36(join)
+    p41(Output)
+    p34-->p35
+    p35-->p36
+    p0-->p9
+    p9-->p13
+    p13-->p18
+    p18-->p34
+    p9-->p23
+    p23-->p28
+    p28-->p35
+    p0-->p36
+    p9-->p34
+    p36-->p41
+
+```

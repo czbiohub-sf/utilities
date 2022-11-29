@@ -1,0 +1,83 @@
+---
+title: "Velocyto"
+namespace: "Velocity"
+description: "Runs the velocity analysis on a BAM file, outputting a loom file."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `velocyto`  
+Namespace: `velocity`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/velocity/velocyto){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/velocity/velocyto/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "path/to/file"
+transcriptome: # please fill in - example: "path/to/file"
+# barcode: "path/to/file"
+without_umi: false
+# output: "$id.$key.output.output"
+logic: "Default"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/velocity/velocyto/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name              |Description                                                                                                                                                                                |Attributes                     |
+|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------|
+|`--input`         |Path to BAM file                                                                                                                                                                           |`file`, required               |
+|`--transcriptome` |Path to GTF file                                                                                                                                                                           |`file`, required               |
+|`--barcode`       |Valid barcodes file, to filter the bam. If --bcfile is not specified all the cell barcodes will be included. Cell barcodes should be specified in the bcfile as the 'CB' tag for each read |`file`                         |
+|`--without_umi`   |foo                                                                                                                                                                                        |`boolean_true`                 |
+|`--output`        |Velocyto loom file                                                                                                                                                                         |`file`, required               |
+|`--logic`         |The logic to use for the filtering.                                                                                                                                                        |`string`, default: `"Default"` |
+
+## Authors
+
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (maintainer)

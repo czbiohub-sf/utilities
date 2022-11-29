@@ -16,10 +16,19 @@ Run `quarto render docs` from the root of the repository to render the website.
 The directory `modules/` was generated using:
 
 ```bash
-bin/tools/docker/quarto/generate_documentation_qmd/generate_documentation_qmd \
-  --input "src" \
-  --output "docs/modules" \
+bin/tools/native/quarto/generate_documentation_qmd/generate_documentation_qmd \
+  --input "`pwd`/src" \
+  --output "`pwd`/docs/modules" \
+  --clean \
+  --write_index \
   --git_repo "czbiohub/utilities" \
   --git_tag "main_build" \
   --git_browse_url "https://github.com/czbiohub/utilities/blob/main/"
+
+bin/tools/docker/quarto/generate_documentation_qmd/generate_documentation_qmd \
+  --input "`pwd`/module_openpipeline" \
+  --output "`pwd`/docs/modules" \
+  --git_repo "openpipelines-bio/openpipeline" \
+  --git_tag "main_build" \
+  --git_browse_url "https://github.com/openpipelines-bio/openpipeline/blob/main/"
 ```

@@ -1,0 +1,83 @@
+---
+title: "Sync test resources"
+namespace: "Download"
+description: "Synchronise the test resources from s3://openpipelines-data to resources_test"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `sync_test_resources`  
+Namespace: `download`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/download/sync_test_resources){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/download/sync_test_resources/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: "s3://openpipelines-data"
+# output: "$id.$key.output.output"
+quiet: false
+dryrun: false
+delete: false
+# exclude: ["foo"]
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/download/sync_test_resources/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name        |Description                                                                                                |Attributes                                     |
+|:-----------|:----------------------------------------------------------------------------------------------------------|:----------------------------------------------|
+|`--input`   |Path to the S3 bucket to sync from.                                                                        |`string`, default: `"s3://openpipelines-data"` |
+|`--output`  |Path to the test resource directory.                                                                       |`file`, default: `"resources_test"`            |
+|`--quiet`   |Displays the operations that would be performed using the specified command without actually running them. |`boolean_true`                                 |
+|`--dryrun`  |Does not display the operations performed from the specified command.                                      |`boolean_true`                                 |
+|`--delete`  |Files that exist in the destination but not in the source are deleted during sync.                         |`boolean_true`                                 |
+|`--exclude` |Exclude all files or objects from the command that matches the specified pattern.                          |`string`                                       |
+
+## Authors
+
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (maintainer)

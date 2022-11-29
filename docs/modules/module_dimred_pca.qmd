@@ -1,0 +1,86 @@
+---
+title: "Pca"
+namespace: "Dimred"
+description: "Computes PCA coordinates, loadings and variance decomposition."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `pca`  
+Namespace: `dimred`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/dimred/pca){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Uses the implementation of scikit-learn [Pedregosa11]
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/dimred/pca/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.h5mu"
+modality: "rna"
+# layer: "foo"
+# output: "$id.$key.output.h5mu"
+obsm_output: "X_pca"
+varm_output: "pca_loadings"
+uns_output: "pca_variance"
+# num_components: 25
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/dimred/pca/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name               |Description                                                                                                          |Attributes                                 |
+|:------------------|:--------------------------------------------------------------------------------------------------------------------|:------------------------------------------|
+|`--input`          |Input h5mu file                                                                                                      |`file`, required, example: `"input.h5mu"`  |
+|`--layer`          |use specified layer for expression values instead of the .X object from the modality.                                |`string`                                   |
+|`--output`         |Output h5mu file.                                                                                                    |`file`, required, example: `"output.h5mu"` |
+|`--obsm_output`    |In which .obsm slot to store the resulting embedding.                                                                |`string`, default: `"X_pca"`               |
+|`--varm_output`    |In which .varm slot to store the resulting loadings matrix.                                                          |`string`, default: `"pca_loadings"`        |
+|`--uns_output`     |In which .uns slot to store the resulting variance objects.                                                          |`string`, default: `"pca_variance"`        |
+|`--num_components` |Number of principal components to compute. Defaults to 50, or 1 - minimum dimension size of selected representation. |`integer`, example: `25`                   |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)

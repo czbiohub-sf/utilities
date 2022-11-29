@@ -4,7 +4,7 @@ listing:
 - id: workflows
   type: table
   contents: workflow_*.qmd
-  fields: [namespace, title, description]
+  fields: [title, namespace, description]
   field-display-names: 
       namespace: Namespace
       title: Name
@@ -12,7 +12,7 @@ listing:
 - id: modules
   type: table
   contents: module_*.qmd
-  fields: [namespace, title, description]
+  fields: [title, namespace, description]
   field-display-names: 
       namespace: Namespace
       title: Name

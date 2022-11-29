@@ -1,25 +1,10 @@
 ---
-title: "Components"
+title: "utilities"
 ---
 
-## Workflows
 
-:::{.column-body-outset}
-|Namespace      |Name    |Description |
-|:--------------|:-------|:-----------|
-|Tabula sapiens |[Concat](workflow_tabula_sapiens_concat.qmd)|            |
-|Tabula sapiens |[Process](workflow_tabula_sapiens_process.qmd)|            |
-:::
+A collection of scripts for common data management and processing tasks.
 
-## Modules
-
-:::{.column-body-outset}
-|Namespace  |Name                 |Description                         |
-|:----------|:--------------------|:-----------------------------------|
-|Demux      |[Spaceranger mkfastq](module_demux_spaceranger_mkfastq.qmd)|Demultiplex raw sequencing data     |
-|Mapping    |[Run star and htseq](module_mapping_run_star_and_htseq.qmd)|Align sequencing data               |
-|Mapping    |[Spaceranger count](module_mapping_spaceranger_count.qmd)|Align fastqs and detect tissues     |
-|Multiomics |[Cellranger arc aggr](module_multiomics_cellranger_arc_aggr.qmd)|Aggregate                           |
-|Multiomics |[Cellranger arc count](module_multiomics_cellranger_arc_count.qmd)|Count                               |
-|Multiomics |[Cellranger cite seq](module_multiomics_cellranger_cite_seq.qmd)|Run cite-seq using cellranger count |
-:::
+The provided pipelines are built using the [Viash framework](http://www.viash.io) on top of the 
+Nextflow workflow system. For more information on Nextflow please visit the [Nextflow github page](https://github.com/nextflow-io/nextflow) 
+and the [Nextflow read the docs page](https://www.nextflow.io/docs/latest/index.html).

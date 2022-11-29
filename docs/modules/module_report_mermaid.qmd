@@ -1,0 +1,77 @@
+---
+title: "Mermaid"
+namespace: "Report"
+description: "Generates a network from mermaid code."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `mermaid`  
+Namespace: `report`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/report/mermaid){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+See `https://mermaid-js.github.io/mermaid/#/Tutorials`. This component uses the external mermaid.ink service to generate visual networks
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/report/mermaid/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "path/to/file"
+# output: "$id.$key.output.output"
+test: "test.py"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/report/mermaid/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name       |Description                  |Attributes                   |
+|:----------|:----------------------------|:----------------------------|
+|`--input`  |Input directory              |`file`, required             |
+|`--output` |Generated network as output. |`file`, required             |
+|`--test`   |The test file to be executed |`file`, default: `"test.py"` |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)

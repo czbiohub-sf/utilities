@@ -1,0 +1,83 @@
+---
+title: "Filter 10xh5"
+namespace: "Process 10xh5"
+description: "Filter a 10x h5 dataset"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `filter_10xh5`  
+Namespace: `process_10xh5`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/process_10xh5/filter_10xh5){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/process_10xh5/filter_10xh5/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "pbmc_1k_protein_v3_raw_feature_bc_matrix.h5"
+# output: "$id.$key.output.h5"
+min_library_size: 0
+min_cells_per_gene: 0
+# keep_feature_types: ["Antibody Capture"]
+verbose: false
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/process_10xh5/filter_10xh5/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                   |Description                                            |Attributes                                                                          |
+|:----------------------|:------------------------------------------------------|:-----------------------------------------------------------------------------------|
+|`--input`              |An h5 file from the 10x genomics website.              |`file`, required, example: `"pbmc_1k_protein_v3_raw_feature_bc_matrix.h5"`          |
+|`--output`             |Output h5 file.                                        |`file`, required, example: `"pbmc_1k_protein_v3_raw_feature_bc_matrix_filtered.h5"` |
+|`--min_library_size`   |Minimum library size.                                  |`integer`, default: `0`                                                             |
+|`--min_cells_per_gene` |Minimum number of cells per gene.                      |`integer`, default: `0`                                                             |
+|`--keep_feature_types` |Specify which feature types will never be filtered out |`string`, example: `"Antibody Capture"`                                             |
+|`--verbose`            |Increase verbosity                                     |`boolean_true`                                                                      |
+
+## Authors
+
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (maintainer)

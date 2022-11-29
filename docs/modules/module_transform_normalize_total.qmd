@@ -1,0 +1,88 @@
+---
+title: "Normalize total"
+namespace: "Transform"
+description: "Normalize counts per cell."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `normalize_total`  
+Namespace: `transform`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/transform/normalize_total){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Normalize each cell by total counts over all genes, so that every cell has the same total count after normalization. If choosing target_sum=1e6, this is CPM normalization.
+
+If exclude_highly_expressed=True, very highly expressed genes are excluded from the computation of the normalization factor (size factor) for each cell. This is meaningful as these can strongly influence the resulting normalized values for all other genes [Weinreb17].
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/transform/normalize_total/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.h5mu"
+modality: "rna"
+# input_layer: "foo"
+# output: "$id.$key.output.h5mu"
+# output_layer: "foo"
+target_sum: 10000
+exclude_highly_expressed: false
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/transform/normalize_total/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                         |Description                                                                                                                                                                                                                                                                            |Attributes                                 |
+|:----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------|
+|`--input`                    |Input h5mu file                                                                                                                                                                                                                                                                        |`file`, required, example: `"input.h5mu"`  |
+|`--input_layer`              |Input layer to use. By default, X is normalized                                                                                                                                                                                                                                        |`string`                                   |
+|`--output`                   |Output h5mu file.                                                                                                                                                                                                                                                                      |`file`, required, default: `"output.h5mu"` |
+|`--output_layer`             |Output layer to use. By default, use X.                                                                                                                                                                                                                                                |`string`                                   |
+|`--target_sum`               |If None, after normalization, each observation (cell) has a total count equal to the median of total counts for observations (cells) before normalization.                                                                                                                             |`integer`, default: `10000`                |
+|`--exclude_highly_expressed` |Exclude (very) highly expressed genes for the computation of the normalization factor (size factor) for each cell. A gene is considered highly expressed, if it has more than max_fraction of the total counts in at least one cell. The not-excluded genes will sum up to target_sum. |`boolean_true`                             |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (contributor)

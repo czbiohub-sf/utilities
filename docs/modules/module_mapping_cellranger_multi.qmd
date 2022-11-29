@@ -1,0 +1,155 @@
+---
+title: "Cellranger multi"
+namespace: "Mapping"
+description: "Align fastq files using Cell Ranger multi."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `cellranger_multi`  
+Namespace: `mapping`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/mapping/cellranger_multi){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/mapping/cellranger_multi/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Outputs
+# output: "$id.$key.output.output"
+
+# Input files
+input: # please fill in - example: ["mysample_S1_L001_R1_001.fastq.gz", "mysample_S1_L001_R2_001.fastq.gz"]
+gex_reference: # please fill in - example: "reference_genome.tar.gz"
+# vdj_reference: "reference_vdj.tar.gz"
+# feature_reference: "feature_reference.csv"
+
+# Library arguments
+library_id: # please fill in - example: ["mysample1"]
+library_type: # please fill in - example: ["Gene Expression"]
+# library_subsample: ["0.5"]
+# library_lanes: ["1-4"]
+
+# Gene expression arguments
+# gex_expect_cells: 3000
+gex_chemistry: "auto"
+gex_secondary_analysis: false
+gex_generate_bam: true
+gex_include_introns: true
+
+# Cell multiplexing parameters
+# cell_multiplex_sample_id: "foo"
+# cell_multiplex_oligo_ids: "foo"
+# cell_multiplex_description: "foo"
+
+# Executor arguments
+dryrun: false
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/mapping/cellranger_multi/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Input files
+
+|Name                  |Description                                                                                                                                                                                                                                                                                                                       |Attributes                                                                                                     |
+|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------|
+|`--input`             |The FASTQ files to be analyzed. FASTQ files should conform to the naming conventions of bcl2fastq and mkfastq: `[Sample Name]_S[Sample Index]_L00[Lane Number]_[Read Type]_001.fastq.gz`                                                                                                                                          |`file`, required, example: `"mysample_S1_L001_R1_001.fastq.gz"`, example: `"mysample_S1_L001_R2_001.fastq.gz"` |
+|`--gex_reference`     |Genome refence index built by Cell Ranger mkref.                                                                                                                                                                                                                                                                                  |`file`, required, example: `"reference_genome.tar.gz"`                                                         |
+|`--vdj_reference`     |VDJ refence index built by Cell Ranger mkref.                                                                                                                                                                                                                                                                                     |`file`, example: `"reference_vdj.tar.gz"`                                                                      |
+|`--feature_reference` |Path to the Feature reference CSV file, declaring Feature Barcode constructs and associated barcodes. Required only for Antibody Capture or CRISPR Guide Capture libraries. See https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/feature-bc-analysis#feature-ref for more information. |`file`, example: `"feature_reference.csv"`                                                                     |
+
+
+### Library arguments
+
+|Name                  |Description                                                                                                                                                                 |Attributes                                       |
+|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------|
+|`--library_id`        |The Illumina sample name to analyze. This must exactly match the 'Sample Name' part of the FASTQ files specified in the `--input` argument.                                 |`string`, required, example: `"mysample1"`       |
+|`--library_type`      |The underlying feature type of the library. Possible values: "Gene Expression", "VDJ", "VDJ-T", "VDJ-B", "Antibody Capture", "CRISPR Guide Capture", "Multiplexing Capture" |`string`, required, example: `"Gene Expression"` |
+|`--library_subsample` |Optional. The rate at which reads from the provided FASTQ files are sampled. Must be strictly greater than 0 and less than or equal to 1.                                   |`string`, example: `"0.5"`                       |
+|`--library_lanes`     |Lanes associated with this sample. Defaults to using all lanes.                                                                                                             |`string`, example: `"1-4"`                       |
+
+
+### Gene expression arguments
+
+Arguments relevant to the analysis of gene expression data.
+
+
+|Name                       |Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |Attributes                  |
+|:--------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------|
+|`--gex_expect_cells`       |Expected number of recovered cells, used as input to cell calling algorithm.                                                                                                                                                                                                                                                                                                                                                                                                                                      |`integer`, example: `3000`  |
+|`--gex_chemistry`          |Assay configuration. - auto: autodetect mode - threeprime: Single Cell 3' - fiveprime: Single Cell 5' - SC3Pv1: Single Cell 3' v1 - SC3Pv2: Single Cell 3' v2 - SC3Pv3: Single Cell 3' v3 - SC3Pv3LT: Single Cell 3' v3 LT - SC3Pv3HT: Single Cell 3' v3 HT - SC5P-PE: Single Cell 5' paired-end - SC5P-R2: Single Cell 5' R2-only - SC-FB: Single Cell Antibody-only 3' v2 or 5' See https://kb.10xgenomics.com/hc/en-us/articles/115003764132-How-does-Cell-Ranger-auto-detect-chemistry- for more information. |`string`, default: `"auto"` |
+|`--gex_secondary_analysis` |Whether or not to run the secondary analysis e.g. clustering.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |`boolean`, default: `FALSE` |
+|`--gex_generate_bam`       |Whether to generate a BAM file.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |`boolean`, default: `TRUE`  |
+|`--gex_include_introns`    |Include intronic reads in count (default=true unless --target-panel is specified in which case default=false)                                                                                                                                                                                                                                                                                                                                                                                                     |`boolean`, default: `TRUE`  |
+
+
+### Cell multiplexing parameters
+
+Arguments related to cell multiplexing.
+
+
+|Name                           |Description                                                                                                                                                                                            |Attributes |
+|:------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------|
+|`--cell_multiplex_sample_id`   |A name to identify a multiplexed sample. Must be alphanumeric with hyphens and/or underscores, and less than 64 characters. Required for Cell Multiplexing libraries.                                  |`string`   |
+|`--cell_multiplex_oligo_ids`   |The Cell Multiplexing oligo IDs used to multiplex this sample. If multiple CMOs were used for a sample, separate IDs with a pipe (e.g., CMO301&#124;CMO302). Required for Cell Multiplexing libraries. |`string`   |
+|`--cell_multiplex_description` |A description for the sample.                                                                                                                                                                          |`string`   |
+
+
+### Outputs
+
+|Name       |Description                                |Attributes                                     |
+|:----------|:------------------------------------------|:----------------------------------------------|
+|`--output` |The folder to store the alignment results. |`file`, required, example: `"/path/to/output"` |
+
+
+### Executor arguments
+
+|Name       |Description                                                                                                        |Attributes     |
+|:----------|:------------------------------------------------------------------------------------------------------------------|:--------------|
+|`--dryrun` |If true, the output directory will only contain the CWL input files, but the pipeline itself will not be executed. |`boolean_true` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (author)

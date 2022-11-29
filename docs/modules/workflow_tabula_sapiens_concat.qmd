@@ -1,0 +1,100 @@
+---
+title: "Concat"
+namespace: "Tabula sapiens"
+description: ""
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `concat`  
+Namespace: `tabula_sapiens`
+
+### Links
+[Source](https://github.com/czbiohub/utilities/blob/main/tabula_sapiens/concat){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -main-script tabula_sapiens/concat/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+
+```
+</details>
+
+```bash
+nextflow run czbiohub/utilities \
+  -r main_build -latest \
+  -profile docker \
+  -main-script tabula_sapiens/concat/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Inputs
+
+|Name               |Description                        |Attributes                                  |
+|:------------------|:----------------------------------|:-------------------------------------------|
+|`--id`             |ID of the sample.                  |`string`, required, example: `"sample"`     |
+|`--input_metadata` |Metadata to be joined to the .obs. |`file`, required, example: `"metadata.csv"` |
+
+
+### Output parameters
+
+|Name       |Description                                |Attributes                                     |
+|:----------|:------------------------------------------|:----------------------------------------------|
+|`--output` |The path to the combined h5mu output file. |`file`, required, default: `"$id.output.h5mu"` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)
+
+## Visualisation
+
+```{mermaid}
+%%| column: screen-inset-shaded
+flowchart LR
+    p0(Input)
+    p7(add_id)
+    p15(join_csv)
+    p23(join_uns_to_obs)
+    p26(toSortedList)
+    p33(concat)
+    p41(from_h5mu_to_h5ad)
+    p44(Output)
+    p0-->p7
+    p7-->p15
+    p15-->p23
+    p23-->p26
+    p26-->p33
+    p33-->p41
+    p41-->p44
+
+```

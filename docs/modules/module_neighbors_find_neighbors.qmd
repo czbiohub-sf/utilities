@@ -1,0 +1,92 @@
+---
+title: "Find neighbors"
+namespace: "Neighbors"
+description: "Compute a neighborhood graph of observations [McInnes18]."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `find_neighbors`  
+Namespace: `neighbors`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/neighbors/find_neighbors){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+The neighbor search efficiency of this heavily relies on UMAP [McInnes18], which also provides a method for estimating connectivities of data points - the connectivity of the manifold (method=='umap'). If method=='gauss', connectivities are computed according to [Coifman05], in the adaption of [Haghverdi16].
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/neighbors/find_neighbors/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.h5mu"
+modality: "rna"
+obsm_input: "X_pca"
+# output: "$id.$key.output.h5mu"
+uns_output: "neighbors"
+obsp_distances: "distances"
+obsp_connectivities: "connectivities"
+metric: "euclidean"
+num_neighbors: 15
+seed: 0
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/neighbors/find_neighbors/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                    |Description                                                                                                                                                                                                                                                                                                                                                                                                                                            |Attributes                                |
+|:-----------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------|
+|`--input`               |Input h5mu file                                                                                                                                                                                                                                                                                                                                                                                                                                        |`file`, required, example: `"input.h5mu"` |
+|`--obsm_input`          |Which .obsm slot to use as a starting PCA embedding.                                                                                                                                                                                                                                                                                                                                                                                                   |`string`, default: `"X_pca"`              |
+|`--output`              |Output h5mu file containing the found neighbors.                                                                                                                                                                                                                                                                                                                                                                                                       |`file`, example: `"output.h5mu"`          |
+|`--uns_output`          |Mandatory .uns slot to store various neighbor output objects.                                                                                                                                                                                                                                                                                                                                                                                          |`string`, default: `"neighbors"`          |
+|`--obsp_distances`      |In which .obsp slot to store the distance matrix between the resulting neighbors.                                                                                                                                                                                                                                                                                                                                                                      |`string`, default: `"distances"`          |
+|`--obsp_connectivities` |In which .obsp slot to store the connectivities matrix between the resulting neighbors.                                                                                                                                                                                                                                                                                                                                                                |`string`, default: `"connectivities"`     |
+|`--metric`              |The distance metric to be used in the generation of the nearest neighborhood network.                                                                                                                                                                                                                                                                                                                                                                  |`string`, default: `"euclidean"`          |
+|`--num_neighbors`       |The size of local neighborhood (in terms of number of neighboring data points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100. If knn is True, number of nearest neighbors to be searched. If knn is False, a Gaussian kernel width is set to the distance of the n_neighbors neighbor. |`integer`, default: `15`                  |
+|`--seed`                |A random seed.                                                                                                                                                                                                                                                                                                                                                                                                                                         |`integer`, default: `0`                   |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (contributor)

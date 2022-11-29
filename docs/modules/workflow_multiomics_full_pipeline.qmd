@@ -1,0 +1,152 @@
+---
+title: "Full pipeline"
+namespace: "Multiomics"
+description: "A pipeline to analyse multiple multiomics samples."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `full_pipeline`  
+Namespace: `multiomics`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/multiomics/full_pipeline){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script workflows/multiomics/full_pipeline/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Inputs
+id: # please fill in - example: "foo"
+input: # please fill in - example: "input.h5mu"
+obs_covariates: # please fill in - example: ["batch", "sample"]
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script workflows/multiomics/full_pipeline/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Inputs
+
+|Name               |Description                                                    |Attributes                                                  |
+|:------------------|:--------------------------------------------------------------|:-----------------------------------------------------------|
+|`--id`             |ID of the sample.                                              |`string`, required, example: `"foo"`                        |
+|`--input`          |Path to the sample.                                            |`file`, required, example: `"input.h5mu"`                   |
+|`--obs_covariates` |The .obs field(s) that define the covariate(s) to regress out. |`string`, required, example: `"batch"`, example: `"sample"` |
+
+## Authors
+
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (author, maintainer)
+
+## Visualisation
+
+```{mermaid}
+%%| column: screen-inset-shaded
+flowchart LR
+    p0(Input)
+    p8(add_id)
+    p15(split_modalities)
+    p18(flatMap)
+    p19(filter)
+    p25(filter_with_counts)
+    p32(do_filter)
+    p40(filter_with_scrublet)
+    p43(toSortedList)
+    p44(filter)
+    p51(concat)
+    p58(normalize_total)
+    p65(log1p)
+    p72(delete_layer)
+    p80(filter_with_hvg)
+    p105(concat)
+    p83(filter)
+    p84(toSortedList)
+    p85(filter)
+    p91(concat)
+    p94(filter)
+    p95(toSortedList)
+    p96(filter)
+    p102(test_wf:run_wf:concat:concat_process1)
+    p106(toSortedList)
+    p112(merge)
+    p122(pca)
+    p130(harmonypy)
+    p138(find_neighbors)
+    p146(leiden)
+    p154(umap)
+    p159(toSortedList)
+    p161(Output)
+    p18-->p19
+    p43-->p44
+    p18-->p83
+    p83-->p84
+    p84-->p85
+    p18-->p94
+    p94-->p95
+    p95-->p96
+    p105-->p106
+    p0-->p8
+    p8-->p15
+    p15-->p18
+    p19-->p25
+    p25-->p32
+    p32-->p40
+    p40-->p43
+    p44-->p51
+    p51-->p58
+    p58-->p65
+    p65-->p72
+    p72-->p80
+    p80-->p105
+    p85-->p91
+    p91-->p105
+    p96-->p102
+    p102-->p105
+    p106-->p112
+    p112-->p122
+    p122-->p130
+    p130-->p138
+    p138-->p146
+    p146-->p154
+    p154-->p159
+    p159-->p161
+
+```

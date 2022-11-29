@@ -1,0 +1,87 @@
+---
+title: "Cellranger mkfastq"
+namespace: "Demux"
+description: "Demultiplex raw sequencing data"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `cellranger_mkfastq`  
+Namespace: `demux`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/demux/cellranger_mkfastq){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/demux/cellranger_mkfastq/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "/path/to/bcl"
+sample_sheet: # please fill in - example: "SampleSheet.csv"
+# output: "$id.$key.output.output"
+separate_reports: false
+# reports: "$id.$key.reports.reports"
+# cores: 2
+# memory: 10
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/demux/cellranger_mkfastq/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                 |Description                                                                             |Attributes                                                          |
+|:--------------------|:---------------------------------------------------------------------------------------|:-------------------------------------------------------------------|
+|`--input`            |Path to the (untarred) BCL files. Expects 'RunParameters.xml' at './'.                  |`file`, required, example: `"/path/to/bcl"`                         |
+|`--sample_sheet`     |The path to the sample sheet.                                                           |`file`, required, example: `"SampleSheet.csv"`                      |
+|`--output`           |The folder to store the demux results                                                   |`file`, required, default: `"fastqs"`, example: `"/path/to/output"` |
+|`--separate_reports` |Should reports be stored in a separate dir. Should be used with the --reports argument. |`boolean_true`                                                      |
+|`--reports`          |Reports directory                                                                       |`file`, default: `"reports"`, example: `"reports_dir"`              |
+|`--cores`            |Set max cores the pipeline may request at one time.                                     |`integer`, example: `2`                                             |
+|`--memory`           |Set max GB the pipeline may request at one time.                                        |`integer`, example: `10`                                            |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Samuel D'Souza [{{< fa brands github >}}](https://github.com/srdsam) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)

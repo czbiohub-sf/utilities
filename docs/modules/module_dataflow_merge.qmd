@@ -1,0 +1,77 @@
+---
+title: "Merge"
+namespace: "Dataflow"
+description: "Combine one or more single-modality .h5mu files together into one .h5mu file"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `merge`  
+Namespace: `dataflow`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/dataflow/merge){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/dataflow/merge/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: ["sample_paths"]
+# output: "$id.$key.output.h5mu"
+compression: "gzip"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/dataflow/merge/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name            |Description                                                       |Attributes                                  |
+|:---------------|:-----------------------------------------------------------------|:-------------------------------------------|
+|`--input`       |Paths to the single-modality .h5mu files that need to be combined |`file`, required, default: `"sample_paths"` |
+|`--output`      |Path to the output file.                                          |`file`, default: `"output.h5mu"`            |
+|`--compression` |The compression format to be used on the final h5mu object.       |`string`, default: `"gzip"`                 |
+
+## Authors
+
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (maintainer)

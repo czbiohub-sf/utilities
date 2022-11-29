@@ -1,0 +1,88 @@
+---
+title: "Make reference"
+namespace: "Reference"
+description: "Preprocess and build a transcriptome reference."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `make_reference`  
+Namespace: `reference`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/reference/make_reference){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Example input files are:
+  - `genome_fasta`: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/GRCh38.primary_assembly.genome.fa.gz
+  - `transcriptome_gtf`: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.annotation.gtf.gz
+  - `ercc`: https://assets.thermofisher.com/TFS-Assets/LSG/manuals/ERCC92.zip
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/reference/make_reference/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+genome_fasta: # please fill in - example: "genome_fasta.fa.gz"
+transcriptome_gtf: # please fill in - example: "transcriptome.gtf.gz"
+# ercc: "ercc.zip"
+# subset_regex: "(ERCC-00002|chr1)"
+# output_fasta: "$id.$key.output_fasta.gz"
+# output_gtf: "$id.$key.output_gtf.gz"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/reference/make_reference/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                  |Description                                                  |Attributes                                                     |
+|:---------------------|:------------------------------------------------------------|:--------------------------------------------------------------|
+|`--genome_fasta`      |Reference genome fasta. Example:                             |`file`, required, example: `"genome_fasta.fa.gz"`              |
+|`--transcriptome_gtf` |Reference transcriptome annotation.                          |`file`, required, example: `"transcriptome.gtf.gz"`            |
+|`--ercc`              |ERCC sequence and annotation file.                           |`file`, example: `"ercc.zip"`                                  |
+|`--subset_regex`      |Will subset the reference chromosomes using the given regex. |`string`, example: `"(ERCC-00002&#124;chr1)"`                  |
+|`--output_fasta`      |Output genome sequence fasta.                                |`file`, required, example: `"genome_sequence.fa.gz"`           |
+|`--output_gtf`        |Output transcriptome annotation gtf.                         |`file`, required, example: `"transcriptome_annotation.gtf.gz"` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)

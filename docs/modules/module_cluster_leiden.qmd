@@ -1,0 +1,91 @@
+---
+title: "Leiden"
+namespace: "Cluster"
+description: "Cluster cells using the Leiden algorithm [Traag18] implemented in the Scanpy framework [Wolf18]."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `leiden`  
+Namespace: `cluster`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/cluster/leiden){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+Leiden is an improved version of the Louvain algorithm [Blondel08]. 
+It has been proposed for single-cell analysis by [Levine15]. 
+This requires having ran `neighbors/find_neighbors` or `neighbors/bbknn` first.
+
+Blondel08: Blondel et al. (2008), Fast unfolding of communities in large networks, J. Stat. Mech.  
+Levine15: Levine et al. (2015), Data-Driven Phenotypic Dissection of AML Reveals Progenitor-like Cells that Correlate with Prognosis, Cell.  
+Traag18: Traag et al. (2018), From Louvain to Leiden: guaranteeing well-connected communities arXiv.  
+Wolf18: Wolf et al. (2018), Scanpy: large-scale single-cell gene expression data analysis, Genome Biology.  
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/cluster/leiden/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.h5mu"
+modality: "rna"
+obsp_connectivities: "connectivities"
+# output: "$id.$key.output.h5mu"
+obs_name: "leiden"
+resolution: 1
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/cluster/leiden/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name                    |Description                                                                                          |Attributes                                 |
+|:-----------------------|:----------------------------------------------------------------------------------------------------|:------------------------------------------|
+|`--input`               |Input file.                                                                                          |`file`, required, example: `"input.h5mu"`  |
+|`--obsp_connectivities` |In which .obsp slot the neighbor connectivities can be found.                                        |`string`, default: `"connectivities"`      |
+|`--output`              |Output file.                                                                                         |`file`, required, example: `"output.h5mu"` |
+|`--obs_name`            |Name of the .obs key under which to add the cluster labels.                                          |`string`, default: `"leiden"`              |
+|`--resolution`          |A parameter value controlling the coarseness of the clustering. Higher values lead to more clusters. |`double`, default: `1`                     |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)

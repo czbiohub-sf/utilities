@@ -1,0 +1,76 @@
+---
+title: "From h5ad to h5mu"
+namespace: "Convert"
+description: "Converts a single layer h5ad file into a single muon object"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `from_h5ad_to_h5mu`  
+Namespace: `convert`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/convert/from_h5ad_to_h5mu){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/convert/from_h5ad_to_h5mu/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: ["input.h5ad"]
+modality: ["rna"]
+# output: "$id.$key.output.h5mu"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/convert/from_h5ad_to_h5mu/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name       |Description       |Attributes                                |
+|:----------|:-----------------|:-----------------------------------------|
+|`--input`  |Input h5ad files  |`file`, required, default: `"input.h5ad"` |
+|`--output` |Output muon file. |`file`, default: `"output.h5mu"`          |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (maintainer)

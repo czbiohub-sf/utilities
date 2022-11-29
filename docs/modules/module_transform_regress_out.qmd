@@ -1,0 +1,80 @@
+---
+title: "Regress out"
+namespace: "Transform"
+description: "Regress out (mostly) unwanted sources of variation."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `regress_out`  
+Namespace: `transform`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/transform/regress_out){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+Uses simple linear regression. This is inspired by Seurat's regressOut function in R [Satija15]. 
+Note that this function tends to overcorrect in certain circumstances as described in issue theislab/scanpy#526. See https://github.com/theislab/scanpy/issues/526
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/transform/regress_out/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.h5mu"
+# output: "$id.$key.output.h5mu"
+modality: "rna"
+# obs_keys: ["foo"]
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/transform/regress_out/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name         |Description                                            |Attributes                                 |
+|:------------|:------------------------------------------------------|:------------------------------------------|
+|`--input`    |Input h5mu file                                        |`file`, required, example: `"input.h5mu"`  |
+|`--output`   |Output h5mu file.                                      |`file`, required, default: `"output.h5mu"` |
+|`--modality` |Which modality (one or more) to run this component on. |`string`, default: `"rna"`                 |
+|`--obs_keys` |Which .obs keys to regress on.                         |`string`                                   |
+
+## Authors
+
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (maintainer, contributor)

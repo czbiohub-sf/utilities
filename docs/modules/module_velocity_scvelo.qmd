@@ -1,0 +1,125 @@
+---
+title: "Scvelo"
+namespace: "Velocity"
+description: ""
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `scvelo`  
+Namespace: `velocity`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/velocity/scvelo){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/velocity/scvelo/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Inputs
+input: # please fill in - example: "path/to/file"
+
+# Outputs
+# output: "$id.$key.output.output"
+
+# Filtering and normalization
+# min_counts: 123
+# min_counts_u: 123
+# min_cells: 123
+# min_cells_u: 123
+# min_shared_counts: 123
+# min_shared_cells: 123
+# n_top_genes: 123
+log_transform: true
+
+# Fitting parameters
+# n_principal_components: 123
+n_neighbors: 30
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/velocity/scvelo/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Inputs
+
+|Name      |Description         |Attributes       |
+|:---------|:-------------------|:----------------|
+|`--input` |Velocyto loom file. |`file`, required |
+
+
+### Outputs
+
+|Name       |Description                                              |Attributes       |
+|:----------|:--------------------------------------------------------|:----------------|
+|`--output` |Output directory. If it does not exist, will be created. |`file`, required |
+
+
+### Filtering and normalization
+
+Arguments for filtering, normalization an log transform (see scvelo.pp.filter_and_normalize function)
+
+
+|Name                  |Description                                                                    |Attributes                 |
+|:---------------------|:------------------------------------------------------------------------------|:--------------------------|
+|`--min_counts`        |Minimum number of counts required for a gene to pass filtering (spliced).      |`integer`                  |
+|`--min_counts_u`      |Minimum number of counts required for a gene to pass filtering (unspliced).    |`integer`                  |
+|`--min_cells`         |Minimum number of cells expressed required to pass filtering (spliced).        |`integer`                  |
+|`--min_cells_u`       |Minimum number of cells expressed required to pass filtering (unspliced).      |`integer`                  |
+|`--min_shared_counts` |Minimum number of counts (both unspliced and spliced) required for a gene.     |`integer`                  |
+|`--min_shared_cells`  |Minimum number of cells required to be expressed (both unspliced and spliced). |`integer`                  |
+|`--n_top_genes`       |Number of genes to keep.                                                       |`integer`                  |
+|`--log_transform`     |Do not log transform counts.                                                   |`boolean`, default: `TRUE` |
+
+
+### Fitting parameters
+
+Arguments for fitting the data
+
+
+|Name                       |Description                                                                                                                                                                                 |Attributes               |
+|:--------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------|
+|`--n_principal_components` |Number of principal components to use for calculating moments.                                                                                                                              |`integer`                |
+|`--n_neighbors`            |Number of neighbors to use. First/second-order moments are computed for each cell across its nearest neighbors, where the neighbor graph is obtained from euclidean distances in PCA space. |`integer`, default: `30` |
+
+## Authors
+
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (maintainer)

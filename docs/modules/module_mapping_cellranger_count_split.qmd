@@ -1,0 +1,81 @@
+---
+title: "Cellranger count split"
+namespace: "Mapping"
+description: "Split 10x Cell Ranger output directory into separate output fields."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `cellranger_count_split`  
+Namespace: `mapping`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/mapping/cellranger_count_split){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/mapping/cellranger_count_split/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input_dir"
+# filtered_h5: "$id.$key.filtered_h5.h5"
+# metrics_summary: "$id.$key.metrics_summary.csv"
+# molecule_info: "$id.$key.molecule_info.h5"
+# bam: "$id.$key.bam.bam"
+# bai: "$id.$key.bai.bai"
+# raw_h5: "$id.$key.raw_h5.h5"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/mapping/cellranger_count_split/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name      |Description                                    |Attributes                               |
+|:---------|:----------------------------------------------|:----------------------------------------|
+|`--input` |Output directory from a Cell Ranger count run. |`file`, required, example: `"input_dir"` |
+
+## Authors
+
+  * Angela Pisco [{{< fa brands github >}}](https://github.com/aopisco) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-0142-2355) (author)
+  * Samuel D'Souza [{{< fa brands github >}}](https://github.com/srdsam) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)

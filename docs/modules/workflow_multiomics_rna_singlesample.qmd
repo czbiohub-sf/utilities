@@ -1,0 +1,96 @@
+---
+title: "Rna singlesample"
+namespace: "Multiomics"
+description: "Processing unimodal single-sample RNA transcriptomics data."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `rna_singlesample`  
+Namespace: `multiomics`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/multiomics/rna_singlesample){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script workflows/multiomics/rna_singlesample/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+id: # please fill in - example: "foo"
+input: # please fill in - example: "dataset.h5mu"
+# output: "$id.$key.output.h5mu"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script workflows/multiomics/rna_singlesample/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name       |Description                     |Attributes                                  |
+|:----------|:-------------------------------|:-------------------------------------------|
+|`--id`     |ID of the sample.               |`string`, required, example: `"foo"`        |
+|`--input`  |Path to the sample.             |`file`, required, example: `"dataset.h5mu"` |
+|`--output` |Destination path to the output. |`file`, required, example: `"output.h5mu"`  |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (author)
+
+## Visualisation
+
+```{mermaid}
+%%| column: screen-inset-shaded
+flowchart LR
+    p0(Input)
+    p8(filter_with_counts)
+    p15(do_filter)
+    p23(filter_with_scrublet)
+    p29(Output)
+    p0-->p8
+    p8-->p15
+    p15-->p23
+    p23-->p29
+
+```

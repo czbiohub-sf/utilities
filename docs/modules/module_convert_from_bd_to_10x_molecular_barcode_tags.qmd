@@ -1,0 +1,79 @@
+---
+title: "From bd to 10x molecular barcode tags"
+namespace: "Convert"
+description: "Convert the molecular barcode sequence SAM tag from BD format (MA) to 10X format (UB)"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `from_bd_to_10x_molecular_barcode_tags`  
+Namespace: `convert`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/convert/from_bd_to_10x_molecular_barcode_tags){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/convert/from_bd_to_10x_molecular_barcode_tags/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.bam"
+# output: "$id.$key.output.sam"
+bam: false
+# threads: 123
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/convert/from_bd_to_10x_molecular_barcode_tags/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name        |Description            |Attributes                               |
+|:-----------|:----------------------|:----------------------------------------|
+|`--input`   |Input SAM or BAM file. |`file`, required, example: `"input.bam"` |
+|`--output`  |Output alignment file. |`file`, example: `"output.sam"`          |
+|`--bam`     |Output a BAM file.     |`boolean_true`                           |
+|`--threads` |Number of threads      |`integer`                                |
+
+## Authors
+
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (maintainer)

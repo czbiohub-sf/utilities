@@ -1,0 +1,75 @@
+---
+title: "From velocyto to h5mu"
+namespace: "Convert"
+description: "Convert a velocyto .loom file to h5mu"
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `from_velocyto_to_h5mu`  
+Namespace: `convert`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/convert/from_velocyto_to_h5mu){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script target/nextflow/convert/from_velocyto_to_h5mu/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Arguments
+input: # please fill in - example: "input.loom"
+# output: "$id.$key.output.h5mu"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script target/nextflow/convert/from_velocyto_to_h5mu/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument group
+
+### Arguments
+
+|Name       |Description                |Attributes                                |
+|:----------|:--------------------------|:-----------------------------------------|
+|`--input`  |Input velocyto .loom file. |`file`, required, example: `"input.loom"` |
+|`--output` |Output h5mu file.          |`file`, example: `"output.h5mu"`          |
+
+## Authors
+
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (maintainer)

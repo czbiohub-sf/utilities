@@ -1,0 +1,126 @@
+---
+title: "Integration"
+namespace: "Multiomics"
+description: "A pipeline for demultiplexing multimodal multi-sample RNA transcriptomics data."
+toc: false
+---
+
+::: {.column-margin}
+
+### Info
+
+ID: `integration`  
+Namespace: `multiomics`
+
+### Links
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/workflows/multiomics/integration){.btn-action .btn-sm .btn-info .btn role="button"}
+
+:::
+
+
+
+## Example commands
+
+You can run the pipeline using `nextflow run`.
+
+### View help
+
+You can use `--help` as a parameter to get an overview of the possible parameters.
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -main-script workflows/multiomics/integration/main.nf \
+  --help
+```
+
+### Run command
+
+<details>
+<summary>Example of `params.yaml`</summary>
+```yaml
+# Inputs
+id: # please fill in - example: "foo"
+input: # please fill in - example: "dataset.h5mu"
+layer: "log_normalized"
+obs_covariates: # please fill in - example: ["batch", "sample"]
+
+# Outputs
+# output: "$id.$key.output.h5mu"
+obsm_pca: "X_pca"
+obsm_integrated: "X_pca_integrated"
+uns_neighbors: "neighbors"
+obsp_neighbor_distances: "distances"
+obsp_neighbor_connectivities: "connectivities"
+obs_cluster: "leiden"
+obsm_umap: "X_umap"
+
+# Nextflow input-output arguments
+publish_dir: # please fill in - example: "output/"
+# param_list: "my_params.yaml"
+```
+</details>
+
+```bash
+nextflow run openpipelines-bio/openpipeline \
+  -r main_build -latest \
+  -profile docker \
+  -main-script workflows/multiomics/integration/main.nf \
+  -params-file params.yaml
+```
+
+:::{.callout-note}
+Replace `-profile docker` with `-profile podman` or `-profile singularity` depending on the desired backend.
+:::
+
+## Argument groups
+
+### Inputs
+
+|Name               |Description                                                                           |Attributes                                                  |
+|:------------------|:-------------------------------------------------------------------------------------|:-----------------------------------------------------------|
+|`--id`             |ID of the sample.                                                                     |`string`, required, example: `"foo"`                        |
+|`--input`          |Path to the sample.                                                                   |`file`, required, example: `"dataset.h5mu"`                 |
+|`--layer`          |use specified layer for expression values instead of the .X object from the modality. |`string`, default: `"log_normalized"`                       |
+|`--obs_covariates` |The .obs field(s) that define the covariate(s) to regress out.                        |`string`, required, example: `"batch"`, example: `"sample"` |
+
+
+### Outputs
+
+|Name                             |Description                                                                             |Attributes                                 |
+|:--------------------------------|:---------------------------------------------------------------------------------------|:------------------------------------------|
+|`--output`                       |Destination path to the output.                                                         |`file`, required, example: `"output.h5mu"` |
+|`--obsm_pca`                     |In which .obsm slot to store the resulting PCA embedding.                               |`string`, default: `"X_pca"`               |
+|`--obsm_integrated`              |In which .obsm slot to store the resulting integrated embedding.                        |`string`, default: `"X_pca_integrated"`    |
+|`--uns_neighbors`                |In which .uns slot to store various neighbor output objects.                            |`string`, default: `"neighbors"`           |
+|`--obsp_neighbor_distances`      |In which .obsp slot to store the distance matrix between the resulting neighbors.       |`string`, default: `"distances"`           |
+|`--obsp_neighbor_connectivities` |In which .obsp slot to store the connectivities matrix between the resulting neighbors. |`string`, default: `"connectivities"`      |
+|`--obs_cluster`                  |Name of the .obs key under which to add the cluster labels.                             |`string`, default: `"leiden"`              |
+|`--obsm_umap`                    |In which .obsm slot to store the resulting UMAP embedding.                              |`string`, default: `"X_umap"`              |
+
+## Authors
+
+  * Dries De Maeyer [{{< fa brands github >}}](https://github.com/ddemaeyer) (author)
+  * Robrecht Cannoodt [{{< fa brands github >}}](https://github.com/rcannood) [{{< fa brands orcid >}}](https://orcid.org/0000-0003-3641-729X) (author, maintainer)
+  * Dries Schaumont [{{< fa brands github >}}](https://github.com/DriesSchaumont) [{{< fa brands orcid >}}](https://orcid.org/0000-0002-4389-0440) (author)
+
+## Visualisation
+
+```{mermaid}
+%%| column: screen-inset-shaded
+flowchart LR
+    p0(Input)
+    p9(pca)
+    p17(harmonypy)
+    p25(find_neighbors)
+    p33(leiden)
+    p41(umap)
+    p48(Output)
+    p0-->p9
+    p9-->p17
+    p17-->p25
+    p25-->p33
+    p33-->p41
+    p41-->p48
+
+```
