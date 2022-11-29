@@ -1,7 +1,7 @@
 nextflow.enable.dsl=2
 
-workflowDir = params.rootDir + "/workflows"
-targetDir = params.rootDir + "/modules_openpipeline/target/nextflow"
+srcDir = params.rootDir + "/src"
+targetDir = params.rootDir + "/module_openpipeline/target/nextflow"
 
 // include { cellranger_mkfastq } from targetDir + "/demux/cellranger_mkfastq/main.nf"
 include { add_id } from targetDir + "/metadata/add_id/main.nf"
@@ -10,10 +10,10 @@ include { join_uns_to_obs } from targetDir + "/metadata/join_uns_to_obs/main.nf"
 include { concat } from targetDir + "/dataflow/concat/main.nf"
 include { from_h5mu_to_h5ad } from targetDir + "/convert/from_h5mu_to_h5ad/main.nf"
 
-include { readConfig; viashChannel; helpMessage } from workflowDir + "/utils/WorkflowHelper.nf"
-include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from workflowDir + "/utils/DataFlowHelper.nf"
+include { readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
+include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
 
-config = readConfig("$workflowDir/concat/config.vsh.yaml")
+config = readConfig("$projectDir/config.vsh.yaml")
 
 workflow {
   helpMessage(config)
