@@ -1,5 +1,7 @@
 ---
 title: "Cellranger cite seq"
+namespace: "Multiomics"
+description: "Run cite-seq using cellranger count"
 toc: false
 ---
 
@@ -11,7 +13,7 @@ ID: `cellranger_cite_seq`
 Namespace: `multiomics`
 
 ### Links
-[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/multiomics/cellranger_cite_seq){.btn-action .btn-sm .btn-info .btn role="button"}
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/multiomics/cellranger_cite_seq){.btn-action .btn-sm .btn-info .btn role="button"}
 
 :::
 
@@ -27,7 +29,7 @@ You can use `--help` as a parameter to get an overview of the possible parameter
 
 ```bash
 nextflow run openpipelines-bio/openpipeline \
-  -r 0.5.1 -latest \
+  -r main_build -latest \
   -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \
   --help
 ```
@@ -43,7 +45,7 @@ nextflow run openpipelines-bio/openpipeline \
 
 ```bash
 nextflow run openpipelines-bio/openpipeline \
-  -r 0.5.1 -latest \
+  -r main_build -latest \
   -profile docker \
   -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \
   -params-file params.yaml

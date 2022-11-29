@@ -1,25 +1,30 @@
 ---
 title: "Components"
+listing:
+- id: workflows
+  type: table
+  contents: workflow_*.qmd
+  fields: [namespace, title, description]
+  field-display-names: 
+      namespace: Namespace
+      title: Name
+      description: Description
+- id: modules
+  type: table
+  contents: module_*.qmd
+  fields: [namespace, title, description]
+  field-display-names: 
+      namespace: Namespace
+      title: Name
+      description: Description
 ---
 
 ## Workflows
 
-:::{.column-body-outset}
-|Namespace      |Name    |Description |
-|:--------------|:-------|:-----------|
-|Tabula sapiens |[Concat](workflow_tabula_sapiens_concat.qmd)|            |
-|Tabula sapiens |[Process](workflow_tabula_sapiens_process.qmd)|            |
+:::{#workflows}
 :::
 
 ## Modules
 
-:::{.column-body-outset}
-|Namespace  |Name                 |Description                         |
-|:----------|:--------------------|:-----------------------------------|
-|Demux      |[Spaceranger mkfastq](module_demux_spaceranger_mkfastq.qmd)|Demultiplex raw sequencing data     |
-|Mapping    |[Run star and htseq](module_mapping_run_star_and_htseq.qmd)|Align sequencing data               |
-|Mapping    |[Spaceranger count](module_mapping_spaceranger_count.qmd)|Align fastqs and detect tissues     |
-|Multiomics |[Cellranger arc aggr](module_multiomics_cellranger_arc_aggr.qmd)|Aggregate                           |
-|Multiomics |[Cellranger arc count](module_multiomics_cellranger_arc_count.qmd)|Count                               |
-|Multiomics |[Cellranger cite seq](module_multiomics_cellranger_cite_seq.qmd)|Run cite-seq using cellranger count |
+:::{#modules}
 :::

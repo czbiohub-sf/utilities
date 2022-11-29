@@ -1,5 +1,7 @@
 ---
 title: "Run star and htseq"
+namespace: "Mapping"
+description: "Align sequencing data"
 toc: false
 ---
 
@@ -11,7 +13,7 @@ ID: `run_star_and_htseq`
 Namespace: `mapping`
 
 ### Links
-[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/mapping/run_star_and_htseq){.btn-action .btn-sm .btn-info .btn role="button"}
+[Source](https://github.com/openpipelines-bio/openpipeline/blob/main/src/mapping/run_star_and_htseq){.btn-action .btn-sm .btn-info .btn role="button"}
 
 :::
 
@@ -27,7 +29,7 @@ You can use `--help` as a parameter to get an overview of the possible parameter
 
 ```bash
 nextflow run openpipelines-bio/openpipeline \
-  -r 0.5.1 -latest \
+  -r main_build -latest \
   -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \
   --help
 ```
@@ -43,7 +45,7 @@ nextflow run openpipelines-bio/openpipeline \
 
 ```bash
 nextflow run openpipelines-bio/openpipeline \
-  -r 0.5.1 -latest \
+  -r main_build -latest \
   -profile docker \
   -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \
   -params-file params.yaml
