@@ -25,7 +25,7 @@
     "href": "modules/module_mapping_spaceranger_count.html#example-commands",
     "title": "Spaceranger count",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/spaceranger_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_mapping_spaceranger_count.html#argument-group",
@@ -53,7 +53,7 @@
     "href": "modules/module_multiomics_cellranger_arc_count.html#example-commands",
     "title": "Cellranger arc count",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_count/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_multiomics_cellranger_arc_count.html#argument-group",
@@ -81,7 +81,7 @@
     "href": "modules/module_mapping_run_star_and_htseq.html#example-commands",
     "title": "Run star and htseq",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/mapping/run_star_and_htseq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_mapping_run_star_and_htseq.html#argument-group",
@@ -109,7 +109,7 @@
     "href": "modules/module_demux_spaceranger_mkfastq.html#example-commands",
     "title": "Spaceranger mkfastq",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/demux/spaceranger_mkfastq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_demux_spaceranger_mkfastq.html#argument-group",
@@ -137,7 +137,7 @@
     "href": "modules/module_multiomics_cellranger_cite_seq.html#example-commands",
     "title": "Cellranger cite seq",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_cite_seq/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_multiomics_cellranger_cite_seq.html#argument-group",
@@ -158,42 +158,14 @@
     "href": "modules/index.html",
     "title": "Components",
     "section": "",
-    "text": "Namespace\nName\nDescription\n\n\n\n\nTabula sapiens\nConcat\n\n\n\nTabula sapiens\nProcess"
+    "text": "Namespace\n\n\nName\n\n\nDescription\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "modules/index.html#modules",
     "href": "modules/index.html#modules",
     "title": "Components",
     "section": "Modules",
-    "text": "Modules\n\n\n\n\nNamespace\nName\nDescription\n\n\n\n\nDemux\nSpaceranger mkfastq\nDemultiplex raw sequencing data\n\n\nMapping\nRun star and htseq\nAlign sequencing data\n\n\nMapping\nSpaceranger count\nAlign fastqs and detect tissues\n\n\nMultiomics\nCellranger arc aggr\nAggregate\n\n\nMultiomics\nCellranger arc count\nCount\n\n\nMultiomics\nCellranger cite seq\nRun cite-seq using cellranger count"
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_concat.html",
-    "href": "modules/workflow_tabula_sapiens_concat.html",
-    "title": "Concat",
-    "section": "",
-    "text": "ID: concat\nNamespace: tabula_sapiens\n\n\n\nSource"
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_concat.html#example-commands",
-    "href": "modules/workflow_tabula_sapiens_concat.html#example-commands",
-    "title": "Concat",
-    "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script tabula_sapiens/concat/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script tabula_sapiens/concat/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_concat.html#argument-groups",
-    "href": "modules/workflow_tabula_sapiens_concat.html#argument-groups",
-    "title": "Concat",
-    "section": "Argument groups",
-    "text": "Argument groups\n\nInputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--id\nID of the sample.\nstring, required, example: \"sample\"\n\n\n--input_metadata\nMetadata to be joined to the .obs.\nfile, required, example: \"metadata.csv\"\n\n\n\n\n\nOutput parameters\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--output\nThe path to the combined h5mu output file.\nfile, required, default: \"$id.output.h5mu\""
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_concat.html#authors",
-    "href": "modules/workflow_tabula_sapiens_concat.html#authors",
-    "title": "Concat",
-    "section": "Authors",
-    "text": "Authors\n\nAngela Pisco   (author)\nRobrecht Cannoodt   (author, maintainer)"
+    "text": "Modules\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Name\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nNamespace\n\n\nName\n\n\nDescription\n\n\n\n\n\n\nMultiomics\n\n\nCellranger arc aggr\n\n\nAggregate\n\n\n\n\nMultiomics\n\n\nCellranger arc count\n\n\nCount\n\n\n\n\nMultiomics\n\n\nCellranger cite seq\n\n\nRun cite-seq using cellranger count\n\n\n\n\nMapping\n\n\nRun star and htseq\n\n\nAlign sequencing data\n\n\n\n\nMapping\n\n\nSpaceranger count\n\n\nAlign fastqs and detect tissues\n\n\n\n\nDemux\n\n\nSpaceranger mkfastq\n\n\nDemultiplex raw sequencing data\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "modules/module_multiomics_cellranger_arc_aggr.html",
@@ -207,7 +179,7 @@
     "href": "modules/module_multiomics_cellranger_arc_aggr.html#example-commands",
     "title": "Cellranger arc aggr",
     "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
+    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r main_build -latest \\\n  -profile docker \\\n  -main-script target/nextflow/multiomics/cellranger_arc_aggr/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
   },
   {
     "objectID": "modules/module_multiomics_cellranger_arc_aggr.html#argument-group",
@@ -222,33 +194,5 @@
     "title": "Cellranger arc aggr",
     "section": "Authors",
     "text": "Authors"
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_process.html",
-    "href": "modules/workflow_tabula_sapiens_process.html",
-    "title": "Process",
-    "section": "",
-    "text": "ID: process\nNamespace: tabula_sapiens\n\n\n\nSource"
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_process.html#example-commands",
-    "href": "modules/workflow_tabula_sapiens_process.html#example-commands",
-    "title": "Process",
-    "section": "Example commands",
-    "text": "Example commands\nYou can run the pipeline using nextflow run.\n\nView help\nYou can use --help as a parameter to get an overview of the possible parameters.\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -main-script tabula_sapiens/process/main.nf \\\n  --help\n\n\nRun command\n\n\nExample of params.yaml\n\n\n\nnextflow run openpipelines-bio/openpipeline \\\n  -r 0.5.1 -latest \\\n  -profile docker \\\n  -main-script tabula_sapiens/process/main.nf \\\n  -params-file params.yaml\n\n\n\n\n\n\nNote\n\n\n\nReplace -profile docker with -profile podman or -profile singularity depending on the desired backend."
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_process.html#argument-group",
-    "href": "modules/workflow_tabula_sapiens_process.html#argument-group",
-    "title": "Process",
-    "section": "Argument group",
-    "text": "Argument group\n\nInputs\n\n\n\n\n\n\n\n\nName\nDescription\nAttributes\n\n\n\n\n--id\nID of the sample.\nstring, required, example: \"foo\"\n\n\n--input\nThe fastq.gz files to align. Can also be a single directory containing fastq.gz files.\nfile, required, example: \"sample_S1_L001_R1_001.fastq.gz\", example: \"sample_S1_L001_R2_001.fastq.gz\"\n\n\n--reference\nThe path to Cell Ranger reference tar.gz file.\nfile, required, example: \"reference.tar.gz\"\n\n\n--output_raw\nThe output h5mu.\nfile, default: \"$id.output_raw\"\n\n\n--output_h5mu\nThe output h5mu.\nfile, default: \"$id.output_h5mu.h5mu\""
-  },
-  {
-    "objectID": "modules/workflow_tabula_sapiens_process.html#authors",
-    "href": "modules/workflow_tabula_sapiens_process.html#authors",
-    "title": "Process",
-    "section": "Authors",
-    "text": "Authors\n\nAngela Pisco   (author)\nRobrecht Cannoodt   (author, maintainer)"
   }
 ]

@@ -1,0 +1,13 @@
+[
+  {
+    "listing": "/modules/index.html",
+    "items": [
+      "/modules/module_multiomics_cellranger_arc_aggr.html",
+      "/modules/module_multiomics_cellranger_arc_count.html",
+      "/modules/module_multiomics_cellranger_cite_seq.html",
+      "/modules/module_mapping_run_star_and_htseq.html",
+      "/modules/module_mapping_spaceranger_count.html",
+      "/modules/module_demux_spaceranger_mkfastq.html"
+    ]
+  }
+]

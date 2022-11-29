@@ -30,6 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-listing/list.min.js"></script>
+<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -58,7 +60,65 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-workflows .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-namespace','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] }],
+      
+      searchColumns: [],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-workflows'] = new List('listing-workflows', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-modules .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-namespace','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-modules'] = new List('listing-modules', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -110,7 +170,7 @@ ul.task-list li input[type="checkbox"] {
 </nav>
     </div>
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -129,77 +189,148 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="workflows" class="level2 page-columns page-full">
+<section id="workflows" class="level2">
 <h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
-<div class="column-body-outset">
-<table class="table">
+<div id="listing-workflows" class="quarto-listing quarto-listing-container-table">
+<div class="listing-actions-group">
+    <div class="input-group input-group-sm quarto-listing-filter">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="search form-control" placeholder="Filter">
+    </div>
+</div>
+
+<table class="quarto-listing-table table">
 <thead>
-<tr class="header">
-<th style="text-align: left;">Namespace</th>
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Description</th>
+<tr>
+<th>
+Namespace
+</th>
+<th>
+Name
+</th>
+<th>
+Description
+</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Tabula sapiens</td>
-<td style="text-align: left;"><a href="../modules/workflow_tabula_sapiens_concat.html">Concat</a></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tabula sapiens</td>
-<td style="text-align: left;"><a href="../modules/workflow_tabula_sapiens_process.html">Process</a></td>
-<td style="text-align: left;"></td>
-</tr>
+<tbody class="list">
 </tbody>
+
 </table>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
 </div>
 </section>
-<section id="modules" class="level2 page-columns page-full">
+<section id="modules" class="level2">
 <h2 class="anchored" data-anchor-id="modules">Modules</h2>
-<div class="column-body-outset">
-<table class="table">
+<div id="listing-modules" class="quarto-listing quarto-listing-container-table">
+<div class="listing-actions-group">
+   <div class="input-group input-group-sm quarto-listing-sort">
+     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+     <select id="listing-modules-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-modules'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+       <option value="" disabled="" selected="" hidden="">Order By</option>
+       <option value="index" data-direction="asc">Default</option>
+         <option value="listing-title-sort" data-direction="asc">
+          Name
+        </option>
+     </select>
+  </div>
+    <div class="input-group input-group-sm quarto-listing-filter">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="search form-control" placeholder="Filter">
+    </div>
+</div>
+
+<table class="quarto-listing-table table">
 <thead>
-<tr class="header">
-<th style="text-align: left;">Namespace</th>
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Description</th>
+<tr>
+<th>
+Namespace
+</th>
+<th>
+<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Name</a>
+</th>
+<th>
+Description
+</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Demux</td>
-<td style="text-align: left;"><a href="../modules/module_demux_spaceranger_mkfastq.html">Spaceranger mkfastq</a></td>
-<td style="text-align: left;">Demultiplex raw sequencing data</td>
+<tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.67" data-listing-title-sort="Cellranger arc aggr" data-listing-filename-sort="module_multiomics_cellranger_arc_aggr.qmd">
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-title">
+<a href="../modules/module_multiomics_cellranger_arc_aggr.html" class="title">Cellranger arc aggr</a>
+</td>
+<td class="listing-description">
+Aggregate
+</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Mapping</td>
-<td style="text-align: left;"><a href="../modules/module_mapping_run_star_and_htseq.html">Run star and htseq</a></td>
-<td style="text-align: left;">Align sequencing data</td>
+<tr data-index="1" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.57" data-listing-title-sort="Cellranger arc count" data-listing-filename-sort="module_multiomics_cellranger_arc_count.qmd">
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-title">
+<a href="../modules/module_multiomics_cellranger_arc_count.html" class="title">Cellranger arc count</a>
+</td>
+<td class="listing-description">
+Count
+</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">Mapping</td>
-<td style="text-align: left;"><a href="../modules/module_mapping_spaceranger_count.html">Spaceranger count</a></td>
-<td style="text-align: left;">Align fastqs and detect tissues</td>
+<tr data-index="2" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.59" data-listing-title-sort="Cellranger cite seq" data-listing-filename-sort="module_multiomics_cellranger_cite_seq.qmd">
+<td class="listing-namespace">
+Multiomics
+</td>
+<td class="listing-title">
+<a href="../modules/module_multiomics_cellranger_cite_seq.html" class="title">Cellranger cite seq</a>
+</td>
+<td class="listing-description">
+Run cite-seq using cellranger count
+</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Multiomics</td>
-<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_arc_aggr.html">Cellranger arc aggr</a></td>
-<td style="text-align: left;">Aggregate</td>
+<tr data-index="3" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.925" data-listing-title-sort="Run star and htseq" data-listing-filename-sort="module_mapping_run_star_and_htseq.qmd">
+<td class="listing-namespace">
+Mapping
+</td>
+<td class="listing-title">
+<a href="../modules/module_mapping_run_star_and_htseq.html" class="title">Run star and htseq</a>
+</td>
+<td class="listing-description">
+Align sequencing data
+</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">Multiomics</td>
-<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_arc_count.html">Cellranger arc count</a></td>
-<td style="text-align: left;">Count</td>
+<tr data-index="4" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="2.91" data-listing-title-sort="Spaceranger count" data-listing-filename-sort="module_mapping_spaceranger_count.qmd">
+<td class="listing-namespace">
+Mapping
+</td>
+<td class="listing-title">
+<a href="../modules/module_mapping_spaceranger_count.html" class="title">Spaceranger count</a>
+</td>
+<td class="listing-description">
+Align fastqs and detect tissues
+</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Multiomics</td>
-<td style="text-align: left;"><a href="../modules/module_multiomics_cellranger_cite_seq.html">Cellranger cite seq</a></td>
-<td style="text-align: left;">Run cite-seq using cellranger count</td>
+<tr data-index="5" data-listing-file-modified-sort="1669713942284" data-listing-reading-time-sort="1.215" data-listing-title-sort="Spaceranger mkfastq" data-listing-filename-sort="module_demux_spaceranger_mkfastq.qmd">
+<td class="listing-namespace">
+Demux
+</td>
+<td class="listing-title">
+<a href="../modules/module_demux_spaceranger_mkfastq.html" class="title">Spaceranger mkfastq</a>
+</td>
+<td class="listing-description">
+Demultiplex raw sequencing data
+</td>
 </tr>
 </tbody>
+
 </table>
+<div class="listing-no-matching d-none">
+No matching items
 </div>
+</div>
+
 
 
 </section>
