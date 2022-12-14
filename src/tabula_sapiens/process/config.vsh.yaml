@@ -33,7 +33,7 @@ functionality:
           name: --output_raw
           direction: output
           default: '$id.output_raw'
-          description: The output h5mu.
+          description: The cellranger output directory.
         - type: file
           name: --output_h5mu
           direction: output
