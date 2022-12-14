@@ -26,7 +26,6 @@ workflow run_wf {
 
   main:
     output_ch = input_ch
-      | view()
 
     // map data to reference using STAR
     // args interpreted from https://github.com/czbiohub/utilities/blob/47371ab0465d85ab8a2a4dfa092581385064ef62/src/utilities/alignment/run_star_and_htseq.py#L29
