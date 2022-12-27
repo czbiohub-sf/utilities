@@ -15,30 +15,40 @@ functionality:
         - name: "--id"
           required: true
           type: string
-          description: ID of the cell.
-          example: foo
-        - name: "--sample_id"
-          required: true
-          type: string
           description: ID of the sample.
-          example: foo
-        - type: file
-          name: --input
+          example: sample
+        - type: string
+          name: --input_id
           required: true
+          description: The ID of the sample being processed. This vector should have the same length as the `--input_r1` argument.
+          example: [ mysample, mysample ]
           multiple: true
           multiple_sep: ";"
-          example: [ "sample_S1_L001_R1_001.fastq.gz", "sample_S1_L001_R2_001.fastq.gz" ]
-          description: The fastq.gz files to align. Can also be a single directory containing fastq.gz files.
+        - type: file
+          name: --input_r1
+          required: true
+          description: Paths to the sequences to be mapped. If using Illumina paired-end reads, only the R1 files should be passed.
+          example: [ mysample_S1_L001_R1_001.fastq.gz, mysample_S1_L002_R1_001.fastq.gz ]
+          multiple: true
+          multiple_sep: ";"
+        - type: file
+          name: --input_r2
+          required: false
+          description: Paths to the sequences to be mapped. If using Illumina paired-end reads, only the R2 files should be passed.
+          example: [ mysample_S1_L001_R2_001.fastq.gz, mysample_S1_L002_R2_001.fastq.gz ]
+          multiple: true
+          multiple_sep: ";"
         - type: file
           name: --reference_index
+          alternatives: --genomeDir
+          description: Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.
+          example: /path/to/reference
           required: true
-          description: The path to STAR reference tar.gz file or directory.
-          example: reference.tar.gz
         - type: file
           name: --reference_gtf
+          description: Path to the gtf reference file.
+          example: genes.gtf
           required: true
-          description: Path to the reference gtf file.
-          example: reference.gtf
         - type: file
           name: --output_raw
           direction: output
