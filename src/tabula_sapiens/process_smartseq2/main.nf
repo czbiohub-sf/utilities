@@ -54,7 +54,9 @@ workflow run_wf {
       ]
       [ id, new_data, data ]
     }
-    | multi_star
+    | multi_star.run(
+      auto: [publish: true]
+    )
     | pmap{ id, output_dir, orig_data ->
       def new_data = [
         "input": output_dir,
@@ -62,7 +64,9 @@ workflow run_wf {
       ]
       [ id, new_data ]
     }
-    | multi_star_to_h5mu
+    | multi_star_to_h5mu.run(
+      auto: [publish: true]
+    )
 
   emit: output_ch
 }
