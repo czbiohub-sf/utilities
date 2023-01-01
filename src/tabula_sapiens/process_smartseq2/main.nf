@@ -3,11 +3,8 @@ nextflow.enable.dsl=2
 srcDir = params.rootDir + "/src"
 targetDir = params.rootDir + "/module_openpipeline/target/nextflow"
 
-include { star_align } from targetDir + "/mapping/star_align/main.nf"
-include { samtools_sort } from targetDir + "/mapping/samtools_sort/main.nf"
-include { htseq_count } from targetDir + "/mapping/htseq_count/main.nf"
-include { htseq_count_to_h5mu } from targetDir + "/mapping/htseq_count_to_h5mu/main.nf"
-include { filter_with_counts } from targetDir + "/filter/filter_with_counts/main.nf"
+include { multi_star } from targetDir + "/mapping/multi_star/main.nf"
+include { multi_star_to_h5mu } from targetDir + "/mapping/multi_star_to_h5mu/main.nf"
 
 include { readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
 include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
@@ -31,8 +28,13 @@ workflow run_wf {
     // args interpreted from https://github.com/czbiohub/utilities/blob/47371ab0465d85ab8a2a4dfa092581385064ef62/src/utilities/alignment/run_star_and_htseq.py#L29
     | pmap{ id, data ->
       def new_data = [
-        "input": data.input,
-        "reference": data.reference_index,
+        "input_id": data.input_id,
+        "input_r1": data.input_r1,
+        "input_r2": data.input_r2,
+        "reference_index": data.reference_index,
+        "reference_gtf": data.reference_gtf,
+        "output": data.output_raw,
+        // STAR parameters
         "outFilterType": "BySJout",
         "outFilterMultimapNmax": 20,
         "alignSJoverhangMin": 8,
@@ -45,70 +47,26 @@ workflow run_wf {
         "outSAMstrandField": "intronMotif",
         "outSAMtype": [ "BAM", "Unsorted" ],
         "outSAMattributes": [ "NH", "HI", "NM", "MD" ],
-        "outReadsUnmapped": "Fastx"
-        // "genomeLoad": "LoadAndKeep",
+        "outReadsUnmapped": "Fastx",
+        // HTSeq parameters
+        "stranded": "no",
+        "mode": "intersection-nonempty"
       ]
       [ id, new_data, data ]
     }
-    | star_align
-
-    // sort aligned reads
-    | pmap { id, dir, passthrough ->
-      def new_data = [
-        "input": workflow.stubRun ? dir : file(dir + "/Aligned.out.bam"),
-        "output_bam": '$id.$key.output.bam',
-        "output_bai": '$id.$key.output.bam.bai',
-        "output_format": "bam"
-      ]
-      [id, new_data, passthrough]
-    }
-    | samtools_sort
-
-    // create count matrix
-    // args interpreted from: https://github.com/czbiohub/utilities/blob/47371ab0465d85ab8a2a4dfa092581385064ef62/src/utilities/alignment/run_star_and_htseq.py#L286
-    | pmap { id, data, passthrough ->
-      def new_data = [
-        "input": data.output_bam,
-        "reference": passthrough.reference_gtf,
-        "order": "name",
-        "stranded": "no",
-        "output_sam_format": "bam",
-        "mode": "intersection-nonempty"
-      ]
-      [id, new_data, passthrough]
-    }
-    | htseq_count
-    
-    // group events by sample id and convert to h5mu
-    // todo: rename sample_id to group_id
-    | map{ tup ->
-      def id = tup[0]
-      def data = tup[1]
-      def passthrough = tup[2]
-      def others = tup.drop(3)
-      [ passthrough.sample_id, [input_id: id, input_counts: data.output, passthrough: passthrough, others: others]]
-    }
-    | groupTuple()
-    | map{ id, tups ->
-      def input_id = tups.collect{it.input_id}
-      def input_counts = tups.collect{it.input_counts}
-      def passthrough = tups[0].passthrough
-      def others = tups[0].others
-      def new_data = [
-        "input_id": input_id,
-        "input_counts": input_counts,
-        "reference": passthrough.reference_gtf
-      ]
-      [ id, new_data, passthrough ] + others
-    }
-    | htseq_count_to_h5mu.run(
-      auto: [ publish: true ]
+    | multi_star.run(
+      auto: [publish: true]
     )
-
-    // remove passthrough
-    | pmap{ id, out, passthrough -> 
-      [ id, out ]
+    | pmap{ id, output_dir, orig_data ->
+      def new_data = [
+        "input": output_dir,
+        "output": orig_data.output_h5mu,
+      ]
+      [ id, new_data ]
     }
+    | multi_star_to_h5mu.run(
+      auto: [publish: true]
+    )
 
   emit: output_ch
 }
