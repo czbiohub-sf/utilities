@@ -80,6 +80,7 @@ workflow run_wf {
     | htseq_count
     
     // group events by sample id and convert to h5mu
+    // todo: rename sample_id to group_id
     | map{ tup ->
       def id = tup[0]
       def data = tup[1]
@@ -100,22 +101,10 @@ workflow run_wf {
       ]
       [ id, new_data, passthrough ] + others
     }
-    | htseq_count_to_h5mu
-
-    // filter counts
-    | pmap{ id, file, passthrough -> 
-      new_data = [
-        "input": file,
-        "output": passthrough.output_h5mu,
-        "min_genes": 100, 
-        "min_counts": 1000, 
-        "do_subset": true
-      ]
-      [ id, new_data, passthrough ]
-    }
-    | filter_with_counts.run(
+    | htseq_count_to_h5mu.run(
       auto: [ publish: true ]
     )
+
     // remove passthrough
     | pmap{ id, out, passthrough -> 
       [ id, out ]
