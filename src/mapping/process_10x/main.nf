@@ -50,8 +50,9 @@ workflow auto {
   viashChannel(params, auto_config)
     | view{"original inputs: $it"}
     | flatMap{ id, data ->
+      def input_dir = file(data.input_dir)
       // look for 10x fastq files
-      def fastq_files = file("${data.input_dir}/**_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz")
+      def fastq_files = file("${input_dir}/**_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz")
 
       // group by id
       def fastq_grouped = fastq_files.groupBy{ fastq_file ->
