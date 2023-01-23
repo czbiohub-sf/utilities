@@ -48,7 +48,7 @@ Output:
 workflow auto {
   helpMessage(auto_config)
   viashChannel(params, auto_config)
-    | view("original inputs: $it")
+    | view{"original inputs: $it"}
     | flatMap{ id, data ->
       // look for 10x fastq files
       def fastq_files = file("${data.input_dir}/**_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz")
