@@ -9,10 +9,11 @@ include { from_10xh5_to_h5mu } from targetDir + "/convert/from_10xh5_to_h5mu/mai
 include { cellbender_remove_background } from targetDir + "/correction/cellbender_remove_background/main.nf"
 include { filter_with_counts } from targetDir + "/filter/filter_with_counts/main.nf"
 
-include { readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
+include { paramExists; readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
 include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
 
 config = readConfig("$projectDir/config.vsh.yaml")
+auto_config = readConfig("$projectDir/auto.vsh.yaml")
 
 workflow {
   helpMessage(config)
