@@ -10,6 +10,11 @@ functionality:
       roles: [ author, maintainer ]
       props: { github: rcannood, orcid: "0000-0003-3641-729X" }
   arguments:
+    - name: "--id"
+      required: true
+      type: string
+      description: Dummy id
+      default: foo
     - type: file
       name: --input_dir
       required: true
