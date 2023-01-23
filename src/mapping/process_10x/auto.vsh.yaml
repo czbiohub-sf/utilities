@@ -1,0 +1,32 @@
+functionality:
+  name: "process_10x_auto"
+  namespace: "mapping"
+  authors:
+    - name: Angela Pisco
+      roles: [ author ]
+      props: { github: aopisco, orcid: "0000-0003-0142-2355" }
+    - name: Robrecht Cannoodt
+      email: robrecht@data-intuitive.com
+      roles: [ author, maintainer ]
+      props: { github: rcannood, orcid: "0000-0003-3641-729X" }
+  arguments:
+    - type: file
+      name: --input_dir
+      required: true
+      example: [ "sample_S1_L001_R1_001.fastq.gz", "sample_S1_L001_R2_001.fastq.gz" ]
+      description: A directory containing one or more 10X samples
+    - type: file
+      name: --reference
+      required: true
+      description: The path to Cell Ranger reference tar.gz file.
+      example: reference.tar.gz
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: auto
+  # test_resources:
+  #   - type: nextflow_script
+  #     path: main.nf
+  #     entrypoint: test_wf
+platforms:
+  - type: nextflow

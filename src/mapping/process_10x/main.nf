@@ -22,6 +22,67 @@ workflow {
     | run_wf
 }
 
+/*
+Recreate same folder structure:
+
+Input:
+/hpc/projects/data_lg/tabula_sapiens/renamed_fastqs/TSP1/fastqs/10X/
+├── TSP1_Bladder_NA_10X_1_1
+│   ├── TSP1_bladder_1_S13_L001_R1_001.fastq.gz
+│   └── TSP1_bladder_1_S13_L001_R2_001.fastq.gz
+└── foo
+    └── TSP1_Pancreas_exocrine_10X_2_3
+        ├── TSP1_exopancreas2_3_S12_L001_I1_001.fastq.gz
+        └── TSP1_exopancreas2_3_S12_L001_R1_001.fastq.gz
+
+Output:
+/hpc/projects/data_lg/tabula_sapiens/realignment_gencode_v41/TSP1/mapping/10X/
+├── TSP1_Bladder_NA_10X_1_1
+│   ├── star_output
+│   └── dataset.h5mu
+└── foo
+    └── TSP1_Pancreas_exocrine_10X_2_3
+        ├── star_output
+        └── dataset.h5mu
+*/
+workflow auto {
+  helpMessage(auto_config)
+  viashChannel(params, auto_config)
+    | view("original inputs: $it")
+    | flatMap{ id, data ->
+      // look for 10x fastq files
+      def fastq_files = file("${data.input_dir}/**_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz")
+
+      // group by id
+      def fastq_grouped = fastq_files.groupBy{ fastq_file ->
+        fastq_file.toString().replace(input_dir.toString() + "/", "").replaceAll("_S[0-9]+_L[0-9]+_R[12]_001.fastq.gz", "")
+      }
+
+      // create output list
+      fastq_grouped.collect{ sample_id, input ->
+        def output_raw = "${sample_id}_output_raw"
+        def output_h5mu = "${sample_id}_output.h5mu"
+
+        def new_data = [
+          input: input,
+          reference: data.reference,
+          output_raw: output_raw,
+          output_h5mu: output_h5mu
+        ]
+        [sample_id, new_data]
+      }
+    }
+    | view { id, data ->
+      "$id:" +
+        "  data.input.size(): ${data.input.size()}" +
+        "  data.input[0]: ${data.input[0]}" +
+        "  data.reference: ${data.reference}" +
+        "  data.output_raw: ${data.output_raw}" +
+        "  data.output_h5mu: ${data.output_h5mu}"
+    }
+    | run_wf
+}
+
 workflow run_wf {
   take: input_ch
 
