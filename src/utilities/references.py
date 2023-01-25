@@ -10,6 +10,7 @@ S3_REFERENCE = "czbiohub-reference"
 reference_genomes = {
     "hg38-plus": "HG38-PLUS",
     "homo.gencode.v30.ERCC.chrM": "homo.gencode.v30.annotation.ERCC92",
+    "homo.gencode.v41.ERCC.chrM": "gencode_v41_ercc_star",
     "mm10-plus": "MM10-PLUS",
     "mm10-1.2.0": "mm10-1.2.0",
     "mm10-1.2.0-premrna": "mm10-1.2.0-premrna",
