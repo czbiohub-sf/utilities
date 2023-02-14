@@ -1,0 +1,126 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "process_smartseq2_auto",
+    "description": "No description",
+    "type": "object",
+    "definitions": {
+      "fastq inputs" : {
+        "title": "Fastq inputs",
+        "type": "object",
+        "description": "No description",
+        "default": "",
+        "properties": {"input_dir": {
+            "type":"string",
+            "description": "A directory containing one or more smartseq2 plates.",
+            
+            "default": ""
+          },"fastq_regex": {
+            "type":"string",
+            "description": "The regex used to match the fastq files. Each set of parentheses is a group.",
+            
+            "default": "(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12].fastq.gz"
+          },"sample_id_replacement": {
+            "type":"string",
+            "description": "Which groups from the fastq regex to use as the sample ID. ","help_text": "Which groups from the fastq regex to use as the sample ID. \nFor example, if the `fastq_regex` has two groups which are relevant \nfor the constructing the sample ID, the value for this parameter should\nprobably be `$1$2`.\n",
+            
+            "default": "$1"
+          },"cell_id_replacement": {
+            "type":"string",
+            "description": "Which groups from the fastq regex to use as the cell ID.","help_text": "Which groups from the fastq regex to use as the cell ID.\n",
+            
+            "default": "$1$2"
+          }
+        }
+      },
+      "reference" : {
+        "title": "Reference",
+        "type": "object",
+        "description": "No description",
+        "default": "",
+        "properties": {"reference_index": {
+            "type":"string",
+            "description": "Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.",
+            
+            "default": ""
+          },"reference_gtf": {
+            "type":"string",
+            "description": "Path to the gtf reference file.",
+            
+            "default": ""
+          }
+        }
+      },
+      "output" : {
+        "title": "Output",
+        "type": "object",
+        "description": "No description",
+        "default": "",
+        "properties": {"output_raw": {
+            "type":"string",
+            "description": "Which template to use to define raw output directories.",
+            
+            "default": "${sample_id}_raw"
+          },"output_h5mu": {
+            "type":"string",
+            "description": "Which template to use to define h5mu output directories.",
+            
+            "default": "${sample_id}.h5mu"
+          },"params_yaml": {
+            "type":"string",
+            "description": "The filename for the param list yaml.",
+            
+            "default": "param_list.yaml"
+          }
+        }
+      },
+      "operational arguments" : {
+        "title": "Operational arguments",
+        "type": "object",
+        "description": "No description",
+        "default": "",
+        "properties": {"dry_run": {
+            "type":"boolean",
+            "description": "If passed, will only generate the param_list.yaml file.",
+            
+            "default": "False"
+          },"id": {
+            "type":"string",
+            "description": "Dummy id. Will be removed in the future.",
+            
+            "default": "auto_run"
+          }
+        }
+      },
+      "nextflow input-output arguments" : {
+        "title": "Nextflow input-output arguments",
+        "type": "object",
+        "description": "Input/output parameters for Nextflow itself. Please note that both publishDir and publish_dir are supported but at least one has to be configured.",
+        "default": "",
+        "properties": {"publish_dir": {
+            "type":"string",
+            "description": "Path to an output directory.",
+            
+            "default": ""
+          }
+        }
+      }
+    },
+    "allOf": [
+      {
+        "$ref": "#/definitions/fastq inputs"
+      },
+      {
+        "$ref": "#/definitions/reference"
+      },
+      {
+        "$ref": "#/definitions/output"
+      },
+      {
+        "$ref": "#/definitions/operational arguments"
+      },
+      {
+        "$ref": "#/definitions/nextflow input-output arguments"
+      }
+      
+    ]
+}
