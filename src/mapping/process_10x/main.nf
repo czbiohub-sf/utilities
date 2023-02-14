@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2
+
 srcDir = params.rootDir + "/src"
 targetDir = params.rootDir + "/module_openpipeline/target/nextflow"
 
