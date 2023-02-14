@@ -186,45 +186,45 @@ def writeParams(pl) {
 workflow auto {
   helpMessage(auto_config)
 
-  autoParams = paramsToList(params, auto_config)
+  auto_params = paramsToList(params, auto_config)[0]
 
-  wfParams = autoParams.collectMany{ data ->
-    def input_dir = file(data.input_dir)
-    def fastq_glob = data.fastq_glob
+  input_dir = file(auto_params.input_dir)
+  fastq_glob = auto_params.fastq_glob
 
-    // look for 10x fastq 
-    println("before glob: ${input_dir}/${fastq_glob}")
-    def fastq_files = file("${input_dir}/${fastq_glob}")
-    println("fastq_files: $fastq_files")
+  // look for 10x fastq 
+  fastq_files = file("${input_dir}/${fastq_glob}")
 
-    // group by id
-    // use glob to search for the sample id
-    def sample_id_regex = fastq_glob.replace("**", "(.*)")
-    def fastq_grouped = fastq_files.groupBy{ fastq_file ->
-      fastq_file.toString()
-        .replace(input_dir.toString() + "/", "") // strip parent directory
-        .replaceAll(sample_id_regex, '$1') // extract sample id using regex
-    }
+  // group by id
+  // use glob to search for the sample id
+  sample_id_regex = fastq_glob.replace("**", "(.*)")
+  fastq_grouped = fastq_files.groupBy{ fastq_file ->
+    fastq_file.toString()
+      .replace(input_dir.toString() + "/", "") // strip parent directory
+      .replaceAll(sample_id_regex, '$1') // extract sample id using regex
+  }
 
-    // create output list
-    fastq_grouped.collect{ sample_id, input ->
-      def output_raw = "${sample_id}_output_raw"
-      def output_h5mu = "${sample_id}_output.h5mu"
+  // create output list
+  wfParams = fastq_grouped.collect{ sample_id, input ->
+    def output_raw = "${sample_id}_output_raw"
+    def output_h5mu = "${sample_id}_output.h5mu"
 
-      [
-        id: sample_id,
-        input: input,
-        reference: data.reference,
-        output_raw: output_raw,
-        output_h5mu: output_h5mu
-      ]
-    }
+    [
+      id: sample_id,
+      input: input,
+      reference: auto_params.reference,
+      output_raw: output_raw,
+      output_h5mu: output_h5mu
+    ]
   }
   // Log params file to output dir
   // todo: make sure they don't overwrite eachother
   writeParams(wfParams)
 
-  Channel.fromList(wfParams)
-    | map{tup -> [tup.id, tup]}
-    | run_wf
+  if (!auto_params.dry_run) {
+    Channel.fromList(wfParams)
+      | map{tup -> [tup.id, tup]}
+      | run_wf
+  } else {
+    println("Dry run, not running pipeline")
+  }
 }

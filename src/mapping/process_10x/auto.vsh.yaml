@@ -29,6 +29,9 @@ functionality:
       required: true
       description: The path to Cell Ranger reference tar.gz file.
       example: reference.tar.gz
+    - type: boolean_true
+      name: --dry_run
+      description: If passed, will only generate the param_list.yaml file.
   resources:
     - type: nextflow_script
       path: main.nf
