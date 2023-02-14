@@ -35,3 +35,16 @@ nextflow run . \
   --reference resources_test/reference/gencode_v41_ercc_cellranger \
   --publish_dir output \
   -stub
+
+
+
+nextflow run czbiohub/utilities \
+  -r implement_auto_workflows \
+  -main-script src/mapping/process_10x/main.nf \
+  -entry auto \
+  -resume \
+  -profile docker \
+  --input_dir resources_test/pbmc_1k_v3/fastqs/pbmc_1k_v3_fastqs \
+  --reference resources_test/reference/gencode_v41_ercc_cellranger \
+  --publish_dir output \
+  --dry_run

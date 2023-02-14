@@ -160,8 +160,17 @@ class NonMetaClassRepresenter extends Representer {
   }
 }
 
-def writeParams(pl) {
-  plStrings = pl.collect { data ->
+def getPublishDir() {
+  def publishDir = 
+    params.containsKey("publish_dir") ? params.publish_dir : 
+    params.containsKey("publishDir") ? params.publishDir : 
+    null
+  return publishDir
+}
+
+def writeParams(param_list, params_file) {
+  // convert file to strings
+  param_list_strings = param_list.collect { data ->
     data.collectEntries{key, val -> 
       if (val instanceof List) {
         new_val = val.collect{it.toString()}
@@ -172,41 +181,47 @@ def writeParams(pl) {
       [key, new_val]
     }
   }
-  def publishDir = 
-    params.containsKey("publish_dir") ? params.publish_dir : 
-    params.containsKey("publishDir") ? params.publishDir : 
-    null
-  def paramsFile = new File("${publishDir}/params.yaml")
-  paramsFile.getParentFile().mkdirs()
+
+  // convert to yaml
   yaml = new Yaml(new NonMetaClassRepresenter())
-  output = yaml.dump(plStrings)
-  paramsFile.write(output)
+  output = yaml.dump(param_list_strings)
+
+  // create parent directory
+  params_file.getParent().mkdirs()
+
+  // write to file
+  params_file.write(output)
 }
 
 workflow auto {
   helpMessage(auto_config)
 
+  // fetch params
   auto_params = paramsToList(params, auto_config)[0]
 
-  input_dir = file(auto_params.input_dir)
-  fastq_glob = auto_params.fastq_glob
-
   // look for 10x fastq 
-  fastq_files = file("${input_dir}/${fastq_glob}")
+  fastq_files = file("${auto_params.input_dir}/**.fastq.gz")
+    .findAll{it.toString()
+    .matches(auto_params.fastq_regex)}
+  println("fastq_files: $fastq_files")
 
-  // group by id
-  // use glob to search for the sample id
-  sample_id_regex = fastq_glob.replace("**", "(.*)")
+  // group by sample id
+  // use regex to search for the sample id
   fastq_grouped = fastq_files.groupBy{ fastq_file ->
     fastq_file.toString()
-      .replace(input_dir.toString() + "/", "") // strip parent directory
-      .replaceAll(sample_id_regex, '$1') // extract sample id using regex
+      .replace("${auto_params.input_dir}/", "") // remove root directory
+      .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
   }
 
+  // create templates for output files
+  engine = new groovy.text.SimpleTemplateEngine()
+  raw_template = engine.createTemplate(auto_params.output_raw)
+  h5mu_template = engine.createTemplate(auto_params.output_h5mu)
+
   // create output list
-  wfParams = fastq_grouped.collect{ sample_id, input ->
-    def output_raw = "${sample_id}_output_raw"
-    def output_h5mu = "${sample_id}_output.h5mu"
+  param_list = fastq_grouped.collect{ sample_id, input ->
+    def output_raw = raw_template.make([sample_id:sample_id]).toString()
+    def output_h5mu = h5mu_template.make([sample_id:sample_id]).toString()
 
     [
       id: sample_id,
@@ -217,11 +232,12 @@ workflow auto {
     ]
   }
   // Log params file to output dir
-  // todo: make sure they don't overwrite eachother
-  writeParams(wfParams)
+  param_file = file("${getPublishDir()}/${auto_params.params_yaml}")
+  writeParams(param_list, param_file)
 
+  // run pipeline
   if (!auto_params.dry_run) {
-    Channel.fromList(wfParams)
+    Channel.fromList(param_list)
       | map{tup -> [tup.id, tup]}
       | run_wf
   } else {
