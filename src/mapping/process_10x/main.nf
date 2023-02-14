@@ -11,8 +11,9 @@ include { add_id } from targetDir + "/metadata/add_id/main.nf"
 include { processConfig; paramExists; readConfig; viashChannel; helpMessage; paramsToList } from srcDir + "/wf_utils/WorkflowHelper.nf"
 include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
 
-config = readConfig("$projectDir/config.vsh.yaml")
-auto_config = readConfig("$projectDir/auto.vsh.yaml")
+configDir = "${params.rootDir}/src/mapping/process_10x"
+config = readConfig("${configDir}/config.vsh.yaml")
+auto_config = readConfig("${configDir}/auto.vsh.yaml")
 
 /*
  * Main CLI workflow. See `nextflow run main.nf --help` documentation and usage.
@@ -203,7 +204,6 @@ workflow auto {
   fastq_files = file("${auto_params.input_dir}/**.fastq.gz")
     .findAll{it.toString()
     .matches(auto_params.fastq_regex)}
-  println("fastq_files: $fastq_files")
 
   // group by sample id
   // use regex to search for the sample id

@@ -1,5 +1,5 @@
 functionality:
-  name: "process_10x_auto"
+  name: "process_smartseq2_auto"
   namespace: "mapping"
   authors:
     - name: Angela Pisco
@@ -16,10 +16,10 @@ functionality:
           name: --input_dir
           required: true
           example: "/path/to/input_dir"
-          description: A directory containing one or more 10X samples
+          description: A directory containing one or more smartseq2 plates.
         - type: string
           name: --fastq_regex
-          default: "(.*)_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz"
+          default: "(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12].fastq.gz"
           description: The regex used to match the fastq files. Each set of parentheses is a group.
         - type: string
           name: --sample_id_replacement
@@ -29,13 +29,24 @@ functionality:
             For example, if the `fastq_regex` has two groups which are relevant 
             for the constructing the sample ID, the value for this parameter should
             probably be `$1$2`.
+        - type: string
+          name: --cell_id_replacement
+          default: "$1$2"
+          description: |
+            Which groups from the fastq regex to use as the cell ID.
     - name: Reference
       arguments:
         - type: file
-          name: --reference
+          name: --reference_index
+          alternatives: --genomeDir
+          description: Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.
+          example: /path/to/reference
           required: true
-          description: The path to Cell Ranger reference tar.gz file.
-          example: reference.tar.gz
+        - type: file
+          name: --reference_gtf
+          description: Path to the gtf reference file.
+          example: genes.gtf
+          required: true
     - name: Output
       arguments:
         - type: string

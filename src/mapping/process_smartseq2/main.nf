@@ -6,11 +6,16 @@ targetDir = params.rootDir + "/module_openpipeline/target/nextflow"
 include { multi_star } from targetDir + "/mapping/multi_star/main.nf"
 include { multi_star_to_h5mu } from targetDir + "/mapping/multi_star_to_h5mu/main.nf"
 
-include { readConfig; viashChannel; helpMessage } from srcDir + "/wf_utils/WorkflowHelper.nf"
+include { processConfig; paramExists; readConfig; viashChannel; helpMessage; paramsToList } from srcDir + "/wf_utils/WorkflowHelper.nf"
 include { setWorkflowArguments; getWorkflowArguments; passthroughMap as pmap } from srcDir + "/wf_utils/DataflowHelper.nf"
 
-config = readConfig("$projectDir/config.vsh.yaml")
+configDir = "${params.rootDir}/src/mapping/process_smartseq2"
+config = readConfig("${configDir}/config.vsh.yaml")
+auto_config = readConfig("${configDir}/auto.vsh.yaml")
 
+/*
+ * Main CLI workflow. See `nextflow run main.nf --help` documentation and usage.
+ */
 workflow {
   helpMessage(config)
 
@@ -18,6 +23,11 @@ workflow {
     | run_wf
 }
 
+/*
+ * Main workflow.
+ * 
+ * This is used by the default workflow, integration workflow and the auto workflow.
+ */
 workflow run_wf {
   take: input_ch
 
@@ -71,6 +81,9 @@ workflow run_wf {
   emit: output_ch
 }
 
+/*
+ * Integration test workflow.
+ */
 // workflow test_wf {
 //   helpMessage(config)
 
@@ -101,3 +114,137 @@ workflow run_wf {
 //     //     assert output_list.size() == 3 : "output channel should contain three events"
 //     //   }
 // }
+
+
+/*
+Workflow for automatically generating a `--param_list` YAML file.
+
+Example. When providing this workflow with a directory with the structure
+listed under "Input", the output of the pipeline will be similar to
+that of the "Output".
+
+Input:
+/hpc/archives/AWS/buckets/tabula-sapiens/Pilot10/fastqs/smartseq2/
+├── batch1
+│   ├── TSP10_Fat_SCAT_SS2_B134180_B133833_Immune_N19_L002_R1.fastq.gz
+│   └── TSP10_Fat_SCAT_SS2_B134180_B133833_Immune_N19_L002_R2.fastq.gz
+├── TSP2_LungNeuron_proximal_SS2_B113453_B133092_Empty_G24_S288_R1_001.fastq.gz
+└── TSP2_LungNeuron_proximal_SS2_B113453_B133092_Empty_G24_S288_R2_001.fastq.gz
+
+Output:
+/hpc/projects/data_lg/tabula_sapiens/realignment_gencode_v41/TSP1/mapping/10X/
+├── batch1
+│   └── TSP10_Fat_SCAT_SS2_B134180_B133833_Immune
+│       ├── star_output
+│       └── dataset.h5mu
+└── TSP2_LungNeuron_proximal_SS2_B113453_B133092_Empty
+    ├── star_output
+    └── dataset.h5mu
+*/
+
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.representer.Representer
+import java.beans.IntrospectionException
+import org.yaml.snakeyaml.introspector.Property
+
+class NonMetaClassRepresenter extends Representer {
+  protected Set<Property> getProperties( Class<? extends Object> type ) throws IntrospectionException {
+    super.getProperties( type ).findAll { it.name != 'metaClass' }
+  }
+}
+
+def getPublishDir() {
+  def publishDir = 
+    params.containsKey("publish_dir") ? params.publish_dir : 
+    params.containsKey("publishDir") ? params.publishDir : 
+    null
+  return publishDir
+}
+
+def writeParams(param_list, params_file) {
+  // convert file to strings
+  param_list_strings = param_list.collect { data ->
+    data.collectEntries{key, val -> 
+      if (val instanceof List) {
+        new_val = val.collect{it.toString()}
+      } else {
+        new_val = val.toString()
+      }
+
+      [key, new_val]
+    }
+  }
+
+  // convert to yaml
+  yaml = new Yaml(new NonMetaClassRepresenter())
+  output = yaml.dump(param_list_strings)
+
+  // create parent directory
+  params_file.getParent().mkdirs()
+
+  // write to file
+  params_file.write(output)
+}
+
+workflow auto {
+  helpMessage(auto_config)
+
+  // fetch params
+  auto_params = paramsToList(params, auto_config)[0]
+
+  // look for ss2 fastqs
+  fastq_files = file("${auto_params.input_dir}/**.fastq.gz")
+    .findAll{it.toString()
+    .matches(auto_params.fastq_regex)}
+
+  // group by sample id
+  // use regex to search for the sample id
+  fastq_grouped = fastq_files.groupBy{ fastq_file ->
+    fastq_file.toString()
+      .replace("${auto_params.input_dir}/", "") // remove root directory
+      .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
+  }
+  // println("fastq_grouped: $fastq_grouped")
+
+  // create templates for output files
+  engine = new groovy.text.SimpleTemplateEngine()
+  raw_template = engine.createTemplate(auto_params.output_raw)
+  h5mu_template = engine.createTemplate(auto_params.output_h5mu)
+
+  // create output list
+  param_list = fastq_grouped.collect{ sample_id, inputs ->
+    def output_raw = raw_template.make([sample_id:sample_id]).toString()
+    def output_h5mu = h5mu_template.make([sample_id:sample_id]).toString()
+
+    def input_r1 = inputs.findAll{it.toString().matches(".*_R1[_.].*")}
+    def input_r2 = inputs.findAll{it.toString().matches(".*_R2[_.].*")}
+    def input_id = input_r1.collect{ fastq_file ->
+      fastq_file.toString()
+        .replace("${auto_params.input_dir}/", "") // remove root directory
+        .replaceAll(auto_params.fastq_regex, auto_params.cell_id_replacement) // extract sample id using regex
+    }
+
+    [
+      id: sample_id,
+      input_id: input_id,
+      input_r1: input_r1,
+      input_r2: input_r2,
+      reference_index: auto_params.reference_index,
+      reference_gtf: auto_params.reference_gtf,
+      output_raw: output_raw,
+      output_h5mu: output_h5mu
+    ]
+  }
+  // Log params file to output dir
+  param_file = file("${getPublishDir()}/${auto_params.params_yaml}")
+  writeParams(param_list, param_file)
+
+  // run pipeline
+  if (!auto_params.dry_run) {
+    Channel.fromList(param_list)
+      | map{tup -> [tup.id, tup]}
+      | run_wf
+  } else {
+    println("Dry run, not running pipeline")
+  }
+}
