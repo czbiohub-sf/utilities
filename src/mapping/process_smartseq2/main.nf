@@ -232,11 +232,7 @@ workflow auto {
   writeParams(param_list, param_file)
 
   // run pipeline
-  // if (!auto_params.dry_run) {
   Channel.fromList(param_list)
     | map{tup -> [tup.id, tup]}
     | run_wf
-  // } else {
-  //   println("Dry run, not running pipeline")
-  // }
 }

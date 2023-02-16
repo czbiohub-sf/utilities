@@ -45,6 +45,8 @@ functionality:
             Only files matching this regular expression will be retained.
             For more details on the notation of regular expression, see the 
             Java Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).
+          info:
+            hidden: true
         - type: string
           name: --sample_id_replacement
           default: "$1"
@@ -53,11 +55,15 @@ functionality:
             For example, if the `fastq_regex` has two groups which are relevant 
             for the constructing the sample ID, the value for this parameter should
             probably be `$1$2`.
+          info:
+            hidden: true
         - type: string
           name: --cell_id_replacement
           default: "$1$2"
           description: |
             Which groups from the fastq regex to use as the cell ID.
+          info:
+            hidden: true
     - name: Reference
       description: |
         The reference to map the reads to.
@@ -89,10 +95,6 @@ functionality:
     - name: Operational arguments
       description: Arguments related to the operational side of the pipeline processing.
       arguments:
-        - type: boolean
-          name: --dry_run
-          description: If passed, will only generate the param_list.yaml file.
-          default: false
         - name: "--id"
           type: string
           description: Dummy id. Will be removed in the future.

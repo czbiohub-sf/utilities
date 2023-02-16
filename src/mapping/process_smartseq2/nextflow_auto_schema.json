@@ -16,17 +16,17 @@
           },
           "fastq_regex": {
             "type": "string",
-            "description": "Only files matching this regular expression will be retained.","help_text": "Only files matching this regular expression will be retained.\nFor more details on the notation of regular expression, see the \nJava Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n",
+            "description": "Only files matching this regular expression will be retained.","help_text": "Only files matching this regular expression will be retained.\nFor more details on the notation of regular expression, see the \nJava Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n","hidden": true,
             "default": "(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12](_001)?.fastq.gz"
           },
           "sample_id_replacement": {
             "type": "string",
-            "description": "Which groups from the fastq regex to use as the sample ID. ","help_text": "Which groups from the fastq regex to use as the sample ID. \nFor example, if the `fastq_regex` has two groups which are relevant \nfor the constructing the sample ID, the value for this parameter should\nprobably be `$1$2`.\n",
+            "description": "Which groups from the fastq regex to use as the sample ID. ","help_text": "Which groups from the fastq regex to use as the sample ID. \nFor example, if the `fastq_regex` has two groups which are relevant \nfor the constructing the sample ID, the value for this parameter should\nprobably be `$1$2`.\n","hidden": true,
             "default": "$1"
           },
           "cell_id_replacement": {
             "type": "string",
-            "description": "Which groups from the fastq regex to use as the cell ID.","help_text": "Which groups from the fastq regex to use as the cell ID.\n",
+            "description": "Which groups from the fastq regex to use as the cell ID.","help_text": "Which groups from the fastq regex to use as the cell ID.\n","hidden": true,
             "default": "$1$2"
           }
           
@@ -68,11 +68,6 @@
         "type": "object",
         "description": "Arguments related to the operational side of the pipeline processing.",
         "properties": {
-          "dry_run": {
-            "type": "boolean",
-            "description": "If passed, will only generate the param_list.yaml file.",
-            "default": "False"
-          },
           "id": {
             "type": "string",
             "description": "Dummy id. Will be removed in the future.","hidden": true,
