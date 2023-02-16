@@ -142,13 +142,8 @@ Output:
     └── dataset.h5mu
 */
 
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.representer.Representer
-import java.beans.IntrospectionException
-import org.yaml.snakeyaml.introspector.Property
-
-class NonMetaClassRepresenter extends Representer {
-  protected Set<Property> getProperties( Class<? extends Object> type ) throws IntrospectionException {
+class NonMetaClassRepresenter extends org.yaml.snakeyaml.representer.Representer {
+  protected Set<org.yaml.snakeyaml.introspector.Property> getProperties( Class<? extends Object> type ) throws java.beans.IntrospectionException {
     super.getProperties( type ).findAll { it.name != 'metaClass' }
   }
 }
@@ -176,7 +171,7 @@ def writeParams(param_list, params_file) {
   }
 
   // convert to yaml
-  yaml = new Yaml(new NonMetaClassRepresenter())
+  yaml = new org.yaml.snakeyaml.Yaml(new NonMetaClassRepresenter())
   output = yaml.dump(param_list_strings)
 
   // create parent directory
@@ -204,47 +199,54 @@ workflow auto {
       .replace("${auto_params.input_dir}/", "") // remove root directory
       .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
   }
-  // println("fastq_grouped: $fastq_grouped")
-
-  // create templates for output files
-  engine = new groovy.text.SimpleTemplateEngine()
-  raw_template = engine.createTemplate(auto_params.output_raw)
-  h5mu_template = engine.createTemplate(auto_params.output_h5mu)
 
   // create output list
-  param_list = fastq_grouped.collect{ sample_id, inputs ->
-    def output_raw = raw_template.make([sample_id:sample_id]).toString()
-    def output_h5mu = h5mu_template.make([sample_id:sample_id]).toString()
+  param_list = fastq_grouped.collectMany{ sample_id, inputs ->
 
-    def input_r1 = inputs.findAll{it.toString().matches(".*_R1[_.].*")}
-    def input_r2 = inputs.findAll{it.toString().matches(".*_R2[_.].*")}
+    // use this regex to look for the R1 files as well as substitute R1 for R2    
+    // def r1_regex = "(.*_R)1([_.].*)"
+    // def input_r1 = inputs.findAll{it.toString().matches(r1_regex)}
+    // def input_r2 = input_r1.collect{ fastq_file -> 
+    //   file(fastq_file.toString().replaceAll(r1_regex, '$12$2'))
+    // }
+    // if (!input_r1.exists() || !input_r2.exists()) { // todo: fix because r1 and r2 are arrays
+    //   return []
+    // }
+
+    def input_r1 = inputs.findAll{it.toString().matches(".*_R1[_.].*")}.sort()
+    def input_r2 = inputs.findAll{it.toString().matches(".*_R2[_.].*")}.sort()
     def input_id = input_r1.collect{ fastq_file ->
       fastq_file.toString()
         .replace("${auto_params.input_dir}/", "") // remove root directory
         .replaceAll(auto_params.fastq_regex, auto_params.cell_id_replacement) // extract sample id using regex
     }
 
-    [
+    if (input_r1.size() != input_r2.size()) {
+      println("Skipping sample '$sample_id' because the number of R1 files (${input_r1.size()}) does not equal the number of R2 files (${input_r2.size()}).")
+      return []
+    }
+
+    [[
       id: sample_id,
       input_id: input_id,
       input_r1: input_r1,
       input_r2: input_r2,
       reference_index: auto_params.reference_index,
       reference_gtf: auto_params.reference_gtf,
-      output_raw: output_raw,
-      output_h5mu: output_h5mu
-    ]
+      output_raw: "${sample_id}_raw",,
+      output_h5mu: "${sample_id}.h5mu"
+    ]]
   }
   // Log params file to output dir
-  param_file = file("${getPublishDir()}/${auto_params.params_yaml}")
+  param_file = file("${getPublishDir()}/param_list.yaml")
   writeParams(param_list, param_file)
 
   // run pipeline
-  if (!auto_params.dry_run) {
-    Channel.fromList(param_list)
-      | map{tup -> [tup.id, tup]}
-      | run_wf
-  } else {
-    println("Dry run, not running pipeline")
-  }
+  // if (!auto_params.dry_run) {
+  Channel.fromList(param_list)
+    | map{tup -> [tup.id, tup]}
+    | run_wf
+  // } else {
+  //   println("Dry run, not running pipeline")
+  // }
 }

@@ -77,18 +77,6 @@ functionality:
           required: true
           description: "Path to an output directory."
           example: "output/"
-        # - type: string
-        #   name: --output_raw
-        #   example: '${sample_id}_raw'
-        #   description: Which template to use to define raw output directories.
-        # - type: string
-        #   name: --output_h5mu
-        #   example: '${sample_id}.h5mu'
-        #   description: Which template to use to define h5mu output directories.
-        # - type: string
-        #   name: --params_yaml
-        #   default: param_list.yaml
-        #   description: The filename for the param list yaml.
     - name: Operational arguments
       description: Arguments related to the operational side of the pipeline processing.
       arguments:
