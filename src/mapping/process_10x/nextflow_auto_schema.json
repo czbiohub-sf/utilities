@@ -1,116 +1,104 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "title": "process_10x_auto",
-    "description": "No description",
+    "description": "Map all 10x Fastq files in a directory.\n\nSteps in the workflow:\n\n  * Look for all `*.fastq.gz` files in the `input_dir` which\n    match the regular expression in `fastq_regex`.\n  * Extract the sample id from the path name using the same `fastq_regex`.\n  * Write the list of samples as a yaml in the output directory.\n  * Map the reads using Cell Ranger\n  * Convert the Cell Ranger output to h5mu\n  * Remove ambient RNA with CellBender\n  * Remove cells with less than 100 genes or 1000 reads.\n  * Make the cell names unique\n  * Output one h5mu file per sample\n\nConcatenating the invididual h5mu files into one h5mu file is a separate pipeline.\n",
     "type": "object",
     "definitions": {
-      "fastq inputs" : {
-        "title": "Fastq inputs",
+      "input directory" : {
+        "title": "Input directory",
         "type": "object",
-        "description": "No description",
-        "default": "",
-        "properties": {"input_dir": {
-            "type":"string",
-            "description": "A directory containing one or more 10X samples",
-            
+        "description": "Arguments related to how to search for `\".fastq.gz\"` files inside the \ninput directory. Only files matching the `fastq_regex` are retained.\n",
+        "properties": {
+          "input_dir": {
+            "type": "string",
+            "description": "A directory containing one or more 10X samples.",
             "default": ""
-          },"fastq_regex": {
-            "type":"string",
-            "description": "The regex used to match the fastq files. Each set of parentheses is a group.",
-            
+          },
+          "fastq_regex": {
+            "type": "string",
+            "description": "Only files matching this regular expression will be retained.","help_text": "Only files matching this regular expression will be retained.\nFor more details on the notation of regular expression, see the \nJava Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n",
             "default": "(.*)_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz"
-          },"sample_id_replacement": {
-            "type":"string",
-            "description": "Which groups from the fastq regex to use as the sample ID. ","help_text": "Which groups from the fastq regex to use as the sample ID. \nFor example, if the `fastq_regex` has two groups which are relevant \nfor the constructing the sample ID, the value for this parameter should\nprobably be `$1$2`.\n",
-            
+          },
+          "sample_id_replacement": {
+            "type": "string",
+            "description": "Which groups from the fastq regex to use as the sample ID. ","help_text": "Which groups from the fastq regex to use as the sample ID. \nFor example, if the `fastq_regex` is `\"(.*)_S[0-9]*(_L[0-9]*)_R[12]_001.fastq.gz`,\nand the fastq file is `\"foo_S002_L001_R1_001.fastq.gz`, setting the \n`sample_id_replacement` to `\"$1\"` results in the sample ID being `\"foo\"`, while\nwith `\"$1$2\"` the sample ID would be \"foo_L001\".\n",
             "default": "$1"
           }
+          
         }
       },
       "reference" : {
         "title": "Reference",
         "type": "object",
-        "description": "No description",
-        "default": "",
-        "properties": {"reference": {
-            "type":"string",
-            "description": "The path to Cell Ranger reference tar.gz file.",
-            
+        "description": "The reference to map the reads to. Ideally, this reference was created with the\n[Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)\npipeline in OpenPipelines.\n",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "description": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file","help_text": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file\nor a directory. Using a directory will be slightly faster.\n",
             "default": ""
           }
+          
         }
       },
-      "output" : {
-        "title": "Output",
+      "output directory" : {
+        "title": "Output directory",
         "type": "object",
-        "description": "No description",
-        "default": "",
-        "properties": {"output_raw": {
-            "type":"string",
+        "description": "The resulting h5mu will be stored in the `publish_dir`. This workflow will \nreplicate the same folder structure of where the fastq files were found relative\nto the `input_dir`.\n",
+        "properties": {
+          "publish_dir": {
+            "type": "string",
+            "description": "Path to an output directory.",
+            "default": ""
+          },
+          "output_raw": {
+            "type": "string",
             "description": "Which template to use to define raw output directories.",
-            
             "default": "${sample_id}_raw"
-          },"output_h5mu": {
-            "type":"string",
+          },
+          "output_h5mu": {
+            "type": "string",
             "description": "Which template to use to define h5mu output directories.",
-            
             "default": "${sample_id}.h5mu"
-          },"params_yaml": {
-            "type":"string",
+          },
+          "params_yaml": {
+            "type": "string",
             "description": "The filename for the param list yaml.",
-            
             "default": "param_list.yaml"
           }
+          
         }
       },
       "operational arguments" : {
         "title": "Operational arguments",
         "type": "object",
-        "description": "No description",
-        "default": "",
-        "properties": {"dry_run": {
-            "type":"boolean",
+        "description": "Arguments related to the operational side of the pipeline processing.",
+        "properties": {
+          "dry_run": {
+            "type": "boolean",
             "description": "If passed, will only generate the param_list.yaml file.",
-            
             "default": "False"
-          },"id": {
-            "type":"string",
-            "description": "Dummy id. Will be removed in the future.",
-            
+          },
+          "id": {
+            "type": "string",
+            "description": "Dummy id. Will be removed in the future.","hidden": true,
             "default": "auto_run"
           }
-        }
-      },
-      "nextflow input-output arguments" : {
-        "title": "Nextflow input-output arguments",
-        "type": "object",
-        "description": "Input/output parameters for Nextflow itself. Please note that both publishDir and publish_dir are supported but at least one has to be configured.",
-        "default": "",
-        "properties": {"publish_dir": {
-            "type":"string",
-            "description": "Path to an output directory.",
-            
-            "default": ""
-          }
+          
         }
       }
     },
     "allOf": [
       {
-        "$ref": "#/definitions/fastq inputs"
+        "$ref": "#/definitions/input directory"
       },
       {
         "$ref": "#/definitions/reference"
       },
       {
-        "$ref": "#/definitions/output"
+        "$ref": "#/definitions/output directory"
       },
       {
         "$ref": "#/definitions/operational arguments"
-      },
-      {
-        "$ref": "#/definitions/nextflow input-output arguments"
       }
-      
-    ]
+      ]
 }
