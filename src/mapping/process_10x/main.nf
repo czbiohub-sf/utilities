@@ -73,9 +73,9 @@ workflow run_wf {
     }
     | filter_with_counts.run(
       args: [
-        layer: "cellbender",
-        min_genes: 100, 
-        min_counts: 1000, 
+        layer: "counts",
+        min_genes: 10,
+        min_counts: 100,
         do_subset: true
       ],
       auto: [ 
