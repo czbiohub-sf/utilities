@@ -203,16 +203,6 @@ workflow auto {
   // create output list
   param_list = fastq_grouped.collectMany{ sample_id, inputs ->
 
-    // use this regex to look for the R1 files as well as substitute R1 for R2    
-    // def r1_regex = "(.*_R)1([_.].*)"
-    // def input_r1 = inputs.findAll{it.toString().matches(r1_regex)}
-    // def input_r2 = input_r1.collect{ fastq_file -> 
-    //   file(fastq_file.toString().replaceAll(r1_regex, '$12$2'))
-    // }
-    // if (!input_r1.exists() || !input_r2.exists()) { // todo: fix because r1 and r2 are arrays
-    //   return []
-    // }
-
     def input_r1 = inputs.findAll{it.toString().matches(".*_R1[_.].*")}.sort()
     def input_r2 = inputs.findAll{it.toString().matches(".*_R2[_.].*")}.sort()
     def input_id = input_r1.collect{ fastq_file ->
@@ -233,7 +223,7 @@ workflow auto {
       input_r2: input_r2,
       reference_index: auto_params.reference_index,
       reference_gtf: auto_params.reference_gtf,
-      output_raw: "${sample_id}_raw",,
+      output_raw: "${sample_id}_raw",
       output_h5mu: "${sample_id}.h5mu"
     ]]
   }
