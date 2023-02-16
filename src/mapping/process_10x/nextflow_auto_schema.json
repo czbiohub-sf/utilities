@@ -7,7 +7,7 @@
       "input directory" : {
         "title": "Input directory",
         "type": "object",
-        "description": "Arguments related to how to search for `\".fastq.gz\"` files inside the \ninput directory. Only files matching the `fastq_regex` are retained.\n",
+        "description": "Arguments related to how to search for `\".fastq.gz\"` files inside the input directory.\nOnly files matching the `fastq_regex` are retained.\n",
         "properties": {
           "input_dir": {
             "type": "string",
@@ -17,7 +17,7 @@
           "fastq_regex": {
             "type": "string",
             "description": "Only files matching this regular expression will be retained.","help_text": "Only files matching this regular expression will be retained.\nFor more details on the notation of regular expression, see the \nJava Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n",
-            "default": "(.*)_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz"
+            "default": "(.*)_S[0-9]+_L[0-9]+_R[12](_001)?.fastq.gz"
           },
           "sample_id_replacement": {
             "type": "string",
@@ -30,11 +30,11 @@
       "reference" : {
         "title": "Reference",
         "type": "object",
-        "description": "The reference to map the reads to. Ideally, this reference was created with the\n[Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)\npipeline in OpenPipelines.\n",
+        "description": "The reference to map the reads to.\nIdeally, this reference was created with the [Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)\npipeline in OpenPipelines.\n",
         "properties": {
           "reference": {
             "type": "string",
-            "description": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file","help_text": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file\nor a directory. Using a directory will be slightly faster.\n",
+            "description": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.","help_text": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.\nExample: /path/to/reference.tar.gz.\n",
             "default": ""
           }
           
@@ -43,27 +43,12 @@
       "output directory" : {
         "title": "Output directory",
         "type": "object",
-        "description": "The resulting h5mu will be stored in the `publish_dir`. This workflow will \nreplicate the same folder structure of where the fastq files were found relative\nto the `input_dir`.\n",
+        "description": "The resulting h5mu will be stored in the `publish_dir`. \nThis workflow will replicate the same folder structure of where the fastq files were found relative\nto the `input_dir`.\n",
         "properties": {
           "publish_dir": {
             "type": "string",
             "description": "Path to an output directory.",
             "default": ""
-          },
-          "output_raw": {
-            "type": "string",
-            "description": "Which template to use to define raw output directories.",
-            "default": "${sample_id}_raw"
-          },
-          "output_h5mu": {
-            "type": "string",
-            "description": "Which template to use to define h5mu output directories.",
-            "default": "${sample_id}.h5mu"
-          },
-          "params_yaml": {
-            "type": "string",
-            "description": "The filename for the param list yaml.",
-            "default": "param_list.yaml"
           }
           
         }

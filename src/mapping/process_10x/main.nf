@@ -215,26 +215,19 @@ workflow auto {
       .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
   }
 
-  // create templates for output files
-  engine = new groovy.text.SimpleTemplateEngine()
-  raw_template = engine.createTemplate(auto_params.output_raw)
-  h5mu_template = engine.createTemplate(auto_params.output_h5mu)
-
   // create output list
   param_list = fastq_grouped.collect{ sample_id, input ->
-    def output_raw = raw_template.make([sample_id:sample_id]).toString()
-    def output_h5mu = h5mu_template.make([sample_id:sample_id]).toString()
 
     [
       id: sample_id,
       input: input,
       reference: auto_params.reference,
-      output_raw: output_raw,
-      output_h5mu: output_h5mu
+      output_raw: "${sample_id}_raw",
+      output_h5mu: "${sample_id}.h5mu"
     ]
   }
   // Log params file to output dir
-  param_file = file("${getPublishDir()}/${auto_params.params_yaml}")
+  param_file = file("${getPublishDir()}/param_list.yaml")
   writeParams(param_list, param_file)
 
   // run pipeline

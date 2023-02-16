@@ -29,8 +29,8 @@ functionality:
   argument_groups:
     - name: Input directory
       description: |
-        Arguments related to how to search for `".fastq.gz"` files inside the 
-        input directory. Only files matching the `fastq_regex` are retained.
+        Arguments related to how to search for `".fastq.gz"` files inside the input directory.
+        Only files matching the `fastq_regex` are retained.
       arguments:
         - type: file
           name: --input_dir
@@ -39,7 +39,7 @@ functionality:
           description: A directory containing one or more 10X samples.
         - type: string
           name: --fastq_regex
-          default: "(.*)_S[0-9]*_L[0-9]*_R[12]_001.fastq.gz"
+          default: "(.*)_S[0-9]+_L[0-9]+_R[12](_001)?.fastq.gz"
           description: |
             Only files matching this regular expression will be retained.
             For more details on the notation of regular expression, see the 
@@ -55,21 +55,21 @@ functionality:
             with `"$1$2"` the sample ID would be "foo_L001".
     - name: Reference
       description: |
-        The reference to map the reads to. Ideally, this reference was created with the
-        [Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)
+        The reference to map the reads to.
+        Ideally, this reference was created with the [Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)
         pipeline in OpenPipelines.
       arguments:
         - type: file
           name: --reference
           required: true
           description: |
-            The path to Cell Ranger reference index. This input can be either a `.tar.gz` file
-            or a directory. Using a directory will be slightly faster.
+            The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.
+            Example: /path/to/reference.tar.gz.
           example: reference.tar.gz
     - name: Output directory
       description: |
-        The resulting h5mu will be stored in the `publish_dir`. This workflow will 
-        replicate the same folder structure of where the fastq files were found relative
+        The resulting h5mu will be stored in the `publish_dir`. 
+        This workflow will replicate the same folder structure of where the fastq files were found relative
         to the `input_dir`.
       arguments:
         - type: file
@@ -77,18 +77,18 @@ functionality:
           required: true
           description: "Path to an output directory."
           example: "output/"
-        - type: string
-          name: --output_raw
-          default: '${sample_id}_raw'
-          description: Which template to use to define raw output directories.
-        - type: string
-          name: --output_h5mu
-          default: '${sample_id}.h5mu'
-          description: Which template to use to define h5mu output directories.
-        - type: string
-          name: --params_yaml
-          default: param_list.yaml
-          description: The filename for the param list yaml.
+        # - type: string
+        #   name: --output_raw
+        #   example: '${sample_id}_raw'
+        #   description: Which template to use to define raw output directories.
+        # - type: string
+        #   name: --output_h5mu
+        #   example: '${sample_id}.h5mu'
+        #   description: Which template to use to define h5mu output directories.
+        # - type: string
+        #   name: --params_yaml
+        #   default: param_list.yaml
+        #   description: The filename for the param list yaml.
     - name: Operational arguments
       description: Arguments related to the operational side of the pipeline processing.
       arguments:
