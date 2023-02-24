@@ -1,0 +1,113 @@
+functionality:
+  name: "process_smartseq2_auto"
+  namespace: "mapping"
+  description: |
+    Map all SmartSeq2 Fastq files in a directory.
+
+    Steps in the workflow:
+
+      * Look for all `*.fastq.gz` files in the `input_dir` which
+        match the regular expression in `fastq_regex`.
+      * Extract the sample id from the path name using the same `fastq_regex` and `sample_id_replacement`.
+      * Detect cell ids from the path name using the `fastq_regex` and `cell_id_replacement`.
+      * Write the list of samples as a yaml in the output directory.
+      * Map the reads using Cell Ranger
+      * Convert the Cell Ranger output to h5mu
+      * Remove ambient RNA with CellBender
+      * Remove cells with less than 100 genes or 1000 reads.
+      * Make the cell names unique
+      * Output one h5mu file per sample
+
+    Concatenating the invididual h5mu files into one h5mu file is a separate pipeline.
+  authors:
+    - name: Angela Pisco
+      roles: [ author ]
+      props: { github: aopisco, orcid: "0000-0003-0142-2355" }
+    - name: Robrecht Cannoodt
+      email: robrecht@data-intuitive.com
+      roles: [ author, maintainer ]
+      props: { github: rcannood, orcid: "0000-0003-3641-729X" }
+  argument_groups:
+    - name: Input directory
+      description: |
+        Arguments related to how to search for `".fastq.gz"` files inside the input directory.
+        Only files matching the `fastq_regex` are retained.
+      arguments:
+        - type: file
+          name: --input_dir
+          required: true
+          example: "/path/to/input_dir"
+          description: A directory containing one or more smartseq2 plates.
+        - type: string
+          name: --fastq_regex
+          default: "(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12](_001)?.fastq.gz"
+          description: |
+            Only files matching this regular expression will be retained.
+            For more details on the notation of regular expression, see the 
+            Java Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).
+          info:
+            hidden: true
+        - type: string
+          name: --sample_id_replacement
+          default: "$1"
+          description: |
+            Which groups from the fastq regex to use as the sample ID. 
+            For example, if the `fastq_regex` has two groups which are relevant 
+            for the constructing the sample ID, the value for this parameter should
+            probably be `$1$2`.
+          info:
+            hidden: true
+        - type: string
+          name: --cell_id_replacement
+          default: "$1$2"
+          description: |
+            Which groups from the fastq regex to use as the cell ID.
+          info:
+            hidden: true
+    - name: Reference
+      description: |
+        The reference to map the reads to.
+        Ideally, this reference was created with the [Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)
+        pipeline in OpenPipelines.
+      arguments:
+        - type: file
+          name: --reference_index
+          alternatives: --genomeDir
+          description: Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.
+          example: /path/to/reference
+          required: true
+        - type: file
+          name: --reference_gtf
+          description: Path to the gtf reference file.
+          example: genes.gtf
+          required: true
+    - name: Output directory
+      description: |
+        The resulting h5mu will be stored in the `publish_dir`. 
+        This workflow will replicate the same folder structure of where the fastq files were found relative
+        to the `input_dir`.
+      arguments:
+        - type: file
+          name: "--publish_dir"
+          required: true
+          description: "Path to an output directory."
+          example: "output/"
+    - name: Operational arguments
+      description: Arguments related to the operational side of the pipeline processing.
+      arguments:
+        - name: "--id"
+          type: string
+          description: Dummy id. Will be removed in the future.
+          default: auto_run
+          info:
+            hidden: true
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: auto
+  # test_resources:
+  #   - type: nextflow_script
+  #     path: main.nf
+  #     entrypoint: test_wf
+platforms:
+  - type: nextflow
