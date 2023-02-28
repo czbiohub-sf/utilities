@@ -35,7 +35,7 @@
             "type": "string",
             "format": "file-path",
             "description": "Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.",
-            "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$"
+            "pattern": "^\\S+_star(\\.tar\\.gz)?$"
           },
           "reference_gtf": {
             "type": "string",
