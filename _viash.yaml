@@ -1,4 +1,4 @@
-viash_version: 0.6.7
+viash_version: 0.7.0
 source: src
 target: target
 
@@ -7,3 +7,4 @@ config_mods: |
   .platforms[.type == 'docker'].target_registry := 'ghcr.io'
   .platforms[.type == 'docker'].target_organization := 'czbiohub'
   .platforms[.type == 'docker'].target_image_source := 'https://github.com/czbiohub/utilities'
+  .platforms[.type == 'nextflow'].directives.tag := '$id'
