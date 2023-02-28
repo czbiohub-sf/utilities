@@ -192,41 +192,29 @@ workflow auto {
     .findAll{it.toString()
     .matches(auto_params.fastq_regex)}
 
-  // group by sample id
-  // use regex to search for the sample id
-  fastq_grouped = fastq_files.groupBy{ fastq_file ->
+  // create output list
+
+  input_r1 = fastq_files.findAll{it.toString().matches(".*_R1[_.].*")}.sort()
+  input_r2 = fastq_files.findAll{it.toString().matches(".*_R2[_.].*")}.sort()
+  input_id = input_r1.collect{ fastq_file ->
     fastq_file.toString()
       .replace("${auto_params.input_dir}/", "") // remove root directory
-      .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
+      .replaceAll(auto_params.fastq_regex, auto_params.cell_id_replacement) // extract sample id using regex
   }
 
-  // create output list
-  param_list = fastq_grouped.collectMany{ sample_id, inputs ->
+  assert input_r1.size() == input_r2.size(): "The number of R1 files (${input_r1.size()}) should equal the number of R2 files (${input_r2.size()})."
 
-    def input_r1 = inputs.findAll{it.toString().matches(".*_R1[_.].*")}.sort()
-    def input_r2 = inputs.findAll{it.toString().matches(".*_R2[_.].*")}.sort()
-    def input_id = input_r1.collect{ fastq_file ->
-      fastq_file.toString()
-        .replace("${auto_params.input_dir}/", "") // remove root directory
-        .replaceAll(auto_params.fastq_regex, auto_params.cell_id_replacement) // extract sample id using regex
-    }
+  param_list = [[
+    id: auto_params.id,
+    input_id: input_id,
+    input_r1: input_r1,
+    input_r2: input_r2,
+    reference_index: auto_params.reference_index,
+    reference_gtf: auto_params.reference_gtf,
+    output_raw: "${auto_params.id}_raw",
+    output_h5mu: "${auto_params.id}.h5mu"
+  ]]
 
-    if (input_r1.size() != input_r2.size()) {
-      println("Skipping sample '$sample_id' because the number of R1 files (${input_r1.size()}) does not equal the number of R2 files (${input_r2.size()}).")
-      return []
-    }
-
-    [[
-      id: sample_id,
-      input_id: input_id,
-      input_r1: input_r1,
-      input_r2: input_r2,
-      reference_index: auto_params.reference_index,
-      reference_gtf: auto_params.reference_gtf,
-      output_raw: "${sample_id}_raw",
-      output_h5mu: "${sample_id}.h5mu"
-    ]]
-  }
   // Log params file to output dir
   param_file = file("${getPublishDir()}/param_list.yaml")
   writeParams(param_list, param_file)
