@@ -11,8 +11,7 @@
         "properties": {
           "input_dir": {
             "type": "string",
-            "description": "A directory containing one or more 10X samples.",
-            "default": ""
+            "description": "A directory containing one or more 10X samples."
           },
           "fastq_regex": {
             "type": "string",
@@ -35,7 +34,7 @@
           "reference": {
             "type": "string",
             "description": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.","help_text": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.\nExample: /path/to/reference.tar.gz.\n",
-            "default": ""
+            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_cellranger.tar.gz"
           }
           
         }
@@ -47,8 +46,7 @@
         "properties": {
           "publish_dir": {
             "type": "string",
-            "description": "Path to an output directory.",
-            "default": ""
+            "description": "Path to an output directory."
           }
           
         }

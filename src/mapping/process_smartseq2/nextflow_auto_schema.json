@@ -33,15 +33,13 @@
         "properties": {
           "reference_index": {
             "type": "string",
-            "format": "file-path",
             "description": "Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.",
-            "pattern": "^\\S+_star(\\.tar\\.gz)?$"
+            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_star.tar.gz"
           },
           "reference_gtf": {
             "type": "string",
-            "format": "file-path",
             "description": "Path to the gtf reference file.",
-            "pattern": "^\\S+\\.gtf(\\.gz)?$"
+            "default": "/hpc/reference/sequencing_alignment/gff_files/human_gencode_v41_ercc_star.gtf"
           }
           
         }
@@ -53,10 +51,8 @@
         "properties": {
           "publish_dir": {
             "type": "string",
-            "format": "directory-path",
             "description": "Path to an output directory."
           }
-          
         }
       },
       "operational arguments" : {
