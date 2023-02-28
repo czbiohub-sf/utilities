@@ -34,7 +34,7 @@
           "reference_index": {
             "type": "string",
             "description": "Path to the reference built by star_build_reference. Corresponds to the --genomeDir argument in the STAR command.",
-            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_star.tar.gz"
+            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_star.tgz"
           },
           "reference_gtf": {
             "type": "string",

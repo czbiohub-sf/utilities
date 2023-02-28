@@ -33,8 +33,9 @@
         "properties": {
           "reference": {
             "type": "string",
-            "description": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.","help_text": "The path to Cell Ranger reference index. This input can be either a `.tar.gz` file or a directory. Using a directory will be slightly faster.\nExample: /path/to/reference.tar.gz.\n",
-            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_cellranger.tar.gz"
+            "description": "The path to Cell Ranger reference index. This input can be either a `.tgz` file or a directory. Using a directory will be slightly faster.",
+            "help_text": "The path to Cell Ranger reference index. This input can be either a `.tgz` file or a directory. Using a directory will be slightly faster.\nExample: /path/to/reference.tgz.\n",
+            "default": "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_cellranger.tgz"
           }
           
         }
