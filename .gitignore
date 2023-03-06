@@ -9,6 +9,7 @@
 resources_test/
 target/
 .viash*
+/viash_tools/
 
 # NextFlow
 work/
