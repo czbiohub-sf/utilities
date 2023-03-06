@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
 
     - uses: viash-io/viash-actions/setup@v3
 
@@ -87,6 +89,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
 
     - uses: viash-io/viash-actions/setup@v3
 
@@ -127,6 +131,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
 
     - uses: viash-io/viash-actions/setup@v3
 
