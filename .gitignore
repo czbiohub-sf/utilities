@@ -6,20 +6,19 @@
 .vscode/settings.json
 
 # Viash-related
-resources_test/
-target/
+/resources_test/
+/target/
 .viash*
 /viash_tools/
 
 # NextFlow
-work/
-.nextflow.log
+/work/
+/.nextflow.log
 flowchart.*
-.nextflow*
+/.nextflow*
 
 # Extra
-trash
-temp*
-foo*
-output*
-meta*
+/trash
+/temp*
+/foo*
+/output*
