@@ -1,0 +1,32 @@
+functionality:
+  name: spaceranger_mkfastq
+  namespace: demux
+  description: Demultiplex raw sequencing data
+  usage: |
+    spaceranger mkfastq --input /path/to/bcl --sample_sheet \
+      sample_sheet.csv --output fastqs --reports reports
+  arguments:
+    - type: file
+      name: --input
+      description: Path to the untarred BCL files.
+      example: "/path/to/bcl"
+      required: true
+    - type: file
+      name: --sample_sheet
+      description: The path to the sample sheet.
+      example: SampleSheet.csv
+    - type: file
+      name: --output
+      direction: output
+      description: The folder to store the demux results
+      example: "/path/to/output"
+      required: true
+  resources:
+    - type: bash_script
+      path: script.sh
+platforms:
+  - type: docker
+    image: ghcr.io/data-intuitive/spaceranger:latest
+  - type: native
+  - type: nextflow
+    variant: vdsl3

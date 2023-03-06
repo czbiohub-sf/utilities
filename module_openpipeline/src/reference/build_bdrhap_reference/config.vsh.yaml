@@ -1,0 +1,43 @@
+functionality:
+  name: build_bdrhap_reference
+  namespace: reference
+  description: Compile a reference into a STAR index compatible with the BD Rhapsody pipeline.
+  authors:
+    - __merge__: ../../authors/angela_pisco.yaml
+      roles: [ author ]
+    - __merge__: ../../authors/robrecht_cannoodt.yaml
+      roles: [ author, maintainer ]
+  arguments:
+    # inputs
+    - type: file
+      name: --genome_fasta
+      required: true
+      description: Reference genome fasta.
+      example: genome_sequence.fa.gz
+    - type: file
+      name: --transcriptome_gtf
+      required: true
+      description: Reference transcriptome annotation.
+      example: transcriptome_annotation.gtf.gz
+    - type: file
+      name: --output
+      direction: output
+      required: true
+      description: Star index
+      example: star_index.tar.gz
+  resources:
+    - type: bash_script
+      path: script.sh
+  # todo: add back tests once test data is pushed to s3
+  # test_resources:
+  #   - type: bash_script
+  #     path: run_test.sh
+platforms:
+  - type: docker
+    image: bdgenomics/rhapsody:1.10.1
+    setup:
+      - type: apt
+        packages: [ pigz ]
+  - type: nextflow
+    directives:
+      label: [ highmem, highcpu ]
