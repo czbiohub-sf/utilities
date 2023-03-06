@@ -4,7 +4,7 @@ set -e
 
 # pipeline settings
 WF_REPOSITORY="czbiohub/utilities"
-WF_MAIN_SCRIPT="src/mapping/process_10x/main.nf"
+WF_MAIN_SCRIPT="src/mapping/process_smartseq2/main.nf"
 WF_REVISION="main_build"
 WF_ENTRY="auto"
 
