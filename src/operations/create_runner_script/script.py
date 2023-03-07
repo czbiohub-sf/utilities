@@ -44,16 +44,16 @@ export NXF_TEMP="`pwd`/temp"
 export NXF_WORK="`pwd`/work"
 
 # do run
-nextflow run \
-  "{par['repository']}" \
-  -r "{par['revision']}" \
-  -main-script "{par['main_script']}" \
-  -entry "{par['entry']}" \
-  -resume \
-  -latest \
-  -with-tower \
-  -profile singularity \
-  -c "{par['nextflow_config']}" \
+nextflow run \\
+  "{par['repository']}" \\
+  -r "{par['revision']}" \\
+  -main-script "{par['main_script']}" \\
+  -entry "{par['entry']}" \\
+  -resume \\
+  -latest \\
+  -with-tower \\
+  -profile singularity \\
+  -c "{par['nextflow_config']}" \\
   $@
 """
 
@@ -63,5 +63,4 @@ f.write(str)
 f.close()
 
 # make output file executable
-st = os.stat(par["output"])
-os.chmod(par["output"], st.st_mode | stat.S_IEXEC)
+os.chmod(par["output"], 0o775)
