@@ -39,7 +39,7 @@ functionality:
           description: A directory containing one or more 10X samples.
         - type: string
           name: --fastq_regex
-          default: "(.*)_S[0-9]+_L[0-9]+_R[12](_001)?.fastq.gz"
+          default: "(.*)_S[0-9]+_(L[0-9]+)?_R[12](_001)?.fastq.gz"
           description: |
             Only files matching this regular expression will be retained.
             For more details on the notation of regular expression, see the 

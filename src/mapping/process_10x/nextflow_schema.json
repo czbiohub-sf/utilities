@@ -17,7 +17,7 @@
           "fastq_regex": {
             "type": "string",
             "description": "Only files matching this regular expression will be retained.","help_text": "Only files matching this regular expression will be retained.\nFor more details on the notation of regular expression, see the \nJava Docs on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n","hidden": true,
-            "default": "(.*)_S[0-9]+_L[0-9]+_R[12](_001)?.fastq.gz"
+            "default": "(.*)_S[0-9]+_(L[0-9]+)?_R[12](_001)?.fastq.gz"
           },
           "sample_id_replacement": {
             "type": "string",
