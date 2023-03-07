@@ -1,0 +1,28 @@
+
+#!/bin/bash
+
+set -e
+
+# nextflow tower settings
+export TOWER_WORKSPACE_ID="124983787544228"
+
+# check whether access token is available
+if [ -z $TOWER_ACCESS_TOKEN ]; then
+  echo Could not find a tower access token!
+  exit 1
+fi
+
+# nextflow settings
+export NXF_VER="22.04.5"
+
+# singularity settings
+export NXF_SINGULARITY_CACHEDIR="/hpc/scratch/group.data.science/singularity_images"
+
+# temp settings
+export APPTAINER_CACHEDIR="`pwd`/temp"
+export APPTAINERENV_TMPDIR="`pwd`/temp"
+export NXF_TEMP="`pwd`/temp"
+export NXF_WORK="`pwd`/work"
+
+# do run
+nextflow run   "czbiohub/utilities"   -r "src/mapping/process_smartseq2/main.nf"   -main-script "main_build"   -entry "auto"   -resume   -latest   -profile singularity   -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config"   $@

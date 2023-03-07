@@ -1,0 +1,57 @@
+functionality:
+  name: create_runner_script
+  namespace: operations
+  description: |
+    Generate a simplified runner script which already has default settings
+    related to running jobs on the CZB HPC.
+  arguments:
+    - name: --output
+      type: file
+      example: path/to/executable
+      description: Output file.
+      required: true
+      direction: output
+    - name: --repository
+      type: string
+      example: czbiohub/utilities
+      description: The repository of the pipeline.
+      required: true
+    - name: --main_script
+      type: string
+      example: src/mapping/process_10x/main.nf
+      description: The main script of the pipeline.
+      required: true
+    - name: --entry
+      type: string
+      example: auto
+      description: The entrypoint of the pipeline.
+    - name: --revision
+      type: string
+      example: main_build
+      description: The revision of the repository.
+    - name: --nextflow_version
+      type: string
+      default: "22.04.5"
+      description: The version of Nextflow to use.
+    - name: --singularity_cache_dir
+      type: string
+      example: "/hpc/scratch/group.data.science/singularity_images"
+      description: "Where to cache the singularity images."
+      required: true
+    - name: --tower_workspace_id
+      type: string
+      example: "124983787544228"
+      description: The tower workspace id.
+      required: true
+    - name: --nextflow_config
+      type: string
+      example: /hpc/scratch/group.data.science/utilities/scripts/czbhpc.config
+      description: "Path to the default nextflow config."
+      required: true
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: native
+  - type: docker
+    image: python:3.10
