@@ -19,6 +19,9 @@ str = f"""
 
 set -e
 
+# load nextflow
+module load nextflow
+
 # nextflow tower settings
 export TOWER_WORKSPACE_ID="{par['tower_workspace_id']}"
 
@@ -48,6 +51,7 @@ nextflow run \
   -entry "{par['entry']}" \
   -resume \
   -latest \
+  -with-tower \
   -profile singularity \
   -c "{par['nextflow_config']}" \
   $@
