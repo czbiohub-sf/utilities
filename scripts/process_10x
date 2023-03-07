@@ -28,4 +28,14 @@ export NXF_TEMP="`pwd`/temp"
 export NXF_WORK="`pwd`/work"
 
 # do run
-nextflow run   "czbiohub/utilities"   -r "main_build"   -main-script "src/mapping/process_10x/main.nf"   -entry "auto"   -resume   -latest   -with-tower   -profile singularity   -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config"   $@
+nextflow run \
+  "czbiohub/utilities" \
+  -r "main_build" \
+  -main-script "src/mapping/process_10x/main.nf" \
+  -entry "auto" \
+  -resume \
+  -latest \
+  -with-tower \
+  -profile singularity \
+  -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config" \
+  $@
