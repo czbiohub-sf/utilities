@@ -25,4 +25,4 @@ export NXF_TEMP="`pwd`/temp"
 export NXF_WORK="`pwd`/work"
 
 # do run
-nextflow run   "czbiohub/utilities"   -r "src/mapping/process_smartseq2/main.nf"   -main-script "main_build"   -entry "auto"   -resume   -latest   -profile singularity   -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config"   $@
+nextflow run   "czbiohub/utilities"   -r "main_build"   -main-script "src/mapping/process_smartseq2/main.nf"   -entry "auto"   -resume   -latest   -profile singularity   -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config"   $@

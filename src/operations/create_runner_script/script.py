@@ -43,8 +43,8 @@ export NXF_WORK="`pwd`/work"
 # do run
 nextflow run \
   "{par['repository']}" \
-  -r "{par['main_script']}" \
-  -main-script "{par['revision']}" \
+  -r "{par['revision']}" \
+  -main-script "{par['main_script']}" \
   -entry "{par['entry']}" \
   -resume \
   -latest \

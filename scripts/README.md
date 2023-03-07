@@ -5,17 +5,19 @@ These are helper scripts used to run pipelines on the CZ Biohub HPC.
 Example command to run 10x run:
 
 ```bash
+tmux new -s nxf_run
 cd /hpc/scratch/group.data.science/nextflow_$USER/
 
 /hpc/scratch/group.data.science/utilities/scripts/process_10x \
   --input_dir "/hpc/archives/AWS/buckets/tabula-sapiens/Pilot27/fastqs/10X/" \
-  --reference_index "/hpc/reference/sequencing_alignment/alignment_references/gencode_v41_ercc_cellranger.tgz" \
+  --reference "/hpc/reference/sequencing_alignment/alignment_references/human_gencode_v41_ercc_cellranger.tgz" \
   --publish_dir "/hpc/scratch/group.data.science/robrecht_temp/TSP27/mapping/10X/"
 ```
 
 Example command to perform ss2 run:
 
 ```bash
+tmux new -s nxf_run
 cd /hpc/scratch/group.data.science/nextflow_$USER/
 
 /hpc/scratch/group.data.science/utilities/scripts/process_smartseq2 \
@@ -24,6 +26,12 @@ cd /hpc/scratch/group.data.science/nextflow_$USER/
   --reference_gtf "/hpc/reference/sequencing_alignment/gff_files/human_gencode_v41.gtf.gz" \
   --publish_dir "/hpc/scratch/group.data.science/robrecht_temp/TSP2/mapping/smartseq2/"
 ```
+
+Press `Control+B` and then `D` to leave the tmux session without killing it.
+
+Run `tmux attach -t nxf_run` to rejoin the session.
+
+
 
 ## Set up
 
