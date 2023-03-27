@@ -77,7 +77,7 @@ jobs:
     - id: ns_list_workflows
       uses: viash-io/viash-actions/ns-list@v3
       with:
-        src: workflows
+        src: src
         format: json
 
     - id: set_matrix
@@ -90,7 +90,7 @@ jobs:
           }
         ]' ${{ steps.ns_list_components.outputs.output_file }} )" >> $GITHUB_OUTPUT
 
-        echo "workflows=$(jq -c '[ .[] | 
+        echo "workflows=$(jq -c '[ .[] | select((.functionality.resources[].type // []) | contains("nextflow_script")) | 
           { 
             "name": (.functionality.namespace + "/" + .functionality.name),
             "main_script": (.info.config | capture("^(?<dir>.*\/)").dir + "/" + .functionality.test_resources[].path),
