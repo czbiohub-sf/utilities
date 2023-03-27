@@ -11,7 +11,7 @@ jobs:
   # phase 1
   list:
     env:
-      s3_bucket: s3://czbiohub-pipelines/utilities/utilities/
+      s3_bucket: s3://czbiohub-pipelines/utilities/
     runs-on: ubuntu-latest
       
     outputs:
