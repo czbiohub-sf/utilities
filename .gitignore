@@ -1,0 +1,24 @@
+
+# DS_Store
+.DS_Store
+
+# VsCode
+.vscode/settings.json
+
+# Viash-related
+/resources_test/
+/target/
+.viash*
+/viash_tools/
+
+# NextFlow
+/work/
+/.nextflow.log
+flowchart.*
+/.nextflow*
+
+# Extra
+/trash
+/temp*
+/foo*
+/output*
