@@ -2,10 +2,13 @@
 
 import argparse
 import glob
+import io
 import os
 import re
 import subprocess
 import sys
+
+import boto3
 
 from utilities.log_util import get_logger, log_command
 
@@ -28,7 +31,8 @@ def get_default_requirements():
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        prog="bcl2fastq.py", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        prog="bcl2fastq.py",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument("--exp_id", required=True)
@@ -84,6 +88,14 @@ def get_parser():
     return parser
 
 
+def _split_s3_string_into_bucket_and_rest(s3_string):
+    match = re.match(r"s3://([^/]+)/(.+)", s3_string)
+
+    if match is None:
+        raise ValueError("invalid s3 string: {}".format(s3_string))
+    return match.groups()
+
+
 def main(logger):
     parser = get_parser()
 
@@ -106,24 +118,24 @@ def main(logger):
     os.makedirs(result_path)
     os.mkdir(bcl_path)
 
-    command = [
-        "aws",
-        "s3",
-        "cp",
-        "--quiet",
-        os.path.join(args.s3_sample_sheet_dir, args.sample_sheet_name),
-        result_path,
-    ]
-    for i in range(S3_RETRY):
-        if not log_command(logger, command, shell=True):
-            break
-        logger.info("retrying s3 copy")
-    else:
-        raise RuntimeError(
-            "couldn't download sample sheet {}".format(
-                os.path.join(args.s3_sample_sheet_dir, args.sample_sheet_name)
-            )
-        )
+    client = boto3.client("s3")
+    fb = io.BytesIO()
+
+    bucket, folder_path = _split_s3_string_into_bucket_and_rest(
+        args.s3_sample_sheet_dir
+    )
+
+    logger.info("Downloading sample sheet: {args.sample_sheet_name}")
+
+    client.download_fileobj(
+        Bucket=bucket,
+        Key=f"{folder_path}/{args.sample_sheet_name}",
+        Fileobj=fb,
+    )
+    sample_sheet_data = fb.getvalue().decode("utf-8-sig")
+
+    with open(f"{result_path}/{args.sample_sheet_name}", "w") as fh:
+        fh.write(sample_sheet_data)
 
     # download the bcl files
     command = [
@@ -165,7 +177,11 @@ def main(logger):
         output_path,
     ]
     failed = log_command(
-        logger, command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+        logger,
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=True
     )
     if failed:
         p.kill()
