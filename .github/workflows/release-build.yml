@@ -119,7 +119,7 @@ jobs:
     - name: Build container
       uses: viash-io/viash-actions/ns-build@v3
       with:
-        config_mod: .functionality.version := 'main_build'
+        config_mod: .functionality.version := '${{ github.event.inputs.version_tag }}'
         platform: docker
         src: ${{ matrix.component.dir }}
         setup: build
