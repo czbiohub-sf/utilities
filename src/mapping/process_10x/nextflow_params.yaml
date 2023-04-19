@@ -1,16 +1,9 @@
-# Input directory
-input_dir: # please fill in - example: "/path/to/input_dir"
-fastq_regex: "(.*)_S[0-9]+_(L[0-9]+)?_R[12](_001)?.fastq.gz"
-sample_id_replacement: "$1"
-
-# Reference
+# Inputs
+id: # please fill in - example: "foo"
+input: # please fill in - example: ["sample_S1_L001_R1_001.fastq.gz", "sample_S1_L001_R2_001.fastq.gz"]
 reference: # please fill in - example: "reference.tar.gz"
-
-# Output directory
-publish_dir: # please fill in - example: "output/"
-
-# Operational arguments
-id: "auto_run"
+# output_raw: "$id.$key.output_raw.output_raw"
+# output_h5mu: "$id.$key.output_h5mu.h5mu"
 
 # Nextflow input-output arguments
 publish_dir: # please fill in - example: "output/"
