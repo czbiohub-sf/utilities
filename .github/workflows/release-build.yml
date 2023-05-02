@@ -66,7 +66,7 @@ jobs:
         publish_dir: .
         publish_branch: release
         full_commit_message: "Deploy for release ${{ github.event.inputs.version_tag }} from ${{ github.sha }}"
-        exclude-assets: ''
+        exclude_assets: ''
 
 
     - id: ns_list_components
