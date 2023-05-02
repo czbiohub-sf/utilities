@@ -43,6 +43,10 @@ jobs:
 
     - uses: viash-io/viash-actions/setup@v3
 
+    - name: Check if all config can be parsed if there is no unicode support
+      run: |
+        LANG=C viash ns list > /dev/null
+
     - uses: viash-io/viash-actions/project/sync-and-cache-s3@v3
       id: cache
       with:
@@ -52,7 +56,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v35.5.3
+      uses: tj-actions/changed-files@v35.9.0
       with:
         separator: ";"
         diff_relative: true
@@ -98,8 +102,10 @@ jobs:
 
     # use cache
     - name: Cache resources data
-      uses: actions/cache@v3
-      timeout-minutes: 10
+      id: restore_cache
+      uses: actions/cache/restore@v3
+      env:
+        SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5
       with:
         path: resources_test
         key: ${{ needs.list.outputs.cache_key }}
