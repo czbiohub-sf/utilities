@@ -1,0 +1,167 @@
+functionality:
+  name: "process_smartseq2_auto"
+  namespace: "mapping"
+  version: "main_build"
+  authors:
+  - name: "Angela Pisco"
+    roles:
+    - "author"
+    props:
+      github: "aopisco"
+      orcid: "0000-0003-0142-2355"
+  - name: "Robrecht Cannoodt"
+    email: "robrecht@data-intuitive.com"
+    roles:
+    - "author"
+    - "maintainer"
+    props:
+      github: "rcannood"
+      orcid: "0000-0003-3641-729X"
+  argument_groups:
+  - name: "Input directory"
+    description: "Arguments related to how to search for `\".fastq.gz\"` files inside\
+      \ the input directory.\nOnly files matching the `fastq_regex` are retained.\n"
+    arguments:
+    - type: "file"
+      name: "--input_dir"
+      description: "A directory containing one or more smartseq2 plates."
+      example:
+      - "/path/to/input_dir"
+      must_exist: true
+      create_parent: true
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "string"
+      name: "--fastq_regex"
+      description: "Only files matching this regular expression will be retained.\n\
+        For more details on the notation of regular expression, see the \nJava Docs\
+        \ on [Regular expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).\n"
+      info:
+        hidden: true
+      default:
+      - "(.*)_R[12](_001)?.fastq.gz"
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "string"
+      name: "--cell_id_replacement"
+      description: "Which groups from the fastq regex to use as the cell ID. \nFor\
+        \ example, if the `fastq_regex` has two groups which are relevant \nfor the\
+        \ constructing the sample ID, the value for this parameter should\nprobably\
+        \ be `$1$2`.\n"
+      info:
+        hidden: true
+      default:
+      - "$1"
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+  - name: "Reference"
+    description: "The reference to map the reads to.\nIdeally, this reference was\
+      \ created with the [Make reference](https://openpipelines.bio/components/workflows/ingestion/make_reference.html)\n\
+      pipeline in OpenPipelines.\n"
+    arguments:
+    - type: "file"
+      name: "--reference_index"
+      alternatives:
+      - "--genomeDir"
+      description: "Path to the reference built by star_build_reference. Corresponds\
+        \ to the --genomeDir argument in the STAR command."
+      example:
+      - "/path/to/reference"
+      must_exist: true
+      create_parent: true
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "file"
+      name: "--reference_gtf"
+      description: "Path to the gtf reference file."
+      example:
+      - "genes.gtf"
+      must_exist: true
+      create_parent: true
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+  - name: "Output directory"
+    description: "The resulting h5mu will be stored in the `publish_dir`. \nThis workflow\
+      \ will replicate the same folder structure of where the fastq files were found\
+      \ relative\nto the `input_dir`.\n"
+    arguments:
+    - type: "file"
+      name: "--publish_dir"
+      description: "Path to an output directory."
+      example:
+      - "output"
+      must_exist: true
+      create_parent: true
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+  - name: "Operational arguments"
+    description: "Arguments related to the operational side of the pipeline processing."
+    arguments:
+    - type: "string"
+      name: "--id"
+      description: "Dummy id. Will be removed in the future."
+      info:
+        hidden: true
+      default:
+      - "output"
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+  resources:
+  - type: "nextflow_script"
+    path: "main.nf"
+    is_executable: true
+    entrypoint: "auto"
+  description: "Map all SmartSeq2 Fastq files in a directory.\n\nSteps in the workflow:\n\
+    \n  * Look for all `*.fastq.gz` files in the `input_dir` which\n    match the\
+    \ regular expression in `fastq_regex`.\n  * Extract the sample id from the path\
+    \ name using the same `fastq_regex` and `sample_id_replacement`.\n  * Detect cell\
+    \ ids from the path name using the `fastq_regex` and `cell_id_replacement`.\n\
+    \  * Write the list of samples as a yaml in the output directory.\n  * Map the\
+    \ reads using Cell Ranger\n  * Convert the Cell Ranger output to h5mu\n  * Remove\
+    \ ambient RNA with CellBender\n  * Remove cells with less than 100 genes or 1000\
+    \ reads.\n  * Make the cell names unique\n  * Output one h5mu file per sample\n\
+    \nConcatenating the invididual h5mu files into one h5mu file is a separate pipeline.\n"
+  status: "enabled"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "nextflow"
+  id: "nextflow"
+  variant: "vdsl3"
+  directives:
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: true
+    transcript: false
+    publish: false
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/utilities/utilities/src/mapping/process_smartseq2/auto.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto"
+  executable: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto/process_smartseq2_auto"
+  viash_version: "0.7.3"
+  git_commit: "ffe9f6e228fca1ca95caa0ed76fe6c84a57e3446"
+  git_remote: "https://github.com/czbiohub/utilities"
