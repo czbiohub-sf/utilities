@@ -6,9 +6,6 @@ on:
       version_tag:
         description: Version tag
         required: true
-      push_documentation:
-        type: boolean
-        description: Create a PR to push workflow and component documentation to the website
 
 jobs:
   # phase 1
