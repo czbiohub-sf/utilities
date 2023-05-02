@@ -66,6 +66,8 @@ jobs:
         publish_dir: .
         publish_branch: release
         full_commit_message: "Deploy for release ${{ github.event.inputs.version_tag }} from ${{ github.sha }}"
+        exclude_assets: ''
+
 
     - id: ns_list_components
       uses: viash-io/viash-actions/ns-list@v3
@@ -84,17 +86,17 @@ jobs:
       run: |
         echo "components=$(jq -c '[ .[] | 
           { 
-            "name": (.functionality.namespace + "/" + .functionality.name),
+            "name": (.functionality.namespace + (.platforms | map(select(.type == "docker"))[0].namespace_separator) + .functionality.name),
             "config": .info.config,
             "dir": .info.config | capture("^(?<dir>.*\/)").dir
           }
         ]' ${{ steps.ns_list_components.outputs.output_file }} )" >> $GITHUB_OUTPUT
 
-        echo "workflows=$(jq -c '[ .[] | select((.functionality.resources[].type // []) | contains("nextflow_script")) | 
+        echo "workflows=$(jq -c '[ .[] | . as $config | (.functionality.test_resources // [])[] | select(.type == "nextflow_script", .entrypoint) |
           { 
-            "name": (.functionality.namespace + "/" + .functionality.name),
-            "main_script": (.info.config | capture("^(?<dir>.*\/)").dir + "/" + .functionality.test_resources[].path),
-            "entry": .functionality.test_resources[].entrypoint
+            "name": ($config.functionality.namespace + "/" + $config.functionality.name),
+            "main_script": (($config.info.config | capture("^(?<dir>.*\/)").dir) + "/" + .path),
+            "entry": .entrypoint
           }
         ]' ${{ steps.ns_list_workflows.outputs.output_file }} )" >> $GITHUB_OUTPUT
 
@@ -168,6 +170,7 @@ jobs:
       with:
         config_mod: ".functionality.version := '${{ github.event.inputs.version_tag }}'"
         parallel: true
+        platform: nextflow
 
     # use cache
     - name: Cache resources data
@@ -176,6 +179,7 @@ jobs:
       with:
         path: resources_test
         key: ${{ needs.list.outputs.cache_key }}
+        fail-on-cache-miss: true
 
     - name: Run integration test
       timeout-minutes: 45
@@ -192,7 +196,7 @@ jobs:
   # phase 4
   component_test:
     needs: [ build, list ]
-    if: ${{ needs.list.outputs.matrix != '[]' && needs.list.outputs.matrix != '' }}
+    if: ${{ needs.list.outputs.component_matrix != '[]' && needs.list.outputs.component_matrix != '' }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -209,8 +213,10 @@ jobs:
 
     # use cache
     - name: Cache resources data
-      uses: actions/cache@v3
-      timeout-minutes: 5
+      id: restore_cache
+      uses: actions/cache/restore@v3
+      env:
+        SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5
       with:
         path: resources_test
         key: ${{ needs.list.outputs.cache_key }}
