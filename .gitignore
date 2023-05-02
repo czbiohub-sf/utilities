@@ -7,7 +7,6 @@
 
 # Viash-related
 /resources_test/
-/target/
 .viash*
 /viash_tools/
 

@@ -1,0 +1,126 @@
+functionality:
+  name: "create_runner_script"
+  namespace: "operations"
+  version: "0.1.0"
+  arguments:
+  - type: "file"
+    name: "--output"
+    description: "Output file."
+    example:
+    - "path/to/executable"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--repository"
+    description: "The repository of the pipeline."
+    example:
+    - "czbiohub/utilities"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--main_script"
+    description: "The main script of the pipeline."
+    example:
+    - "src/mapping/process_10x/main.nf"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--entry"
+    description: "The entrypoint of the pipeline."
+    example:
+    - "auto"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--revision"
+    description: "The revision of the repository."
+    example:
+    - "main_build"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--nextflow_version"
+    description: "The version of Nextflow to use."
+    default:
+    - "22.04.5"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--singularity_cache_dir"
+    description: "Where to cache the singularity images."
+    example:
+    - "/hpc/scratch/group.data.science/singularity_images"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--tower_workspace_id"
+    description: "The tower workspace id."
+    example:
+    - "124983787544228"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--nextflow_config"
+    description: "Path to the default nextflow config."
+    example:
+    - "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  resources:
+  - type: "python_script"
+    path: "script.py"
+    is_executable: true
+  description: "Generate a simplified runner script which already has default settings\n\
+    related to running jobs on the CZB HPC.\n"
+  status: "enabled"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "native"
+  id: "native"
+- type: "docker"
+  id: "docker"
+  image: "python:3.10"
+  target_organization: "czbiohub"
+  target_registry: "docker.io"
+  namespace_separator: "_"
+  resolve_volume: "Automatic"
+  chown: true
+  setup_strategy: "ifneedbepullelsecachedbuild"
+  target_image_source: "https://github.com/czbiohub/utilities"
+info:
+  config: "/home/runner/work/utilities/utilities/src/operations/create_runner_script/config.vsh.yaml"
+  platform: "docker"
+  output: "/home/runner/work/utilities/utilities/target/docker/operations/create_runner_script"
+  executable: "/home/runner/work/utilities/utilities/target/docker/operations/create_runner_script/create_runner_script"
+  viash_version: "0.7.3"
+  git_commit: "ffe9f6e228fca1ca95caa0ed76fe6c84a57e3446"
+  git_remote: "https://github.com/czbiohub/utilities"
