@@ -40,7 +40,7 @@ functionality:
           description: A directory containing one or more smartseq2 plates.
         - type: string
           name: --fastq_regex
-          default: "(.*)_R[12](_001)?.fastq.gz"
+          default: "(.*/)?(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12](_001)?.fastq.gz"
           description: |
             Only files matching this regular expression will be retained.
             For more details on the notation of regular expression, see the 
@@ -48,13 +48,28 @@ functionality:
           info:
             hidden: true
         - type: string
-          name: --cell_id_replacement
+          name: --sample_id_replacement
           default: "$1"
           description: |
+            Which groups from the fastq regex to use as the sample ID. 
+            Assuming a fastq file is detected at `dir1/dir2/sample_id_A1_foo_R1.fastq.gz`,
+            the outputs of several regexes is listed:
+
+              * `$1` -> `dir1/dir2`
+              * `$1$2` -> `dir1/dir2/sample_id`
+              * `$2` -> `sample_id`
+          info:
+            hidden: true
+        - type: string
+          name: --cell_id_replacement
+          default: "$1$2$3"
+          description: |
             Which groups from the fastq regex to use as the cell ID. 
-            For example, if the `fastq_regex` has two groups which are relevant 
-            for the constructing the sample ID, the value for this parameter should
-            probably be `$1$2`.
+            Assuming a fastq file is detected at `dir1/dir2/sample_id_A1_foo_R1.fastq.gz`,
+            the outputs of several regexes is listed:
+
+              * `$1$2$3` -> `dir1/dir2/sample_id_A1`
+              * `$1$2$3$4` -> `dir1/dir2/sample_id_A1_foo`
           info:
             hidden: true
     - name: Reference
