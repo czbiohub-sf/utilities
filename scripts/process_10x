@@ -30,7 +30,7 @@ export NXF_WORK="`pwd`/work"
 # do run
 nextflow run \
   "czbiohub/utilities" \
-  -r "main_build" \
+  -r "0.1.0" \
   -main-script "src/mapping/process_10x/main.nf" \
   -entry "auto" \
   -resume \
