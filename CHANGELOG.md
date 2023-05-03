@@ -1,8 +1,8 @@
 # utilities 0.1.1
 
-* `mapping/process_10x_auto`: Allow grouping input fastqs per folder or via a custom regex statement.
+* `mapping/process_smartseq2_auto`: Allow grouping input fastqs per folder or via a custom regex statement.
 
-* `mapping/process_10x_auto`: Add more documentation to the arguments to clarify regex usage.
+* `mapping/process_smartseq2_auto`: Add more documentation to the arguments to clarify regex usage.
 
 # utilities 0.1.0
 
