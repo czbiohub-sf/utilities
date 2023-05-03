@@ -153,10 +153,10 @@ functionality:
     \ name using the same `fastq_regex` and `sample_id_replacement`.\n  * Detect cell\
     \ ids from the path name using the `fastq_regex` and `cell_id_replacement`.\n\
     \  * Write the list of samples as a yaml in the output directory.\n  * Map the\
-    \ reads using Cell Ranger\n  * Convert the Cell Ranger output to h5mu\n  * Remove\
-    \ ambient RNA with CellBender\n  * Remove cells with less than 100 genes or 1000\
-    \ reads.\n  * Make the cell names unique\n  * Output one h5mu file per sample\n\
-    \nConcatenating the invididual h5mu files into one h5mu file is a separate pipeline.\n"
+    \ reads using Star\n  * Sort counts with samtools\n  * Convert to count table\
+    \ with HTSeq\n  * Compute QC metrics with MultiQC\n  * Output one h5mu file per\
+    \ sample\n\nConcatenating the invididual h5mu files into one h5mu file is a separate\
+    \ pipeline.\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
@@ -178,5 +178,5 @@ info:
   output: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto"
   executable: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto/process_smartseq2_auto"
   viash_version: "0.7.3"
-  git_commit: "a469fc11104e6772a06dfa34933e1508a8347b33"
+  git_commit: "f639468c9d0ed115776e10d0f7a3330fff04ab20"
   git_remote: "https://github.com/czbiohub/utilities"

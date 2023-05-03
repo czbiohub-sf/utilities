@@ -79,5 +79,5 @@ info:
   output: "/home/runner/work/utilities/utilities/target/native/demux/spaceranger_mkfastq"
   executable: "/home/runner/work/utilities/utilities/target/native/demux/spaceranger_mkfastq/spaceranger_mkfastq"
   viash_version: "0.7.3"
-  git_commit: "a469fc11104e6772a06dfa34933e1508a8347b33"
+  git_commit: "f639468c9d0ed115776e10d0f7a3330fff04ab20"
   git_remote: "https://github.com/czbiohub/utilities"
