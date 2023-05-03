@@ -208,7 +208,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/mapping/process_10x/auto.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "f4bc99bf82a915a68541bcfd58b146064c8dba2b",
+    "git_commit" : "f639468c9d0ed115776e10d0f7a3330fff04ab20",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))

@@ -216,7 +216,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
         "entrypoint" : "auto"
       }
     ],
-    "description" : "Map all SmartSeq2 Fastq files in a directory.\n\nSteps in the workflow:\n\n  * Look for all `*.fastq.gz` files in the `input_dir` which\n    match the regular expression in `fastq_regex`.\n  * Extract the sample id from the path name using the same `fastq_regex` and `sample_id_replacement`.\n  * Detect cell ids from the path name using the `fastq_regex` and `cell_id_replacement`.\n  * Write the list of samples as a yaml in the output directory.\n  * Map the reads using Cell Ranger\n  * Convert the Cell Ranger output to h5mu\n  * Remove ambient RNA with CellBender\n  * Remove cells with less than 100 genes or 1000 reads.\n  * Make the cell names unique\n  * Output one h5mu file per sample\n\nConcatenating the invididual h5mu files into one h5mu file is a separate pipeline.\n",
+    "description" : "Map all SmartSeq2 Fastq files in a directory.\n\nSteps in the workflow:\n\n  * Look for all `*.fastq.gz` files in the `input_dir` which\n    match the regular expression in `fastq_regex`.\n  * Extract the sample id from the path name using the same `fastq_regex` and `sample_id_replacement`.\n  * Detect cell ids from the path name using the `fastq_regex` and `cell_id_replacement`.\n  * Write the list of samples as a yaml in the output directory.\n  * Map the reads using Star\n  * Sort counts with samtools\n  * Convert to count table with HTSeq\n  * Compute QC metrics with MultiQC\n  * Output one h5mu file per sample\n\nConcatenating the invididual h5mu files into one h5mu file is a separate pipeline.\n",
     "status" : "enabled",
     "set_wd_to_resources_dir" : false
   },
@@ -242,7 +242,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/mapping/process_smartseq2/auto.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "f4bc99bf82a915a68541bcfd58b146064c8dba2b",
+    "git_commit" : "f639468c9d0ed115776e10d0f7a3330fff04ab20",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))

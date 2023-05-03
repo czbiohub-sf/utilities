@@ -11,11 +11,10 @@ functionality:
       * Extract the sample id from the path name using the same `fastq_regex` and `sample_id_replacement`.
       * Detect cell ids from the path name using the `fastq_regex` and `cell_id_replacement`.
       * Write the list of samples as a yaml in the output directory.
-      * Map the reads using Cell Ranger
-      * Convert the Cell Ranger output to h5mu
-      * Remove ambient RNA with CellBender
-      * Remove cells with less than 100 genes or 1000 reads.
-      * Make the cell names unique
+      * Map the reads using Star
+      * Sort counts with samtools
+      * Convert to count table with HTSeq
+      * Compute QC metrics with MultiQC
       * Output one h5mu file per sample
 
     Concatenating the invididual h5mu files into one h5mu file is a separate pipeline.

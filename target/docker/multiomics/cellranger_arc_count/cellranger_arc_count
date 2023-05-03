@@ -416,9 +416,9 @@ FROM ghcr.io/data-intuitive/cellranger_arc:2.0
 
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics cellranger_arc_count"
-LABEL org.opencontainers.image.created="2023-05-03T20:09:52Z"
+LABEL org.opencontainers.image.created="2023-05-03T21:05:53Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="f4bc99bf82a915a68541bcfd58b146064c8dba2b"
+LABEL org.opencontainers.image.revision="f639468c9d0ed115776e10d0f7a3330fff04ab20"
 LABEL org.opencontainers.image.version="0.1.1"
 VIASHDOCKER
 }
