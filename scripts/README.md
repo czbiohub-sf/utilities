@@ -74,7 +74,7 @@ viash run src/operations/create_runner_script/config.vsh.yaml -- \
   --repository czbiohub/utilities \
   --main_script src/mapping/process_10x/main.nf \
   --entry auto \
-  --revision main_build \
+  --revision 0.1.0 \
   --singularity_cache_dir /hpc/scratch/group.data.science/singularity_images \
   --tower_workspace_id 124983787544228 \
   --nextflow_config /hpc/scratch/group.data.science/utilities/scripts/czbhpc.config
@@ -84,7 +84,7 @@ viash run src/operations/create_runner_script/config.vsh.yaml -- \
   --repository czbiohub/utilities \
   --main_script src/mapping/process_smartseq2/main.nf \
   --entry auto \
-  --revision main_build \
+  --revision 0.1.0 \
   --singularity_cache_dir /hpc/scratch/group.data.science/singularity_images \
   --tower_workspace_id 124983787544228 \
   --nextflow_config /hpc/scratch/group.data.science/utilities/scripts/czbhpc.config
