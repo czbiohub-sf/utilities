@@ -42,7 +42,22 @@ functionality:
       info:
         hidden: true
       default:
-      - "(.*)_R[12](_001)?.fastq.gz"
+      - "(.*/)?(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12](_001)?.fastq.gz"
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "string"
+      name: "--sample_id_replacement"
+      description: "Which groups from the fastq regex to use as the sample ID. \n\
+        Assuming a fastq file is detected at `dir1/dir2/sample_id_A1_foo_R1.fastq.gz`,\n\
+        the outputs of several regexes is listed:\n\n  * `$1` -> `dir1/dir2`\n  *\
+        \ `$1$2` -> `dir1/dir2/sample_id`\n  * `$2` -> `sample_id`\n"
+      info:
+        hidden: true
+      default:
+      - "$1"
       required: false
       direction: "input"
       multiple: false
@@ -50,14 +65,14 @@ functionality:
       dest: "par"
     - type: "string"
       name: "--cell_id_replacement"
-      description: "Which groups from the fastq regex to use as the cell ID. \nFor\
-        \ example, if the `fastq_regex` has two groups which are relevant \nfor the\
-        \ constructing the sample ID, the value for this parameter should\nprobably\
-        \ be `$1$2`.\n"
+      description: "Which groups from the fastq regex to use as the cell ID. \nAssuming\
+        \ a fastq file is detected at `dir1/dir2/sample_id_A1_foo_R1.fastq.gz`,\n\
+        the outputs of several regexes is listed:\n\n  * `$1$2$3` -> `dir1/dir2/sample_id_A1`\n\
+        \  * `$1$2$3$4` -> `dir1/dir2/sample_id_A1_foo`\n"
       info:
         hidden: true
       default:
-      - "$1"
+      - "$1$2$3"
       required: false
       direction: "input"
       multiple: false
@@ -163,5 +178,5 @@ info:
   output: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto"
   executable: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2_auto/process_smartseq2_auto"
   viash_version: "0.7.3"
-  git_commit: "fe9d13b5313a883550b35341ae3e01a48c5921c9"
+  git_commit: "b8329071fe730f7d0cf30106aec6ac350043b5f2"
   git_remote: "https://github.com/czbiohub/utilities"
