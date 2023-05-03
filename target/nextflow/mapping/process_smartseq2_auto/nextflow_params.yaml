@@ -1,7 +1,8 @@
 # Input directory
 input_dir: # please fill in - example: "/path/to/input_dir"
-fastq_regex: "(.*)_R[12](_001)?.fastq.gz"
-cell_id_replacement: "$1"
+fastq_regex: "(.*/)?(.*)(_[A-P][0-9]{1,2})(_.*)?_R[12](_001)?.fastq.gz"
+sample_id_replacement: "$1"
+cell_id_replacement: "$1$2$3"
 
 # Reference
 reference_index: # please fill in - example: "/path/to/reference"
