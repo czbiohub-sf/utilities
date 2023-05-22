@@ -242,7 +242,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/mapping/process_smartseq2/auto.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "f9f4a9d43de443447b273bc2658b170bbcea2407",
+    "git_commit" : "518574160304133c0f7404c442027c6d2bbb7a2a",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))
