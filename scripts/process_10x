@@ -27,10 +27,18 @@ export APPTAINERENV_TMPDIR="`pwd`/temp"
 export NXF_TEMP="`pwd`/temp"
 export NXF_WORK="`pwd`/work"
 
+# workaround for submodule being unintentionally removed
+# when 'nextflow pull' is not run beforehand.
+if [ ! -d "$HOME/.nextflow/assets/czbiohub/utilities/module_openpipeline/" ]; then
+  echo "Couldn't find OpenPipelines modules. Recloning the utilities Nextflow pipelines."
+  rm -rf "$HOME/.nextflow/assets/czbiohub/utilities/"
+  nextflow pull "czbiohub/utilities" -r "0.1.2"
+fi
+
 # do run
 nextflow run \
   "czbiohub/utilities" \
-  -r "0.1.1" \
+  -r "0.1.2" \
   -main-script "src/mapping/process_10x/main.nf" \
   -entry "auto" \
   -resume \

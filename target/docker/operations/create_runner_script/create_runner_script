@@ -426,9 +426,9 @@ FROM python:3.10
 
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component operations create_runner_script"
-LABEL org.opencontainers.image.created="2023-05-22T15:26:27Z"
+LABEL org.opencontainers.image.created="2023-05-22T15:46:57Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="518574160304133c0f7404c442027c6d2bbb7a2a"
+LABEL org.opencontainers.image.revision="0021673e8db57790df4a194ef9c581927a9b8413"
 LABEL org.opencontainers.image.version="main_build"
 VIASHDOCKER
 }
@@ -1020,6 +1020,14 @@ export APPTAINER_CACHEDIR="\`pwd\`/temp"
 export APPTAINERENV_TMPDIR="\`pwd\`/temp"
 export NXF_TEMP="\`pwd\`/temp"
 export NXF_WORK="\`pwd\`/work"
+
+# workaround for submodule being unintentionally removed
+# when 'nextflow pull' is not run beforehand.
+if [ ! -d "\$HOME/.nextflow/assets/czbiohub/utilities/module_openpipeline/" ]; then
+  echo "Couldn't find OpenPipelines modules. Recloning the utilities Nextflow pipelines."
+  rm -rf "\$HOME/.nextflow/assets/czbiohub/utilities/"
+  nextflow pull "czbiohub/utilities" -r "{par['revision']}"
+fi
 
 # do run
 nextflow run \\\\
