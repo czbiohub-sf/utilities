@@ -1,3 +1,11 @@
+# utilities 0.1.2
+
+* `operations/create_runner_script`: Add workaround for submodule being unintentionally removed when 'nextflow pull' is not run beforehand.
+
+* `mapping/process_smartseq2_auto`: Added above workaround to helper script.
+
+* `mapping/process_10x_auto`: Added above workaround to helper script.
+
 # utilities 0.1.1
 
 * `mapping/process_smartseq2_auto`: Allow grouping input fastqs per folder or via a custom regex statement.

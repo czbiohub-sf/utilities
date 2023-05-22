@@ -1,7 +1,7 @@
 functionality:
   name: "spaceranger_mkfastq"
   namespace: "demux"
-  version: "0.1.1"
+  version: "0.1.2"
   arguments:
   - type: "file"
     name: "--input"
@@ -79,5 +79,5 @@ info:
   output: "/home/runner/work/utilities/utilities/target/docker/demux/spaceranger_mkfastq"
   executable: "/home/runner/work/utilities/utilities/target/docker/demux/spaceranger_mkfastq/spaceranger_mkfastq"
   viash_version: "0.7.3"
-  git_commit: "f639468c9d0ed115776e10d0f7a3330fff04ab20"
+  git_commit: "0021673e8db57790df4a194ef9c581927a9b8413"
   git_remote: "https://github.com/czbiohub/utilities"
