@@ -156,7 +156,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/tabula_sapiens/concat/config.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "4ef7d34d03a598f6017702acb6cb35b3f698a747",
+    "git_commit" : "937e97a067f0dd6eb353fe2971957e5e0f1f80db",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))

@@ -399,9 +399,9 @@ FROM ghcr.io/data-intuitive/spaceranger:latest
 
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component demux spaceranger_mkfastq"
-LABEL org.opencontainers.image.created="2023-05-30T10:59:39Z"
+LABEL org.opencontainers.image.created="2023-05-30T11:04:04Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="4ef7d34d03a598f6017702acb6cb35b3f698a747"
+LABEL org.opencontainers.image.revision="937e97a067f0dd6eb353fe2971957e5e0f1f80db"
 LABEL org.opencontainers.image.version="main_build"
 VIASHDOCKER
 }
