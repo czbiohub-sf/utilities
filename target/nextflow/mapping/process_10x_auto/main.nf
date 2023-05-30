@@ -82,7 +82,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
               "hidden" : true
             },
             "default" : [
-              "(.*)_S[0-9]+_(L[0-9]+)?_R[12](_001)?.fastq.gz"
+              "(.*)_S[0-9]+(_L[0-9]+)?_R[12](_001)?.fastq.gz"
             ],
             "required" : false,
             "direction" : "input",
@@ -208,7 +208,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/mapping/process_10x/auto.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "e0004bc9c9a0ce5636df28b48a837a4459023711",
+    "git_commit" : "56f3ca64cd5e050c13aefe3aaf0db69f72f956df",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))
