@@ -426,9 +426,9 @@ FROM python:3.10
 
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component operations create_runner_script"
-LABEL org.opencontainers.image.created="2023-05-23T07:47:19Z"
+LABEL org.opencontainers.image.created="2023-05-30T08:52:54Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="54b6322faa244e2d61d6397b2f3dd02709fe25df"
+LABEL org.opencontainers.image.revision="f4d720537815d29c24e25e43d590583a25a0e4ff"
 LABEL org.opencontainers.image.version="main_build"
 VIASHDOCKER
 }

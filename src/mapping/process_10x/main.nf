@@ -213,6 +213,7 @@ workflow auto {
     fastq_file.toString()
       .replace("${auto_params.input_dir}/", "") // remove root directory
       .replaceAll(auto_params.fastq_regex, auto_params.sample_id_replacement) // extract sample id using regex
+      .replaceAll('/$', "") // strip trailing /
   }
 
   // create output list

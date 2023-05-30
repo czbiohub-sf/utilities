@@ -123,7 +123,7 @@ thisConfig = processConfig(jsonSlurper.parseText('''{
     "config" : "/home/runner/work/utilities/utilities/src/demux/spaceranger_mkfastq/config.vsh.yaml",
     "platform" : "nextflow",
     "viash_version" : "0.7.3",
-    "git_commit" : "54b6322faa244e2d61d6397b2f3dd02709fe25df",
+    "git_commit" : "f4d720537815d29c24e25e43d590583a25a0e4ff",
     "git_remote" : "https://github.com/czbiohub/utilities"
   }
 }'''))
