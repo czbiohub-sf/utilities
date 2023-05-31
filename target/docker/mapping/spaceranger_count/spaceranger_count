@@ -423,9 +423,9 @@ FROM ghcr.io/data-intuitive/spaceranger:latest
 
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component mapping spaceranger_count"
-LABEL org.opencontainers.image.created="2023-05-31T08:52:24Z"
+LABEL org.opencontainers.image.created="2023-05-31T09:59:58Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="cf545be1751af61190fcd8685d6c28069cf54cbe"
+LABEL org.opencontainers.image.revision="ec787e2945c07032ce4c97e3d859ead500d60e37"
 LABEL org.opencontainers.image.version="main_build"
 VIASHDOCKER
 }
