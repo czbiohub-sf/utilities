@@ -1,7 +1,7 @@
 functionality:
   name: "process_smartseq2"
   namespace: "mapping"
-  version: "0.1.2"
+  version: "0.1.3"
   authors:
   - name: "Angela Pisco"
     roles:
@@ -146,5 +146,5 @@ info:
   output: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2"
   executable: "/home/runner/work/utilities/utilities/target/nextflow/mapping/process_smartseq2/process_smartseq2"
   viash_version: "0.7.3"
-  git_commit: "0021673e8db57790df4a194ef9c581927a9b8413"
+  git_commit: "0120a8e813499e4a6c690a375ba663aea07fca8a"
   git_remote: "https://github.com/czbiohub/utilities"

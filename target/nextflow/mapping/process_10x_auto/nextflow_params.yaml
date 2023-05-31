@@ -1,6 +1,6 @@
 # Input directory
 input_dir: # please fill in - example: "/path/to/input_dir"
-fastq_regex: "(.*)_S[0-9]+_(L[0-9]+)?_R[12](_001)?.fastq.gz"
+fastq_regex: "(.*)_S[0-9]+(_L[0-9]+)?_R[12](_001)?.fastq.gz"
 sample_id_replacement: "$1"
 
 # Reference

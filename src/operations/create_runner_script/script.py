@@ -17,6 +17,8 @@ par = {
 str = f"""
 #!/bin/bash
 
+UTILITIES_TAG="${{UTILITIES_TAG:-{par['revision']}}}"
+
 set -e
 
 # load nextflow
@@ -48,13 +50,13 @@ export NXF_WORK="`pwd`/work"
 if [ ! -d "$HOME/.nextflow/assets/czbiohub/utilities/module_openpipeline/" ]; then
   echo "Couldn't find OpenPipelines modules. Recloning the utilities Nextflow pipelines."
   rm -rf "$HOME/.nextflow/assets/czbiohub/utilities/"
-  nextflow pull "czbiohub/utilities" -r "{par['revision']}"
+  nextflow pull "czbiohub/utilities" -r "$UTILITIES_TAG"
 fi
 
 # do run
 nextflow run \\
   "{par['repository']}" \\
-  -r "{par['revision']}" \\
+  -r "$UTILITIES_TAG" \\
   -main-script "{par['main_script']}" \\
   -entry "{par['entry']}" \\
   -resume \\

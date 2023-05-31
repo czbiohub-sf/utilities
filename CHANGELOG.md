@@ -1,3 +1,13 @@
+# utilities 0.1.3
+
+* `mapping/process_smartseq2_auto`: Strip trailing slashes from id.
+
+* `mapping/process_10x_auto`: Strip trailing slashes from id.
+
+* `mapping/process_10x_auto`: Fix regex not detecting fastq files not containing `_L001`.
+
+* Switch to development build of OpenPipelines (pre0.9.0).
+
 # utilities 0.1.2
 
 * `operations/create_runner_script`: Add workaround for submodule being unintentionally removed when 'nextflow pull' is not run beforehand.

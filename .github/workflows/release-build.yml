@@ -37,6 +37,7 @@ jobs:
       run: |
         # allow publishing the target folder
         sed -i '/^\/target\/$/d' .gitignore
+        rm .gitmodules
 
     - uses: viash-io/viash-actions/ns-build@v3
       with:

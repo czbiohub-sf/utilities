@@ -1,6 +1,8 @@
 
 #!/bin/bash
 
+UTILITIES_TAG="${UTILITIES_TAG:-0.1.2}"
+
 set -e
 
 # load nextflow
@@ -32,13 +34,13 @@ export NXF_WORK="`pwd`/work"
 if [ ! -d "$HOME/.nextflow/assets/czbiohub/utilities/module_openpipeline/" ]; then
   echo "Couldn't find OpenPipelines modules. Recloning the utilities Nextflow pipelines."
   rm -rf "$HOME/.nextflow/assets/czbiohub/utilities/"
-  nextflow pull "czbiohub/utilities" -r "0.1.2"
+  nextflow pull "czbiohub/utilities" -r "$UTILITIES_TAG"
 fi
 
 # do run
 nextflow run \
   "czbiohub/utilities" \
-  -r "0.1.2" \
+  -r "$UTILITIES_TAG" \
   -main-script "src/mapping/process_smartseq2/main.nf" \
   -entry "auto" \
   -resume \
