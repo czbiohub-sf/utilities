@@ -418,9 +418,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy" "pandas" "scanpy"
 
 LABEL org.opencontainers.image.description="Companion container for running component multiomics cellranger_arc_aggr"
-LABEL org.opencontainers.image.created="2023-05-30T11:04:05Z"
+LABEL org.opencontainers.image.created="2023-05-31T08:52:24Z"
 LABEL org.opencontainers.image.source="https://github.com/czbiohub/utilities"
-LABEL org.opencontainers.image.revision="937e97a067f0dd6eb353fe2971957e5e0f1f80db"
+LABEL org.opencontainers.image.revision="cf545be1751af61190fcd8685d6c28069cf54cbe"
 LABEL org.opencontainers.image.version="main_build"
 VIASHDOCKER
 }
