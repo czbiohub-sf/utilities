@@ -45,7 +45,6 @@ nextflow run \
   -entry "auto" \
   -resume \
   -latest \
-  -with-tower \
   -profile singularity \
   -c "/hpc/scratch/group.data.science/utilities/scripts/czbhpc.config" \
   $@
