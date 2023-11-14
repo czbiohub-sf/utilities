@@ -34,7 +34,8 @@ reference_genomes = {
     "mouse_genome_mcherry": "mouse_genome_mcherry",
     "SARS.GRCh38_genome" : "SARS.GRCh38_genome",
     "rhesus_human" : "rhesus_human_genome",
-    "rhesus_genome" : "rhesus_genome"
+    "rhesus_genome" : "rhesus_genome",
+    "M31_GRCm39" : "M31_GRCm39",
 }
 
 
